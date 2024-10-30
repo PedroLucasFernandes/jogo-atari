@@ -34,7 +34,7 @@ export const googleAuthenticate = async (req: Request, res: Response) => {
 
         // Cria um token JWT
         const jwtToken = jwt.sign(
-            { id: user[0].id, email: user[0].email, username: user[0].username },
+            { id: user.id, email: user.email, username: user.username },
             SECRET_KEY,
             { expiresIn: "5d" }
         );

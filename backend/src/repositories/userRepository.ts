@@ -69,7 +69,7 @@ export const getUserByEmail = async (email: string) => {
     const query = "SELECT * FROM users WHERE email=$1";
     try {
         const result = await pool.query(query, [email]);
-        return result.rows;
+        return result.rows[0];
     } catch (error) {
         console.log(error);
         throw new Error("Failed to locate the user by email.");
