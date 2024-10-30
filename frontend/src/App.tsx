@@ -1,25 +1,17 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import LoginButton from './components/LoginButton';
 
 function App() {
+  const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+
+  if (!clientId) {
+    throw new Error("REACT_APP_GOOGLE_CLIENT_ID is not defined in .env file");
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <GoogleOAuthProvider clientId={clientId}>
+      <LoginButton />
+    </GoogleOAuthProvider>
   );
 }
 

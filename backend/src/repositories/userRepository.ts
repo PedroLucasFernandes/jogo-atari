@@ -17,18 +17,26 @@ export const getAllUsers = async (): Promise<IUser[]> => {
     }
 };
 
+
 export const createUser = async (
     username: string,
     email: string,
-    password: string,
+    password: string | null,
+    oauth_provider: string | null = null, // Define como opcional
+    oauth_id: string | null = null         // Define como opcional
 ) => {
-    const query =
-        "INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email";
+    const query = `
+      INSERT INTO users (username, email, password, oauth_provider, oauth_id)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING id, username, email
+    `;
     try {
         const result = await pool.query(query, [
             username,
             email,
             password,
+            oauth_provider,
+            oauth_id,
         ]);
         return result.rows[0];
     } catch (error) {
@@ -36,6 +44,26 @@ export const createUser = async (
         throw new Error("Failed to create user.");
     }
 };
+
+// export const createUser = async (
+//     username: string,
+//     email: string,
+//     password: string,
+// ) => {
+//     const query =
+//         "INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email";
+//     try {
+//         const result = await pool.query(query, [
+//             username,
+//             email,
+//             password,
+//         ]);
+//         return result.rows[0];
+//     } catch (error) {
+//         console.error("Error creating user:", error);
+//         throw new Error("Failed to create user.");
+//     }
+// };
 
 export const getUserByEmail = async (email: string) => {
     const query = "SELECT * FROM users WHERE email=$1";
@@ -52,6 +80,7 @@ export const getUserByUsername = async (username: string) => {
     const query = "SELECT * FROM users WHERE username=$1";
     try {
         const result = await pool.query(query, [username]);
+        console.log("Result rows do getUserByUsername:", result.rows);
         return result.rows;
     } catch (error) {
         console.log(error);
