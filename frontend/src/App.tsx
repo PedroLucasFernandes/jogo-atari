@@ -1,5 +1,7 @@
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import LoginButton from './components/LoginButton';
+import MainMenu from './views/MainMenu';
+import { WebSocketProvider } from './context/WebSocketContext';
 
 function App() {
   const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
@@ -8,10 +10,15 @@ function App() {
     throw new Error("REACT_APP_GOOGLE_CLIENT_ID is not defined in .env file");
   }
 
+
+
   return (
-    <GoogleOAuthProvider clientId={clientId}>
-      <LoginButton />
-    </GoogleOAuthProvider>
+    <WebSocketProvider>
+      <GoogleOAuthProvider clientId={clientId}>
+        <LoginButton />
+      </GoogleOAuthProvider>
+      <MainMenu /> {/* TESTE WEBSCOKET */}
+    </WebSocketProvider>
   );
 }
 
