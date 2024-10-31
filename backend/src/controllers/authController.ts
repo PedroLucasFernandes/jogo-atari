@@ -39,7 +39,13 @@ export const googleAuthenticate = async (req: Request, res: Response) => {
             { expiresIn: "5d" }
         );
 
-        res.status(200).json({ auth: true, token: jwtToken, user });
+        // Define o cookie 'session_id' com o token JWT
+        const maxAge = 10 * 24 * 60 * 60 * 1000; // 10 dias em milissegundos
+        res.cookie("session_id", jwtToken, { maxAge, httpOnly: true });
+
+
+        // Retorna os dados do usuário junto com o token de autenticação
+        res.status(200).json({ auth: true, data: user, message: "User successfully authenticated with Google!" });
     } catch (error) {
         console.error("Erro na autenticação com Google:", error);
         res.status(500).json({ error: "Failed to authenticate with Google" });
