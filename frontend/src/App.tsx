@@ -1,5 +1,5 @@
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import LoginButton from './components/LoginButton';
+import LoginButton from './components/LoginGoogleButton/LoginGoogleButton';
 import MainMenu from './views/MainMenu';
 import { WebSocketProvider } from './context/WebSocketContext';
 
