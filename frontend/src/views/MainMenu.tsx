@@ -20,7 +20,7 @@ const MainMenu: React.FC = () => {
 
 
   return (
-    <Box id="main-menu">
+    <Box id="main-menu" sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
       <h1>Welcome to Main Menu!</h1>
       {socketId ? 'Socket Connected' : 'Socket not Connected'}
       <Button>Play</Button>
