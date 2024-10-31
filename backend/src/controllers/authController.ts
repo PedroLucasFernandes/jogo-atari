@@ -10,7 +10,6 @@ export const googleAuthenticate = async (req: Request, res: Response) => {
     const { token } = req.body;
 
     try {
-        // Verifica o token com Google
         const ticket = await client.verifyIdToken({
             idToken: token,
             audience: process.env.GOOGLE_CLIENT_ID as string, // Força a tipagem aqui
@@ -24,27 +23,22 @@ export const googleAuthenticate = async (req: Request, res: Response) => {
 
         const { sub, email, name } = payload;
 
-        // Verifica se o usuário já existe no banco
         let user = await userRepository.getUserByEmail(email);
 
-        // Se o usuário não existir, cria um novo
         if (!user) {
             user = await userRepository.createUser(name, email, null, "google", sub);
         }
 
-        // Cria um token JWT
         const jwtToken = jwt.sign(
             { id: user.id, email: user.email, username: user.username },
             SECRET_KEY,
             { expiresIn: "5d" }
         );
 
-        // Define o cookie 'session_id' com o token JWT
+
         const maxAge = 10 * 24 * 60 * 60 * 1000; // 10 dias em milissegundos
         res.cookie("session_id", jwtToken, { maxAge, httpOnly: true });
 
-
-        // Retorna os dados do usuário junto com o token de autenticação
         res.status(200).json({ auth: true, data: user, message: "User successfully authenticated with Google!" });
     } catch (error) {
         console.error("Erro na autenticação com Google:", error);

@@ -32,7 +32,6 @@ export const authenticateUser = async (email: string, password: string) => {
                 }, SECRET_KEY, {
                     expiresIn: "5d",
                 });
-                // Vou retornar os dados do usuário direto no login pra apagar aquela rota auth
                 return { auth: true, token, user };
             }
         }
