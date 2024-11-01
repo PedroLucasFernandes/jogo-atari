@@ -24,7 +24,7 @@ export const Login: React.FC = () => {
     if (data) {
       console.log("Logado com sucesso:", data);
       setUser(data as User);
-      navigate('/game');
+      navigate('/monolito');
 
     }
   };

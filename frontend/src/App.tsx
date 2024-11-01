@@ -8,6 +8,7 @@ import { GameMonolito } from './views/GameMonolito/GameMonolito';
 import { Login } from './views/Login/Login';
 import { Register } from './views/Register/Register';
 import { UserProvider } from './context/UserContext';
+import ProtectedRoute from './components/ProtectedRoutes/ProtectedRoutes';
 
 function App() {
   const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
@@ -25,8 +26,10 @@ function App() {
               <Route path='/' element={<Home />} />
               <Route path='/login' element={<Login />} />
               <Route path='/register' element={<Register />} />
+
               <Route path="/game" element={<Game />} />
-              <Route path="/monolito" element={<GameMonolito />} />
+
+              <Route path="/monolito" element={<ProtectedRoute children={<GameMonolito />} />} />
             </Routes>
           </Router>
         </UserProvider>
