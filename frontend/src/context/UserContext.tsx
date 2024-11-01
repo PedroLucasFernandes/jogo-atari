@@ -1,11 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { validateAuthApi } from '../api/authApi';
-
-interface User {
-    id: string;
-    username: string;
-    email: string;
-}
+import { User } from '../interfaces/User';
 
 interface UserContextType {
     user: User | null;
@@ -53,5 +48,3 @@ export const useUser = () => {
     }
     return context;
 };
-
-export type { User };

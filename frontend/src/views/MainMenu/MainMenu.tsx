@@ -7,7 +7,7 @@ import { useWebSocket } from '../../context/WebSocketContext';
 
 
 
-const MainMenu: React.FC = () => {
+export const MainMenu: React.FC = () => {
 
   const { webSocketService, socketId } = useWebSocket();
 
@@ -29,4 +29,3 @@ const MainMenu: React.FC = () => {
 
 };
 
-export default MainMenu;

@@ -1,19 +1,19 @@
-import './Login.css'
+import './Register.css'
 import { useState } from "react";
-import { loginApi } from "../../api/loginApi";
+import { loginApi, registerApi } from "../../api/loginApi";
 import { useUser } from "../../context/UserContext";
 import { useNavigate } from "react-router-dom";
-import { User } from "../../interfaces/User";
 
 
-export const Login: React.FC = () => {
+export const Register: React.FC = () => {
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { setUser } = useUser();
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
-    const { data, error } = await loginApi({ email, password });
+  const handleRegister = async () => {
+    const { data, error } = await registerApi({ username, email, password });
 
     if (error) {
       //TODO: Alerta
@@ -22,16 +22,20 @@ export const Login: React.FC = () => {
     }
 
     if (data) {
-      console.log("Logado com sucesso:", data);
-      setUser(data as User);
-      navigate('/game');
-
+      console.log("Registrado com sucesso:", data);
+      navigate('/login');
     }
   };
 
   return (
-    <div id="login">
-      <h1>Login</h1>
+    <div id="register">
+      <h1>Register</h1>
+      <input
+        placeholder='Username'
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        autoFocus
+      />
       <input
         placeholder='Email'
         value={email}
@@ -44,10 +48,10 @@ export const Login: React.FC = () => {
       />
 
       <button
-        disabled={!email || !password}
-        onClick={handleLogin}
-      >Entrar</button>
+        disabled={!username || !email || !password}
+        onClick={handleRegister}
+        value={'Registrar'}
+      >Registrar</button>
     </div>
   );
-
 }
