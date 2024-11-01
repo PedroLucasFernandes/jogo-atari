@@ -11,6 +11,7 @@ const LoginButton: React.FC = () => {
                     headers: {
                         "Content-Type": "application/json"
                     },
+                    credentials: "include",
                     body: JSON.stringify({ token: response.credential })
                 });
 
