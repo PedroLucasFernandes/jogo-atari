@@ -2,7 +2,7 @@ import './MainMenu.css'
 import Box from "@mui/joy/Box";
 import Button from "@mui/joy/Button";
 import React, { useEffect } from "react";
-import { useWebSocket } from '../context/WebSocketContext';
+import { useWebSocket } from '../../context/WebSocketContext';
 
 
 

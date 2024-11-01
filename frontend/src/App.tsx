@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import Game from './components/Game';
 import LoginButton from './components/LoginGoogleButton/LoginGoogleButton';
-import MainMenu from './views/MainMenu';
+import MainMenu from './views/MainMenu/MainMenu';
 import { WebSocketProvider } from './context/WebSocketContext';
 
 function App() {
@@ -14,14 +14,14 @@ function App() {
 
   return (
     <WebSocketProvider>
-    <GoogleOAuthProvider clientId={clientId}>
-           <Router>
-            <Routes>
-                <Route path='/' element={<LoginButton/>} />
-                <Route path="/game" element={<Game />} />
-            </Routes>
+      <GoogleOAuthProvider clientId={clientId}>
+        <Router>
+          <Routes>
+            <Route path='/' element={<LoginButton />} />
+            <Route path="/game" element={<Game />} />
+          </Routes>
         </Router>
-    </GoogleOAuthProvider>
+      </GoogleOAuthProvider>
     </WebSocketProvider>
   );
 }
