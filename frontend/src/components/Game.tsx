@@ -41,7 +41,7 @@ const Game: React.FC = () => {
     const initialY2 = 470;
     const initialX2 = 670;
 
-    const ball: Ball = { x: 400, y: 300, radius: 10, speedX: 3, speedY: 3, color: 'white' };
+    const ball: Ball = { x: 400, y: 300, radius: 10, speedX: 2, speedY: 2, color: 'white' };
 
     const walls: Wall[] = [
         { x: 20, y: 20, width: 80, height: 80, active: true },
@@ -50,10 +50,44 @@ const Game: React.FC = () => {
         { x: 700, y: 500, width: 80, height: 80, active: true }
     ];
 
-    const moveBots = () => {
-        players.forEach((player) => {
-            if (player.isBot) {
+    const checkWallCollision = () => {
+        walls.forEach((wall, index) => {
+            if (
+                wall.active &&
+                ball.x + ball.radius > wall.x &&
+                ball.x - ball.radius < wall.x + wall.width &&
+                ball.y + ball.radius > wall.y &&
+                ball.y - ball.radius < wall.y + wall.height
+            ) {
+                // Invert direction with a slight random angle
+                ball.speedX *= -1;
+                ball.speedY *= -1;
 
+                ball.speedX += (Math.random() - 0.5) * 0.5; // add randomness
+                ball.speedY += (Math.random() - 0.5) * 0.5;
+
+                setLives((prevLives) => {
+                    const newLives = [...prevLives];
+                    newLives[index] = Math.max(0, newLives[index] - 1);
+                    return newLives;
+                });
+            }
+        });
+    };
+
+    const checkPlayerCollision = () => {
+        players.forEach((player) => {
+            const dx = ball.x - player.x;
+            const dy = ball.y - player.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < ball.radius + player.size / 2) {
+                // Invert speed with slight random angle for more dynamic movement
+                ball.speedX *= -1;
+                ball.speedY *= -1;
+
+                ball.speedX += (Math.random() - 0.5) * 0.5; // add randomness
+                ball.speedY += (Math.random() - 0.5) * 0.5;
             }
         });
     };
@@ -62,10 +96,13 @@ const Game: React.FC = () => {
         ball.x += ball.speedX;
         ball.y += ball.speedY;
 
-        if (ball.x <= 0 || ball.x >= 800) ball.speedX *= -1;
-        if (ball.y <= 0 || ball.y >= 600) ball.speedY *= -1;
+        // Bouncing off the canvas edges
+        if (ball.x <= ball.radius || ball.x >= 800 - ball.radius) ball.speedX *= -1;
+        if (ball.y <= ball.radius || ball.y >= 600 - ball.radius) ball.speedY *= -1;
 
-        moveBots();
+        // Check collisions
+        checkWallCollision();
+        checkPlayerCollision();
     };
 
     useEffect(() => {
@@ -78,10 +115,10 @@ const Game: React.FC = () => {
             const speed = 10;
             const humanPlayer = players[3];
 
+            // Movement within restricted zone for the human player
             if (e.key === 'w' && humanPlayer.y > 0 && humanPlayer.y >= initialY2 + 10) humanPlayer.y -= speed;
             if (e.key === 's' && humanPlayer.y + humanPlayer.size / 2 < canvas.height && humanPlayer.y >= initialY2 && humanPlayer.x <= initialX2) humanPlayer.y += speed;
             if (e.key === 'a' && humanPlayer.x > 0 && humanPlayer.x >= initialX2 + 10) humanPlayer.x -= speed;
-            
             if (e.key === 'd' && humanPlayer.x + humanPlayer.size / 2 < canvas.width && humanPlayer.y <= initialY2) humanPlayer.x += speed;
         };
 
@@ -98,36 +135,40 @@ const Game: React.FC = () => {
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
         };
-    }, [ball.x, ball.y, players]);
+    }, []);
 
     const drawGame = (context: CanvasRenderingContext2D) => {
         context.clearRect(0, 0, 800, 600);
-    
+
+        // Draw the ball
         context.fillStyle = ball.color;
         context.beginPath();
         context.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
         context.fill();
-    
+
+        // Draw the walls
         walls.forEach((wall) => {
             if (wall.active) {
                 context.fillStyle = 'gray';
                 context.fillRect(wall.x, wall.y, wall.width, wall.height);
             }
         });
-    
+
+        // Draw the players
         players.forEach((player) => {
             context.fillStyle = player.color;
             const centerX = player.x - player.size / 2;
             const centerY = player.y - player.size / 2;
             context.fillRect(centerX, centerY, player.size, player.size);
         });
-    
+
+        // Draw lives
         context.fillStyle = 'white';
         context.font = '16px Arial';
         lives.forEach((life, index) => {
             context.fillText(`Player ${index + 1} Vidas: ${life}`, 10, 20 + index * 20);
         });
-    };    
+    };
 
     return <canvas ref={canvasRef} width={800} height={600} style={{ background: 'black' }} />;
 };
