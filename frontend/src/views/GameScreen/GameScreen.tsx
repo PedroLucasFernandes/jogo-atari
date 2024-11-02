@@ -33,7 +33,7 @@ interface ScreenProps {
 const Game: React.FC<ScreenProps> = ({ setScreen }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [lives, setLives] = useState<number[]>([4, 4, 4, 4]);
-    const { gameState } = useWebSocket();
+    const { gameState, movePlayer } = useWebSocket();
 
     console.log("Game state na GameScreen.tsx", gameState);
 
@@ -83,13 +83,18 @@ const Game: React.FC<ScreenProps> = ({ setScreen }) => {
         if (!context) return;
 
         const handleKeyDown = (e: KeyboardEvent) => {
+
+            //Código para efetuar o movimento pelo servidor
+            //const keyPressed = e.key
+            //movePlayer(keyPressed)
+
+
             const speed = 10;
             const humanPlayer = players[3];
 
-            if (e.key === 'w' && humanPlayer.y > 0 && humanPlayer.y >= initialY2 + 10) humanPlayer.y -= speed;
+            if (e.key === 'w' && humanPlayer.y > 0 && humanPlayer.y >= initialY2 + 10) { } humanPlayer.y -= speed;
             if (e.key === 's' && humanPlayer.y + humanPlayer.size / 2 < canvas.height && humanPlayer.y >= initialY2 && humanPlayer.x <= initialX2) humanPlayer.y += speed;
             if (e.key === 'a' && humanPlayer.x > 0 && humanPlayer.x >= initialX2 + 10) humanPlayer.x -= speed;
-
             if (e.key === 'd' && humanPlayer.x + humanPlayer.size / 2 < canvas.width && humanPlayer.y <= initialY2) humanPlayer.x += speed;
         };
 

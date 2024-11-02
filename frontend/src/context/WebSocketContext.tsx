@@ -42,6 +42,11 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setGameState(data.data.gameState)
     });
 
+    webSocketService.registerCallback('playerMoved', (data) => {
+      console.log(`Jogador se moveu: ${data}`);
+      setGameState(data.data.gameState)
+    });
+
   }, []);
 
 
@@ -110,6 +115,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const data = { keyPressed: keyPressed, playerId: socketId }
     webSocketService.send({ type: 'movePlayer', data });
   }
+
 
   return (
     <WebSocketContext.Provider value={{
