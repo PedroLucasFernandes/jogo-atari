@@ -20,14 +20,14 @@ export const authenticateUser = async (email: string, password: string) => {
     try {
         const user = await userRepository.getUserByEmail(email);
 
-        if (user && user.length > 0) {
-            const matchPassword = await comparePassword(password, user[0].password);
+        if (user) {
+            const matchPassword = await comparePassword(password, user.password);
 
             if (matchPassword) {
                 const token = jwt.sign({
-                    id: user[0].id,
-                    username: user[0].username,
-                    email: user[0].email,
+                    id: user.id,
+                    username: user.username,
+                    email: user.email,
 
                 }, SECRET_KEY, {
                     expiresIn: "5d",

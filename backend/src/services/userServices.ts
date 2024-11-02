@@ -58,7 +58,7 @@ export const createUser = async (
         }
 
         const existingEmail = await userRepository.getUserByEmail(email);
-        if (existingEmail.length > 0) {
+        if (existingEmail) {
             throw new Error("Email already registered.");
         }
 
