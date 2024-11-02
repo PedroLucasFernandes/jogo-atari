@@ -4,6 +4,7 @@ import { loginApi } from "../../api/loginApi";
 import { useUser } from "../../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { User } from "../../interfaces/User";
+import LoginGoogleButton from '../../components/LoginGoogleButton/LoginGoogleButton';
 
 
 export const Login: React.FC = () => {
@@ -47,6 +48,7 @@ export const Login: React.FC = () => {
         disabled={!email || !password}
         onClick={handleLogin}
       >Entrar</button>
+    <LoginGoogleButton/>
     </div>
   );
 

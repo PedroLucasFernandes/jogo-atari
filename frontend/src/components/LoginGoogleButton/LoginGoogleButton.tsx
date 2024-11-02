@@ -1,7 +1,12 @@
 import React from "react";
 import { GoogleLogin, googleLogout, CredentialResponse } from "@react-oauth/google";
+import { useUser } from "../../context/UserContext";
+import { useNavigate } from "react-router-dom";
+import { User } from "../../interfaces/User";
 
-const LoginButton: React.FC = () => {
+const LoginGoogleButton: React.FC = () => {
+    const { setUser } = useUser();
+    const navigate = useNavigate();
     const handleLoginSuccess = async (response: CredentialResponse) => {
         if (response.credential) {
             try {
@@ -17,10 +22,12 @@ const LoginButton: React.FC = () => {
 
                 const data = await res.json();
 
-                if (res.ok) {
-                    console.log("Autenticação bem-sucedida:", data);
-                    // Aqui você pode salvar o token JWT no localStorage, no state ou cookie para futuras requisições
-                } else {
+                if (data) {
+                    console.log("Logado com sucesso:", data);
+                    setUser(data as User);
+                    navigate('/monolito');
+              
+                  } else {
                     console.error("Erro na autenticação:", data.error);
                 }
             } catch (error) {
@@ -41,4 +48,4 @@ const LoginButton: React.FC = () => {
     );
 };
 
-export default LoginButton;
+export default LoginGoogleButton;
