@@ -49,6 +49,7 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
       <Button onClick={() => navigate('/game')}>Jogo - sem validação</Button>
       <Button onClick={() => setScreen('create-room')}>Criar partida</Button>
       <Button onClick={() => setScreen('join-room')}>Encontrar partida</Button>
+      <Button onClick={() => setScreen('waiting-room')}>Sala de espera</Button>
       <Button onClick={() => setScreen('ranking-room')}>Ranking</Button>
       <Button onClick={handleLogout}>Logout</Button>
     </Box>
