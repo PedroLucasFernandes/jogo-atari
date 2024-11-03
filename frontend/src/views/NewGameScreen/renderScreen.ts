@@ -22,7 +22,8 @@ export default function renderScreen(
   canvasScreen: HTMLCanvasElement,
   game: IGame,
   requestAnimationFrame: (callback: FrameRequestCallback) => number,
-  currentPlayerId: string
+  currentPlayerId: string,
+  backgroundImage: HTMLImageElement
 ) {
 
   const context = canvasScreen.getContext('2d')
@@ -32,6 +33,10 @@ export default function renderScreen(
   }
 
   context.clearRect(0, 0, 800, 600);
+
+    // Desenha a imagem de fundo
+    context.drawImage(backgroundImage, 0, 0, game.gameState.canvas.width, game.gameState.canvas.height);
+
 
   context.fillStyle = game.gameState.ball.color;
   context.beginPath();
@@ -63,6 +68,6 @@ export default function renderScreen(
   }); */
 
   requestAnimationFrame(() => {
-    renderScreen(canvasScreen, game, requestAnimationFrame, currentPlayerId)
+    renderScreen(canvasScreen, game, requestAnimationFrame, currentPlayerId, backgroundImage)
   })
 }

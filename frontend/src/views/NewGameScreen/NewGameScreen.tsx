@@ -2,6 +2,7 @@ import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 're
 import { useWebSocket } from '../../context/WebSocketContext';
 import createGame from '../../services/game';
 import renderScreen from './renderScreen';
+import bgImage from '../../assets/bg-space.svg';
 
 
 
@@ -14,6 +15,23 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen }) => {
 	const { socketId, gameState, movePlayer } = useWebSocket();
 	//const game = createGame();
 	const game = useRef(createGame()).current;
+	  // Estado para armazenar a imagem de fundo carregada
+	  const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
+
+
+	useEffect(() => {
+	      // Carregar a imagem de fundo uma vez
+		  const img = new Image();
+		  img.src = bgImage; // Usa a imagem importada
+  
+		  img.onload = () => {
+			  setBackgroundImage(img); // Armazena a imagem no estado assim que for carregada
+		  };
+  
+		  img.onerror = () => {
+			  console.error("Erro ao carregar a imagem de fundo.");
+		  };
+	  }, []);
 
 	useEffect(() => {
 		const canvas = canvasRef.current;
@@ -30,8 +48,12 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen }) => {
 			game.setState(gameState);
 		}
 
-		renderScreen(canvas, game, requestAnimationFrame, socketId);
-	}, [gameState, socketId]);
+		 // Passa a imagem de fundo para o renderScreen
+		 if (backgroundImage) {
+			renderScreen(canvas, game, requestAnimationFrame, socketId, backgroundImage);
+		  }
+
+	}, [gameState, socketId, backgroundImage]);
 
 
 	useEffect(() => {
@@ -53,7 +75,7 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen }) => {
 		};
 	}, [])
 
-	return <canvas ref={canvasRef} width={800} height={600} style={{ background: 'black' }} />;
+	return <canvas ref={canvasRef} width={800} height={600}/>;
 };
 
 export default NewGameScreen;
