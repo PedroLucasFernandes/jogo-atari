@@ -1,11 +1,20 @@
 export type AcceptedMoves = 'w' | 'a' | 's' | 'd' | 'arrowup' | 'arrowleft' | 'arrowdown' | 'arrowright';
 
+// export interface IWall {
+//   x: number;
+//   y: number;
+//   width: number;
+//   height: number;
+//   active: boolean;
+// }
+
 export interface IWall {
   x: number;
   y: number;
   width: number;
   height: number;
-  active: boolean;
+  active: boolean; // Para saber se a parede está ativa
+  parts: boolean[]; // Representa se cada parte está ativa (true) ou removida (false)
 }
 
 export interface IPlayer {
@@ -84,12 +93,20 @@ export interface IGame {
   stop: () => void;
 }
 
+// export const initialWallsState: IWall[] = [
+//   { x: 20, y: 20, width: 80, height: 80, active: true },
+//   { x: 700, y: 20, width: 80, height: 80, active: true },
+//   { x: 20, y: 500, width: 80, height: 80, active: true },
+//   { x: 700, y: 500, width: 80, height: 80, active: true }
+// ];
+
 export const initialWallsState: IWall[] = [
-  { x: 20, y: 20, width: 80, height: 80, active: true },
-  { x: 700, y: 20, width: 80, height: 80, active: true },
-  { x: 20, y: 500, width: 80, height: 80, active: true },
-  { x: 700, y: 500, width: 80, height: 80, active: true }
+  { x: 20, y: 20, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] },
+  { x: 700, y: 20, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] },
+  { x: 20, y: 500, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] },
+  { x: 700, y: 500, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] }
 ];
+
 
 /* export const initialPlayersState: IPlayer[] = [
   { 'bot0': { x: 110, y: 110, size: 20, color: 'blue', isBot: true } },

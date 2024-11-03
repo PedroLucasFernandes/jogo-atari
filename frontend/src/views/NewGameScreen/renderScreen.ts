@@ -1,4 +1,22 @@
-import { IGame, IPlayer } from "../../interfaces/game"
+import { IGame, IPlayer, IWall } from "../../interfaces/game"
+
+function renderWalls(context: CanvasRenderingContext2D, walls: IWall[]) {
+  walls.forEach((wall) => {
+    if (wall.active) {
+      context.fillStyle = 'gray';
+      const partWidth = wall.width / 2;
+      const partHeight = wall.height / 3;
+
+      for (let i = 0; i < wall.parts.length; i++) {
+        if (wall.parts[i]) {
+          const partX = wall.x + (i % 2) * partWidth;
+          const partY = wall.y + Math.floor(i / 2) * partHeight;
+          context.fillRect(partX, partY, partWidth, partHeight);
+        }
+      }
+    }
+  });
+}
 
 export default function renderScreen(
   canvasScreen: HTMLCanvasElement,
@@ -20,12 +38,15 @@ export default function renderScreen(
   context.arc(game.gameState.ball.x, game.gameState.ball.y, game.gameState.ball.radius, 0, Math.PI * 2);
   context.fill();
 
-  game.gameState.walls.forEach((wall) => {
-    if (wall.active) {
-      context.fillStyle = 'gray';
-      context.fillRect(wall.x, wall.y, wall.width, wall.height);
-    }
-  });
+    // Renderiza as paredes
+    renderWalls(context, game.gameState.walls);
+
+  // game.gameState.walls.forEach((wall) => {
+  //   if (wall.active) {
+  //     context.fillStyle = 'gray';
+  //     context.fillRect(wall.x, wall.y, wall.width, wall.height);
+  //   }
+  // });
 
   for (const playerId in game.gameState.players) {
     const player = game.gameState.players[playerId];

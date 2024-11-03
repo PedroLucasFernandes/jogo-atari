@@ -6,6 +6,7 @@ export interface IWall {
   width: number;
   height: number;
   active: boolean;
+  parts: boolean[];
 }
 
 export interface IPlayer {
@@ -56,11 +57,18 @@ export interface IGame {
   movePlayer: (command: IGameMessage) => void;
 }
 
+// export const initialWallsState: IWall[] = [
+//   { x: 20, y: 20, width: 80, height: 80, active: true },
+//   { x: 700, y: 20, width: 80, height: 80, active: true },
+//   { x: 20, y: 500, width: 80, height: 80, active: true },
+//   { x: 700, y: 500, width: 80, height: 80, active: true }
+// ];
+
 export const initialWallsState: IWall[] = [
-  { x: 20, y: 20, width: 80, height: 80, active: true },
-  { x: 700, y: 20, width: 80, height: 80, active: true },
-  { x: 20, y: 500, width: 80, height: 80, active: true },
-  { x: 700, y: 500, width: 80, height: 80, active: true }
+  { x: 20, y: 20, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] },
+  { x: 700, y: 20, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] },
+  { x: 20, y: 500, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] },
+  { x: 700, y: 500, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] }
 ];
 
 export const initialPlayersState: PlayersRecord = {

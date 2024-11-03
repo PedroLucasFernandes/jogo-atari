@@ -115,19 +115,85 @@ export default function createGame() {
     notifyAll({ type: 'movePlayer', data })
   }
 
+  // function moveBall() {
+  //   gameState.ball.x += gameState.ball.speedX;
+  //   gameState.ball.y += gameState.ball.speedY;
+
+  //   if (gameState.ball.x <= 0 || gameState.ball.x >= 800) gameState.ball.speedX *= -1;
+  //   if (gameState.ball.y <= 0 || gameState.ball.y >= 600) gameState.ball.speedY *= -1;
+
+  //   const data = {
+  //     ball: gameState.ball,
+  //   }
+
+  //   notifyAll({ type: 'moveBall', data })
+  // }
+
   function moveBall() {
+    // Atualiza a posição da bola
     gameState.ball.x += gameState.ball.speedX;
     gameState.ball.y += gameState.ball.speedY;
 
-    if (gameState.ball.x <= 0 || gameState.ball.x >= 800) gameState.ball.speedX *= -1;
-    if (gameState.ball.y <= 0 || gameState.ball.y >= 600) gameState.ball.speedY *= -1;
-
-    const data = {
-      ball: gameState.ball,
+    // Verifica colisão com as bordas do canvas
+    if (gameState.ball.x <= 0 || gameState.ball.x >= gameState.canvas.width) {
+      gameState.ball.speedX *= -1;
+    }
+    if (gameState.ball.y <= 0 || gameState.ball.y >= gameState.canvas.height) {
+      gameState.ball.speedY *= -1;
     }
 
-    notifyAll({ type: 'moveBall', data })
+    // Verifica colisão da bola com cada jogador
+    for (const playerId in gameState.players) {
+      const player = gameState.players[playerId];
+
+      if (
+        gameState.ball.x + gameState.ball.radius > player.x &&
+        gameState.ball.x - gameState.ball.radius < player.x + player.size &&
+        gameState.ball.y + gameState.ball.radius > player.y &&
+        gameState.ball.y - gameState.ball.radius < player.y + player.size
+      ) {
+        // Rebater a bola ao detectar colisão
+        gameState.ball.speedX *= -1; // Inverte a direção no eixo X
+        gameState.ball.speedY *= -1; // Inverte a direção no eixo Y
+
+        break; // Sai do loop após detectar a colisão com um jogador
+      }
+    }
+
+    for (const wall of gameState.walls) {
+      if (wall.active) {
+        const partWidth = wall.width / 2;
+        const partHeight = wall.height / 3;
+
+        for (let i = 0; i < wall.parts.length; i++) {
+          if (wall.parts[i]) {
+            const partX = wall.x + (i % 2) * partWidth;
+            const partY = wall.y + Math.floor(i / 2) * partHeight;
+
+            if (
+              gameState.ball.x + gameState.ball.radius > partX &&
+              gameState.ball.x - gameState.ball.radius < partX + partWidth &&
+              gameState.ball.y + gameState.ball.radius > partY &&
+              gameState.ball.y - gameState.ball.radius < partY + partHeight
+            ) {
+              console.log(`Colisão detectada na parte ${i} da parede na posição (${partX}, ${partY})`);
+              // Colisão detectada, desativa a parte e inverte a direção da bola
+              wall.parts[i] = false;
+              gameState.ball.speedX *= -1;
+              gameState.ball.speedY *= -1;
+              break;
+            }
+          }
+        }
+      }
+    }
+    // Notifica os observadores com o novo estado da bola
+    const data = {
+      ball: gameState.ball,
+    };
+    notifyAll({ type: 'moveBall', data });
   }
+
 
   function addPlayer(playerId: string) {
     const { bot3, ...remainingPlayers } = gameState.players;
