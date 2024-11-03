@@ -78,11 +78,11 @@ const Game: React.FC = () => {
             const speed = 10;
             const humanPlayer = players[3];
 
-            if (e.key === 'w' && humanPlayer.y > 0 && humanPlayer.y >= initialY2 + 10) humanPlayer.y -= speed;
-            if (e.key === 's' && humanPlayer.y + humanPlayer.size / 2 < canvas.height && humanPlayer.y >= initialY2 && humanPlayer.x <= initialX2) humanPlayer.y += speed;
-            if (e.key === 'a' && humanPlayer.x > 0 && humanPlayer.x >= initialX2 + 10) humanPlayer.x -= speed;
+            if ((e.key === 'w' || e.key === 'ArrowUp') && humanPlayer.y > 0 && humanPlayer.y >= initialY2 + 10) humanPlayer.y -= speed;
+            if ((e.key === 's' || e.key === 'ArrowDown' )&& humanPlayer.y + humanPlayer.size / 2 < canvas.height && humanPlayer.y >= initialY2 && humanPlayer.x <= initialX2) humanPlayer.y += speed;
+            if ((e.key === 'a' || e.key === 'ArrowLeft')&& humanPlayer.x > 0 && humanPlayer.x >= initialX2 + 10) humanPlayer.x -= speed;
             
-            if (e.key === 'd' && humanPlayer.x + humanPlayer.size / 2 < canvas.width && humanPlayer.y <= initialY2) humanPlayer.x += speed;
+            if ((e.key === 'd' || e.key === 'ArrowRight') && humanPlayer.x + humanPlayer.size / 2 < canvas.width && humanPlayer.y <= initialY2) humanPlayer.x += speed;
         };
 
         document.addEventListener('keydown', handleKeyDown);
