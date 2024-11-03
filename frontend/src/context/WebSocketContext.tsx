@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { webSocketService } from '../services/WebSocketService';
-import { IGameState } from '../interfaces/game';
+import { IGameState, initialBallState, initialCanvasState, initialPlayersState, initialWallsState } from '../interfaces/game';
 
 interface WebSocketContextType {
   isConnected: boolean;
@@ -42,9 +42,38 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setGameState(data.data.gameState)
     });
 
-    webSocketService.registerCallback('playerMoved', (data) => {
-      console.log(`Jogador se moveu: ${data}`);
+    webSocketService.registerCallback('movePlayer', (data) => {
+      console.log(`Jogador se moveu: ${JSON.stringify(data)}`);
       setGameState(data.data.gameState)
+    });
+
+    webSocketService.registerCallback('moveBall', (data) => {
+      //console.log(`Bola se moveu: ${JSON.stringify(data)}`);
+      // Verifica se a mensagem contém a propriedade 'data' e 'ball'
+      if (data.data && data.data.ball) {
+        setGameState(prevGameState => {
+          // Se o estado anterior for nulo, você pode retornar um novo estado inicial
+          if (prevGameState === null) {
+            return {
+              players: initialPlayersState,
+              walls: initialWallsState,
+              ball: initialBallState,
+              canvas: initialCanvasState,
+            };
+          }
+
+          // Atualiza o estado do jogo
+          return {
+            ...prevGameState,
+            ball: {
+              ...prevGameState.ball, // Mantém as propriedades existentes da bola
+              ...data.data.ball    // Atualiza apenas as propriedades recebidas na mensagem
+            }
+          };
+        });
+      } else {
+        console.error('Erro ao atualizar o estado da bola:', data);
+      }
     });
 
   }, []);

@@ -6,6 +6,7 @@ import { JoinRoomScreen } from '../JoinRoomScreen/JoinRoomScreen';
 import { WaitingRoomScreen } from '../WaitingRoomScreen/WaitingRoomScreen';
 import { RankingScreen } from '../RankingScreen/RankingScreen';
 import GameScreen from '../GameScreen/GameScreen';
+import NewGameScreen from '../NewGameScreen/NewGameScreen';
 
 // Testando em como renderizar o conteúdo de uma rota dinamicamente
 
@@ -26,7 +27,7 @@ export const GameMonolito: React.FC = () => {
             case 'ranking-room':
                 return <RankingScreen setScreen={setScreen} />;
             case 'game':
-                return <GameScreen setScreen={setScreen} />;
+                return <NewGameScreen setScreen={setScreen} />;
             default:
                 return <MainMenuScreen setScreen={setScreen} />;
         }
