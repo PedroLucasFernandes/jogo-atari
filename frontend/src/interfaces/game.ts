@@ -13,8 +13,8 @@ export interface IPlayer {
   x: number;
   y: number;
   size: number;
-  imageSrc?: string;
   isBot: boolean;
+  imageSrc: string;
 }
 
 export type PlayersRecord = Record<string, IPlayer>;
@@ -65,10 +65,10 @@ export const initialWallsState: IWall[] = [
 ];
 
 export const initialPlayersState: PlayersRecord = {
-  'bot0': { x: 110, y: 110, size: 20, isBot: true, imageSrc: "/assets/p1.png" },
-  'bot1': { x: 670, y: 110, size: 20, isBot: true, imageSrc: "/assets/p1.png" },
-  'bot2': { x: 110, y: 470, size: 20, isBot: true, imageSrc: "/assets/p1.png" },
-  'bot3': { x: 670, y: 470, size: 20, isBot: false, imageSrc: "/assets/p1.png"}
+  'bot0': { x: 110, y: 110, size: 20, isBot: true, imageSrc: "" },
+  'bot1': { x: 670, y: 110, size: 20, isBot: true, imageSrc: "" },
+  'bot2': { x: 110, y: 470, size: 20, isBot: true, imageSrc: "" },
+  'bot3': { x: 670, y: 470, size: 20, isBot: false, imageSrc: "" }
 };
 
 export const initialBallState: IBall = {
@@ -86,6 +86,10 @@ export const initialCanvasState: ICanvas = {
 };
 
 
-
+export const playersImages = Array.from({ length: 5 }, (_, i) => {
+  const img = new Image(300, 300);
+  img.src = `/assets/player${i + 1}.svg`;
+  return img;
+});
 
 

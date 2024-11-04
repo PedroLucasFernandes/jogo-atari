@@ -22,6 +22,7 @@ export interface IPlayer {
   y: number;
   size: number;
   isBot: boolean;
+  imageSrc: string;
 }
 
 export type PlayersRecord = Record<string, IPlayer>;
@@ -76,10 +77,10 @@ export const initialWallsState: IWall[] = [
 ];
 
 export const initialPlayersState: PlayersRecord = {
-  'bot0': { x: 150, y: 150, size: 80, isBot: true }, // Movido mais para dentro do canvas
-  'bot1': { x: 630, y: 150, size: 80, isBot: true }, // Movido mais para dentro do canvas
-  'bot2': { x: 150, y: 430, size: 80, isBot: true }, // Movido mais para dentro do canvas
-  'bot3': { x: 630, y: 430, size: 80, isBot: false } // Movido mais para dentro do canvas
+  'bot0': { x: 150, y: 150, size: 80, isBot: true, imageSrc: '' }, // Movido mais para dentro do canvas
+  'bot1': { x: 630, y: 150, size: 80, isBot: true, imageSrc: '' }, // Movido mais para dentro do canvas
+  'bot2': { x: 150, y: 430, size: 80, isBot: true, imageSrc: '' }, // Movido mais para dentro do canvas
+  'bot3': { x: 630, y: 430, size: 80, isBot: false, imageSrc: '' } // Movido mais para dentro do canvas
 };
 
 
