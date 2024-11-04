@@ -162,10 +162,25 @@ export default function createGame() {
     }
 
     const data = {
-      gameState,
-    };
-    notifyAll({ type: 'movePlayer', data });
+      gameState
+    }
+    notifyAll({ type: 'movePlayer', data })
   }
+
+  function notifyBallUpdate() {
+    const data = {
+      ball: gameState.ball,
+    };
+    notifyAll({ type: 'updateBall', data });
+  }
+
+  function notifyWallUpdate() {
+    const data = {
+      walls: gameState.walls,
+    };
+    notifyAll({ type: 'updateWall', data });
+  }
+
 
 
   function moveBall() {
@@ -204,8 +219,6 @@ export default function createGame() {
         const randomVariation = (Math.random() - 0.5) * 2; // Variação entre -1 e 1 (ajuste conforme necessário)
         gameState.ball.speedX += randomVariation;
 
-        collisionDetected = true;
-
         break; // Sai do loop após detectar a colisão com um jogador
       }
     }
@@ -239,25 +252,12 @@ export default function createGame() {
       }
     }
 
-    const data = {
-      ball: gameState.ball,
-      walls: gameState.walls,
-      players: gameState.players
-    };
-    notifyAll({ type: 'moveBall', data });
-    // Notifica os observadores com o novo estado da bola
-    // if (collisionDetected) {
-    //   const data = {
-    //     ball: gameState.ball,
-    //     walls: gameState.walls,
-    //     players: gameState.players
-    //   };
-    //   notifyAll({ type: 'moveBall', data });
-    // }
-    // const data = {
-    //   ball: gameState.ball,
-    // };
-    // notifyAll({ type: 'moveBall', data });
+
+    if (collisionDetected) {
+      notifyWallUpdate();
+    }
+
+    notifyBallUpdate();
   }
 
 

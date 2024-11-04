@@ -56,6 +56,8 @@ export interface IGameMessage {
     keyPressed?: string;
     gameState?: IGameState;
     ball?: IBall;
+    walls?: IWall[];
+    player?: IPlayer;
   }
 }
 
