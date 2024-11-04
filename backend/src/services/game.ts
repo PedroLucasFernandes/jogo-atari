@@ -10,8 +10,8 @@ export default function createGame() {
   }
 
   const speed = 10;
-  const initialY3 = 470;
-  const initialX3 = 670;
+  const initialY3 = 430;
+  const initialX3 = 630;
 
   const observers: Array<(message: IGameMessage) => void> = [];
 
@@ -90,32 +90,61 @@ export default function createGame() {
   // }
 
   function movePlayer(message: IGameMessage) {
+
+    // VOU DEIXAR AQUI COMENTADO UMA OPÇÃO PARA DEIXAR O MOVIMENTO DOS JOGADORES LIVRE PELA TELA
+    // const acceptedMoves: Record<AcceptedMoves, (player: IPlayer) => void> = {
+    //   w(player: IPlayer) {
+    //     if (player.y > 0) player.y -= speed; // Remova as restrições específicas de posição aqui
+    //   },
+    //   a(player: IPlayer) {
+    //     if (player.x > 0) player.x -= speed;
+    //   },
+    //   s(player: IPlayer) {
+    //     if (player.y + player.size < gameState.canvas.height) player.y += speed;
+    //   },
+    //   d(player: IPlayer) {
+    //     if (player.x + player.size < gameState.canvas.width) player.x += speed;
+    //   },
+    //   arrowup(player: IPlayer) {
+    //     if (player.y > 0) player.y -= speed;
+    //   },
+    //   arrowleft(player: IPlayer) {
+    //     if (player.x > 0) player.x -= speed;
+    //   },
+    //   arrowdown(player: IPlayer) {
+    //     if (player.y + player.size < gameState.canvas.height) player.y += speed;
+    //   },
+    //   arrowright(player: IPlayer) {
+    //     if (player.x + player.size < gameState.canvas.width) player.x += speed;
+    //   },
+    // };
+
     const acceptedMoves: Record<AcceptedMoves, (player: IPlayer) => void> = {
       w(player: IPlayer) {
-        if (player.y > 0) player.y -= speed; // Remova as restrições específicas de posição aqui
+        if (player.y > 0 && player.y >= initialY3 + 10) player.y -= speed
       },
       a(player: IPlayer) {
-        if (player.x > 0) player.x -= speed;
+        if (player.x > 0 && player.x >= initialX3 + 10) player.x -= speed;
       },
       s(player: IPlayer) {
-        if (player.y + player.size < gameState.canvas.height) player.y += speed;
+        if (player.y + player.size / 2 < gameState.canvas.height && player.y >= initialY3 && player.x <= initialX3) player.y += speed;
       },
       d(player: IPlayer) {
-        if (player.x + player.size < gameState.canvas.width) player.x += speed;
+        if (player.x + player.size / 2 < gameState.canvas.width && player.y <= initialY3) player.x += speed;
       },
       arrowup(player: IPlayer) {
-        if (player.y > 0) player.y -= speed;
+        if (player.y > 0 && player.y >= initialY3 + 10) player.y -= speed
       },
       arrowleft(player: IPlayer) {
-        if (player.x > 0) player.x -= speed;
+        if (player.x > 0 && player.x >= initialX3 + 10) player.x -= speed;
       },
       arrowdown(player: IPlayer) {
-        if (player.y + player.size < gameState.canvas.height) player.y += speed;
+        if (player.y + player.size / 2 < gameState.canvas.height && player.y >= initialY3 && player.x <= initialX3) player.y += speed;
       },
       arrowright(player: IPlayer) {
-        if (player.x + player.size < gameState.canvas.width) player.x += speed;
+        if (player.x + player.size / 2 < gameState.canvas.width && player.y <= initialY3) player.x += speed;
       },
-    };
+    }
 
     if (!message.data.keyPressed) return;
     const keyPressed: string = message.data.keyPressed;
@@ -164,11 +193,37 @@ export default function createGame() {
       ) {
         // Rebater a bola ao detectar colisão
         gameState.ball.speedX *= -1; // Inverte a direção no eixo X
-        gameState.ball.speedY *= -1; // Inverte a direção no eixo Y
+
+        // Adiciona uma variação aleatória à direção Y
+        const randomAngle = (Math.random() - 0.5) * 0.3; // Variação entre -0.15 e 0.15 (ajuste conforme necessário)
+        gameState.ball.speedY = gameState.ball.speedY * -1 + randomAngle; // Inverte Y e adiciona variação
+
+        // Adiciona uma variação leve à velocidade X para evitar trajetórias muito previsíveis
+        const randomVariation = (Math.random() - 0.5) * 2; // Variação entre -1 e 1 (ajuste conforme necessário)
+        gameState.ball.speedX += randomVariation;
 
         break; // Sai do loop após detectar a colisão com um jogador
       }
     }
+
+
+    // // Verifica colisão da bola com cada jogador
+    // for (const playerId in gameState.players) {
+    //   const player = gameState.players[playerId];
+
+    //   if (
+    //     gameState.ball.x + gameState.ball.radius > player.x &&
+    //     gameState.ball.x - gameState.ball.radius < player.x + player.size &&
+    //     gameState.ball.y + gameState.ball.radius > player.y &&
+    //     gameState.ball.y - gameState.ball.radius < player.y + player.size
+    //   ) {
+    //     // Rebater a bola ao detectar colisão
+    //     gameState.ball.speedX *= -1; // Inverte a direção no eixo X
+    //     gameState.ball.speedY *= -1; // Inverte a direção no eixo Y
+
+    //     break; // Sai do loop após detectar a colisão com um jogador
+    //   }
+    // }
 
     for (const wall of gameState.walls) {
       if (wall.active) {

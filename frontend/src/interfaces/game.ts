@@ -65,11 +65,11 @@ export const initialWallsState: IWall[] = [
 ];
 
 export const initialPlayersState: PlayersRecord = {
-  'bot0': { x: 110, y: 110, size: 20, isBot: true, imageSrc: "" },
-  'bot1': { x: 670, y: 110, size: 20, isBot: true, imageSrc: "" },
-  'bot2': { x: 110, y: 470, size: 20, isBot: true, imageSrc: "" },
-  'bot3': { x: 670, y: 470, size: 20, isBot: false, imageSrc: "" }
-};
+  'bot0': { x: 150, y: 150, size: 80, isBot: true, imageSrc: '' }, // Movido mais para dentro do canvas
+  'bot1': { x: 630, y: 150, size: 80, isBot: true, imageSrc: '' }, // Movido mais para dentro do canvas
+  'bot2': { x: 150, y: 430, size: 80, isBot: true, imageSrc: '' }, // Movido mais para dentro do canvas
+  'bot3': { x: 630, y: 430, size: 80, isBot: false, imageSrc: '' } // Movido mais para dentro do canvas
+}
 
 export const initialBallState: IBall = {
   x: 400,
