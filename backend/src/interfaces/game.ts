@@ -21,21 +21,10 @@ export interface IPlayer {
   x: number;
   y: number;
   size: number;
-  color: string;
   isBot: boolean;
 }
 
 export type PlayersRecord = Record<string, IPlayer>;
-
-/* export interface IPlayer {
-  [id: string]: {
-    x: number;
-    y: number;
-    size: number;
-    color: string;
-    isBot: boolean;
-  };
-} */
 
 export interface IBall {
   x: number;
@@ -50,20 +39,6 @@ export interface ICanvas {
   width: number;
   height: number;
 }
-
-/* export interface IGameState {
-  players: Record<string, IPlayer>;
-  walls: IWall[];
-  ball: IBall;
-  canvas: ICanvas;
-} */
-
-/* export interface IGameState {
-  players: IPlayer[];
-  walls: IWall[];
-  ball: IBall;
-  canvas: ICanvas;
-} */
 export interface IGameState {
   players: PlayersRecord;
   walls: IWall[];
@@ -93,13 +68,6 @@ export interface IGame {
   stop: () => void;
 }
 
-// export const initialWallsState: IWall[] = [
-//   { x: 20, y: 20, width: 80, height: 80, active: true },
-//   { x: 700, y: 20, width: 80, height: 80, active: true },
-//   { x: 20, y: 500, width: 80, height: 80, active: true },
-//   { x: 700, y: 500, width: 80, height: 80, active: true }
-// ];
-
 export const initialWallsState: IWall[] = [
   { x: 20, y: 20, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] },
   { x: 700, y: 20, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] },
@@ -107,19 +75,11 @@ export const initialWallsState: IWall[] = [
   { x: 700, y: 500, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] }
 ];
 
-
-/* export const initialPlayersState: IPlayer[] = [
-  { 'bot0': { x: 110, y: 110, size: 20, color: 'blue', isBot: true } },
-  { 'bot1': { x: 670, y: 110, size: 20, color: 'green', isBot: true } },
-  { 'bot2': { x: 110, y: 470, size: 20, color: 'yellow', isBot: true } },
-  { 'bot3': { x: 670, y: 470, size: 20, color: 'red', isBot: false } }
-]; */
-
 export const initialPlayersState: PlayersRecord = {
-  'bot0': { x: 110, y: 110, size: 20, color: 'blue', isBot: true },
-  'bot1': { x: 670, y: 110, size: 20, color: 'green', isBot: true },
-  'bot2': { x: 110, y: 470, size: 20, color: 'yellow', isBot: true },
-  'bot3': { x: 670, y: 470, size: 20, color: 'red', isBot: false }
+  'bot0': { x: 150, y: 150, size: 80, isBot: true }, // Movido mais para dentro do canvas
+  'bot1': { x: 630, y: 150, size: 80, isBot: true }, // Movido mais para dentro do canvas
+  'bot2': { x: 150, y: 430, size: 80, isBot: true }, // Movido mais para dentro do canvas
+  'bot3': { x: 630, y: 430, size: 80, isBot: false } // Movido mais para dentro do canvas
 };
 
 

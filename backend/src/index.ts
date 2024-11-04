@@ -21,8 +21,8 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(express.json());
 app.use(cookieParser());
+app.use(express.json());
 app.use("/api", routes);
 
 const server = app.listen(PORT, () => {

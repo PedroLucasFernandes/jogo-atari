@@ -2,20 +2,6 @@ import { AcceptedMoves, IGameMessage, IGameState, initialBallState, initialCanva
 
 export default function createGame() {
 
-  /* const gameState: IGameState = {
-    players: {
-      'bot0': initialPlayersState[0],
-      'bot1': initialPlayersState[1],
-      'bot2': initialPlayersState[2],
-      'bot3': initialPlayersState[3],
-
-      //[message.data.playerId]: initialPlayersState[3],
-    },
-    walls: initialWallsState,
-    ball: initialBallState,
-    canvas: initialCanvasState,
-  } */
-
   const gameState: IGameState = {
     players: initialPlayersState,
     walls: initialWallsState,
@@ -27,9 +13,6 @@ export default function createGame() {
   const initialY3 = 470;
   const initialX3 = 670;
 
-  //const observers = [];
-
-  //const observers: ((message: IGameMessage) => void)[] = [];
   const observers: Array<(message: IGameMessage) => void> = [];
 
   let intervalId: NodeJS.Timeout | null = null;
@@ -39,10 +22,6 @@ export default function createGame() {
 
     intervalId = setInterval(moveBall, frequency);
   }
-
-  /* function subscribe(observer: () => void) {
-    observers.push(observer);
-  } */
 
   function subscribe(observerFunction: (message: IGameMessage) => void) {
     observers.push(observerFunction);
@@ -58,48 +37,93 @@ export default function createGame() {
     Object.assign(gameState, newState)
   }
 
+  // function movePlayer(message: IGameMessage) {
+
+  //   const acceptedMoves: Record<AcceptedMoves, (player: IPlayer) => void> = {
+  //     w(player: IPlayer) {
+  //       if (player.y > 0 && player.y >= initialY3 + 10) player.y -= speed
+  //     },
+  //     a(player: IPlayer) {
+  //       if (player.x > 0 && player.x >= initialX3 + 10) player.x -= speed;
+  //     },
+  //     s(player: IPlayer) {
+  //       if (player.y + player.size / 2 < gameState.canvas.height && player.y >= initialY3 && player.x <= initialX3) player.y += speed;
+  //     },
+  //     d(player: IPlayer) {
+  //       if (player.x + player.size / 2 < gameState.canvas.width && player.y <= initialY3) player.x += speed;
+  //     },
+  //     arrowup(player: IPlayer) {
+  //       if (player.y > 0 && player.y >= initialY3 + 10) player.y -= speed
+  //     },
+  //     arrowleft(player: IPlayer) {
+  //       if (player.x > 0 && player.x >= initialX3 + 10) player.x -= speed;
+  //     },
+  //     arrowdown(player: IPlayer) {
+  //       if (player.y + player.size / 2 < gameState.canvas.height && player.y >= initialY3 && player.x <= initialX3) player.y += speed;
+  //     },
+  //     arrowright(player: IPlayer) {
+  //       if (player.x + player.size / 2 < gameState.canvas.width && player.y <= initialY3) player.x += speed;
+  //     },
+  //   }
+
+  //   if (!message.data.keyPressed) return;
+  //   const keyPressed: string = message.data.keyPressed;
+
+  //   if (!message.data.playerId) return;
+  //   const playerId: string = message.data.playerId
+
+  //   if (keyPressed in acceptedMoves) {
+  //     //const player = gameState.players[playerId]; // Use o playerId do comando
+  //     const player = gameState.players[playerId];
+  //     const moveFunction = acceptedMoves[keyPressed as AcceptedMoves];
+
+  //     if (player && moveFunction) {
+  //       moveFunction(player);
+  //     }
+  //   }
 
 
+  //   const data = {
+  //     gameState
+  //   }
+  //   notifyAll({ type: 'movePlayer', data })
+  // }
 
   function movePlayer(message: IGameMessage) {
-
-    //notifyAll(message)
-
     const acceptedMoves: Record<AcceptedMoves, (player: IPlayer) => void> = {
       w(player: IPlayer) {
-        if (player.y > 0 && player.y >= initialY3 + 10) player.y -= speed
+        if (player.y > 0) player.y -= speed; // Remova as restrições específicas de posição aqui
       },
       a(player: IPlayer) {
-        if (player.x > 0 && player.x >= initialX3 + 10) player.x -= speed;
+        if (player.x > 0) player.x -= speed;
       },
       s(player: IPlayer) {
-        if (player.y + player.size / 2 < gameState.canvas.height && player.y >= initialY3 && player.x <= initialX3) player.y += speed;
+        if (player.y + player.size < gameState.canvas.height) player.y += speed;
       },
       d(player: IPlayer) {
-        if (player.x + player.size / 2 < gameState.canvas.width && player.y <= initialY3) player.x += speed;
+        if (player.x + player.size < gameState.canvas.width) player.x += speed;
       },
       arrowup(player: IPlayer) {
-        if (player.y > 0 && player.y >= initialY3 + 10) player.y -= speed
+        if (player.y > 0) player.y -= speed;
       },
       arrowleft(player: IPlayer) {
-        if (player.x > 0 && player.x >= initialX3 + 10) player.x -= speed;
+        if (player.x > 0) player.x -= speed;
       },
       arrowdown(player: IPlayer) {
-        if (player.y + player.size / 2 < gameState.canvas.height && player.y >= initialY3 && player.x <= initialX3) player.y += speed;
+        if (player.y + player.size < gameState.canvas.height) player.y += speed;
       },
       arrowright(player: IPlayer) {
-        if (player.x + player.size / 2 < gameState.canvas.width && player.y <= initialY3) player.x += speed;
+        if (player.x + player.size < gameState.canvas.width) player.x += speed;
       },
-    }
+    };
 
     if (!message.data.keyPressed) return;
     const keyPressed: string = message.data.keyPressed;
 
     if (!message.data.playerId) return;
-    const playerId: string = message.data.playerId
+    const playerId: string = message.data.playerId;
 
     if (keyPressed in acceptedMoves) {
-      //const player = gameState.players[playerId]; // Use o playerId do comando
       const player = gameState.players[playerId];
       const moveFunction = acceptedMoves[keyPressed as AcceptedMoves];
 
@@ -108,26 +132,12 @@ export default function createGame() {
       }
     }
 
-
     const data = {
-      gameState
-    }
-    notifyAll({ type: 'movePlayer', data })
+      gameState,
+    };
+    notifyAll({ type: 'movePlayer', data });
   }
 
-  // function moveBall() {
-  //   gameState.ball.x += gameState.ball.speedX;
-  //   gameState.ball.y += gameState.ball.speedY;
-
-  //   if (gameState.ball.x <= 0 || gameState.ball.x >= 800) gameState.ball.speedX *= -1;
-  //   if (gameState.ball.y <= 0 || gameState.ball.y >= 600) gameState.ball.speedY *= -1;
-
-  //   const data = {
-  //     ball: gameState.ball,
-  //   }
-
-  //   notifyAll({ type: 'moveBall', data })
-  // }
 
   function moveBall() {
     // Atualiza a posição da bola
@@ -176,8 +186,7 @@ export default function createGame() {
               gameState.ball.y + gameState.ball.radius > partY &&
               gameState.ball.y - gameState.ball.radius < partY + partHeight
             ) {
-              console.log(`Colisão detectada na parte ${i} da parede na posição (${partX}, ${partY})`);
-              // Colisão detectada, desativa a parte e inverte a direção da bola
+
               wall.parts[i] = false;
               gameState.ball.speedX *= -1;
               gameState.ball.speedY *= -1;
