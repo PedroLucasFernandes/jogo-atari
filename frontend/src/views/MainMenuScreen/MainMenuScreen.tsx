@@ -51,18 +51,24 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
       <Box
         onClick={() => setShowLogout(!showLogout)}
         sx={{
-          position: 'absolute',
+          position: 'fixed',
           top: '16px',
           right: '16px',
           cursor: 'pointer',
-          color: 'white'
+          color: 'white',
+          zIndex: 10,
         }}
       >
         <AccountCircle fontSize="large" />
       </Box>
 
       {showLogout && (
-        <div className="logout-button">
+        <div id="logout-button" style={{
+          position: 'fixed',
+          top: '60px',
+          right: '16px',
+          zIndex: 9,
+        }}>
           <Button onClick={handleLogout}>Logout</Button>
         </div>
       )}
@@ -94,6 +100,4 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
 
     </Box>
   );
-
 };
-
