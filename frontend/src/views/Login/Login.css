@@ -1,9 +1,50 @@
 #login {
+  background-color: #090826;
+  color: #750de5;
   width: 100%;
   display: flex;
   flex: 1 1;
-
+  font-family: "Chewy", system-ui;
+  font-weight: 400;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
+
+#square{
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 25%;
+  padding: 1.3rem;
+  border-radius: 2rem;
+}
+
+#character{
+  width: 20%;
+}
+
+.button {
+  padding: 0.5rem;
+  width: 30%;
+  border-radius: 2rem;
+  margin: 1rem;
+  font-size: 1.2rem;
+  font-family: "Chewy", system-ui;
+  background-color: #750de5;
+  color: white;
+  cursor: pointer;
+}
+
+.button:hover {
+  cursor: pointer; 
+}
+
+.button:disabled {
+  background-color: #cccccc; 
+  color: #666666; 
+  cursor: not-allowed; 
+}
+
