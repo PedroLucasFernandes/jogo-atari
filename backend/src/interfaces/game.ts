@@ -1,6 +1,6 @@
 export type AcceptedMoves = 'w' | 'a' | 's' | 'd' | 'arrowup' | 'arrowleft' | 'arrowdown' | 'arrowright';
 
-// export interface IWall {
+// export interface IPlanet {
 //   x: number;
 //   y: number;
 //   width: number;
@@ -8,13 +8,14 @@ export type AcceptedMoves = 'w' | 'a' | 's' | 'd' | 'arrowup' | 'arrowleft' | 'a
 //   active: boolean;
 // }
 
-export interface IWall {
+export interface IPlanet {
   x: number;
   y: number;
   width: number;
   height: number;
   active: boolean; // Para saber se a parede está ativa
-  parts: boolean[]; // Representa se cada parte está ativa (true) ou removida (false)
+  parts: boolean[]; // Cada parte representará um fragmento da imagem
+  imageSrc: string; // Caminho da imagem do planeta
 }
 
 export interface IPlayer {
@@ -42,7 +43,7 @@ export interface ICanvas {
 }
 export interface IGameState {
   players: PlayersRecord;
-  walls: IWall[];
+  planets: IPlanet[];
   ball: IBall;
   canvas: ICanvas;
 }
@@ -56,7 +57,7 @@ export interface IGameMessage {
     keyPressed?: string;
     gameState?: IGameState;
     ball?: IBall;
-    walls?: IWall[];
+    planets?: IPlanet[];
     player?: IPlayer;
   }
 }
@@ -71,11 +72,11 @@ export interface IGame {
   stop: () => void;
 }
 
-export const initialWallsState: IWall[] = [
-  { x: 20, y: 20, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] },
-  { x: 700, y: 20, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] },
-  { x: 20, y: 500, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] },
-  { x: 700, y: 500, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] }
+export const initialPlanetsState: IPlanet[] = [
+  { x: 20, y: 20, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true], imageSrc: '' },
+  { x: 700, y: 20, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true], imageSrc: '' },
+  { x: 20, y: 500, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true], imageSrc: '' },
+  { x: 700, y: 500, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true], imageSrc: '' }
 ];
 
 export const initialPlayersState: PlayersRecord = {

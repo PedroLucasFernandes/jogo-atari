@@ -1,12 +1,13 @@
 export type AcceptedMoves = 'w' | 'a' | 's' | 'd' | 'arrowup' | 'arrowleft' | 'arrowdown' | 'arrowright';
 
-export interface IWall {
+export interface IPlanet {
   x: number;
   y: number;
   width: number;
   height: number;
   active: boolean;
   parts: boolean[];
+  imageSrc: string; // Caminho da imagem do planeta
 }
 
 export interface IPlayer {
@@ -35,7 +36,7 @@ export interface ICanvas {
 
 export interface IGameState {
   players: PlayersRecord;
-  walls: IWall[];
+  planets: IPlanet[];
   ball: IBall;
   canvas: ICanvas;
 }
@@ -57,11 +58,11 @@ export interface IGame {
   movePlayer: (command: IGameMessage) => void;
 }
 
-export const initialWallsState: IWall[] = [
-  { x: 20, y: 20, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] },
-  { x: 700, y: 20, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] },
-  { x: 20, y: 500, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] },
-  { x: 700, y: 500, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] }
+export const initialPlanetsState: IPlanet[] = [
+  { x: 20, y: 20, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true], imageSrc: '' },
+  { x: 700, y: 20, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] , imageSrc: ''},
+  { x: 20, y: 500, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] , imageSrc: ''},
+  { x: 700, y: 500, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] , imageSrc: ''}
 ];
 
 export const initialPlayersState: PlayersRecord = {
@@ -92,4 +93,19 @@ export const playersImages = Array.from({ length: 5 }, (_, i) => {
   return img;
 });
 
+export const planetImages = Array.from({ length: 4 }, (_, i) => {
+  const img = new Image();
+  img.src = `/assets/planet${i + 1}.svg`;
+  return img;
+});
 
+// export const planetImages = Array.from({ length: 4 }, (_, i) => {
+//   const img = new Image();
+//   img.src = `/assets/planet${i + 1}.svg`;
+  
+//   // Adiciona um listener para debug
+//   img.onload = () => console.log(`Planet ${i + 1} loaded successfully`);
+//   img.onerror = (e) => console.error(`Error loading planet ${i + 1}:`, e);
+  
+//   return img;
+// });

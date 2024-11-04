@@ -1,10 +1,10 @@
-import { AcceptedMoves, IGameMessage, IGameState, initialBallState, initialCanvasState, initialPlayersState, initialWallsState, IPlayer, PlayersRecord } from "../interfaces/game"
+import { AcceptedMoves, IGameMessage, IGameState, initialBallState, initialCanvasState, initialPlayersState, initialPlanetsState, IPlayer, PlayersRecord } from "../interfaces/game"
 
 export default function createGame() {
 
   const gameState: IGameState = {
     players: initialPlayersState,
-    walls: initialWallsState,
+    planets: initialPlanetsState,
     ball: initialBallState,
     canvas: initialCanvasState,
   }
@@ -174,11 +174,11 @@ export default function createGame() {
     notifyAll({ type: 'updateBall', data });
   }
 
-  function notifyWallUpdate() {
+  function notifyPlanetUpdate() {
     const data = {
-      walls: gameState.walls,
+      planets: gameState.planets,
     };
-    notifyAll({ type: 'updateWall', data });
+    notifyAll({ type: 'updatePlanet', data });
   }
 
 
@@ -223,15 +223,15 @@ export default function createGame() {
       }
     }
 
-    for (const wall of gameState.walls) {
-      if (wall.active) {
-        const partWidth = wall.width / 2;
-        const partHeight = wall.height / 3;
+    for (const planet of gameState.planets) {
+      if (planet.active) {
+        const partWidth = planet.width / 2;
+        const partHeight = planet.height / 3;
 
-        for (let i = 0; i < wall.parts.length; i++) {
-          if (wall.parts[i]) {
-            const partX = wall.x + (i % 2) * partWidth;
-            const partY = wall.y + Math.floor(i / 2) * partHeight;
+        for (let i = 0; i < planet.parts.length; i++) {
+          if (planet.parts[i]) {
+            const partX = planet.x + (i % 2) * partWidth;
+            const partY = planet.y + Math.floor(i / 2) * partHeight;
 
             if (
               gameState.ball.x + gameState.ball.radius > partX &&
@@ -240,7 +240,7 @@ export default function createGame() {
               gameState.ball.y - gameState.ball.radius < partY + partHeight
             ) {
 
-              wall.parts[i] = false;
+              planet.parts[i] = false;
               gameState.ball.speedX *= -1;
               gameState.ball.speedY *= -1;
 
@@ -254,7 +254,7 @@ export default function createGame() {
 
 
     if (collisionDetected) {
-      notifyWallUpdate();
+      notifyPlanetUpdate();
     }
 
     notifyBallUpdate();

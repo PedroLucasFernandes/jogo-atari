@@ -1,4 +1,4 @@
-import { AcceptedMoves, IGameMessage, IGameState, initialBallState, initialCanvasState, initialPlayersState, initialWallsState, IPlayer } from "../interfaces/game"
+import { AcceptedMoves, IGameMessage, IGameState, initialBallState, initialCanvasState, initialPlayersState, initialPlanetsState, IPlayer } from "../interfaces/game"
 
 export default function createGame() {
 
@@ -10,7 +10,7 @@ export default function createGame() {
       'bot3': initialPlayersState[3],
 
     },
-    walls: initialWallsState,
+    planets: initialPlanetsState,
     ball: initialBallState,
     canvas: initialCanvasState,
   }

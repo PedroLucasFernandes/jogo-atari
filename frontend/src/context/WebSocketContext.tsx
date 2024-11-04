@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { webSocketService } from '../services/WebSocketService';
-import { IGameState, initialBallState, initialCanvasState, initialPlayersState, initialWallsState } from '../interfaces/game';
+import { IGameState, initialBallState, initialCanvasState, initialPlayersState, initialPlanetsState } from '../interfaces/game';
 
 interface WebSocketContextType {
   isConnected: boolean;
@@ -54,7 +54,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           if (prevGameState === null) {
             return {
               players: initialPlayersState,
-              walls: initialWallsState,
+              planets: initialPlanetsState,
               ball: initialBallState,
               canvas: initialCanvasState,
             };
@@ -74,14 +74,14 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
     });
   
-    webSocketService.registerCallback('updateWall', (data) => {
-      if (data.data && data.data.walls) {
+    webSocketService.registerCallback('updatePlanet', (data) => {
+      if (data.data && data.data.planets) {
         setGameState(prevGameState => {
           // Se o estado anterior for nulo, você pode retornar um novo estado inicial
           if (prevGameState === null) {
             return {
               players: initialPlayersState,
-              walls: initialWallsState,
+              planets: initialPlanetsState,
               ball: initialBallState,
               canvas: initialCanvasState,
             };
@@ -90,43 +90,13 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           // Atualiza o estado do jogo
           return {
             ...prevGameState,
-            walls: data.data.walls,
+            planets: data.data.planets,
           };
         });
       } else {
         console.error('Erro ao atualizar o estado das paredes:', data);
       }
     });
-
-    // webSocketService.registerCallback('moveBall', (data) => {
-    //   //console.log(`Bola se moveu: ${JSON.stringify(data)}`);
-    //   // Verifica se a mensagem contém a propriedade 'data' e 'ball'
-    //   if (data.data && data.data.ball) {
-    //     setGameState(prevGameState => {
-    //       // Se o estado anterior for nulo, você pode retornar um novo estado inicial
-    //       if (prevGameState === null) {
-    //         return {
-    //           players: initialPlayersState,
-    //           walls: initialWallsState,
-    //           ball: initialBallState,
-    //           canvas: initialCanvasState,
-    //         };
-    //       }
-
-    //       // Atualiza o estado do jogo
-    //       return {
-    //         ...prevGameState,
-    //         ball: {
-    //           ...prevGameState.ball, // Mantém as propriedades existentes da bola
-    //           ...data.data.ball    // Atualiza apenas as propriedades recebidas na mensagem
-    //         },
-    //       };
-    //     });
-    //   } else {
-    //     console.error('Erro ao atualizar o estado da bola:', data);
-    //   }
-    // });
-
   }, []);
 
 
