@@ -68,7 +68,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             ball: {
               ...prevGameState.ball, // Mantém as propriedades existentes da bola
               ...data.data.ball    // Atualiza apenas as propriedades recebidas na mensagem
-            }
+            },
+             walls: [...data.data.walls], // Atualiza as paredes com o novo estado recebido
           };
         });
       } else {

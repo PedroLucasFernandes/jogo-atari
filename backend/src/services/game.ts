@@ -169,6 +169,8 @@ export default function createGame() {
 
 
   function moveBall() {
+    let collisionDetected = false;
+
     // Atualiza a posição da bola
     gameState.ball.x += gameState.ball.speedX;
     gameState.ball.y += gameState.ball.speedY;
@@ -202,28 +204,11 @@ export default function createGame() {
         const randomVariation = (Math.random() - 0.5) * 2; // Variação entre -1 e 1 (ajuste conforme necessário)
         gameState.ball.speedX += randomVariation;
 
+        collisionDetected = true;
+
         break; // Sai do loop após detectar a colisão com um jogador
       }
     }
-
-
-    // // Verifica colisão da bola com cada jogador
-    // for (const playerId in gameState.players) {
-    //   const player = gameState.players[playerId];
-
-    //   if (
-    //     gameState.ball.x + gameState.ball.radius > player.x &&
-    //     gameState.ball.x - gameState.ball.radius < player.x + player.size &&
-    //     gameState.ball.y + gameState.ball.radius > player.y &&
-    //     gameState.ball.y - gameState.ball.radius < player.y + player.size
-    //   ) {
-    //     // Rebater a bola ao detectar colisão
-    //     gameState.ball.speedX *= -1; // Inverte a direção no eixo X
-    //     gameState.ball.speedY *= -1; // Inverte a direção no eixo Y
-
-    //     break; // Sai do loop após detectar a colisão com um jogador
-    //   }
-    // }
 
     for (const wall of gameState.walls) {
       if (wall.active) {
@@ -245,17 +230,34 @@ export default function createGame() {
               wall.parts[i] = false;
               gameState.ball.speedX *= -1;
               gameState.ball.speedY *= -1;
+
+              collisionDetected = true;
               break;
             }
           }
         }
       }
     }
-    // Notifica os observadores com o novo estado da bola
+
     const data = {
       ball: gameState.ball,
+      walls: gameState.walls,
+      players: gameState.players
     };
     notifyAll({ type: 'moveBall', data });
+    // Notifica os observadores com o novo estado da bola
+    // if (collisionDetected) {
+    //   const data = {
+    //     ball: gameState.ball,
+    //     walls: gameState.walls,
+    //     players: gameState.players
+    //   };
+    //   notifyAll({ type: 'moveBall', data });
+    // }
+    // const data = {
+    //   ball: gameState.ball,
+    // };
+    // notifyAll({ type: 'moveBall', data });
   }
 
 
