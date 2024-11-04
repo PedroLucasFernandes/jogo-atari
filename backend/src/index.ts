@@ -9,6 +9,7 @@ import { WebSocket } from 'ws';
 import { v4 as uuidv4 } from 'uuid';
 import createGame from "./services/game";
 import { IGame, IGameMessage, IGameState } from "./interfaces/game";
+import WebSocketService from "./services/webSocketServices";
 
 dotenv.config();
 
@@ -31,12 +32,14 @@ const server = app.listen(PORT, () => {
 
 // Configuração do WebSocket
 const wss = new WebSocketServer({ server });
+const webSocketService = new WebSocketService(wss);
+export default { getClient: webSocketService.getClient.bind(webSocketService) };
 
-const clients: Record<string, WebSocket> = {}; // Armazena os clientes conectados
+//const clients: Record<string, WebSocket> = {}; // Armazena os clientes conectados
 
 
 
-
+/*
 interface Room {
 	host: WebSocket;
 	players: WebSocket[];
@@ -44,9 +47,9 @@ interface Room {
 }
 const rooms: Record<string, Room> = {};
 const games: IGame[] = [];
+ */
 
-
-
+/*
 wss.on("connection", (ws, req) => {
 	// Middleware de autenticação do WebSocket
 	const token = req.headers.cookie?.split("; ").find((c) => c.startsWith("session_id="))?.split("=")[1];
@@ -166,6 +169,6 @@ wss.on("connection", (ws, req) => {
 		});
 	});
 });
-
-const getClient = (socketId: string) => clients[socketId];
-export default { getClient };
+ */
+//const getClient = (socketId: string) => clients[socketId];
+//export default { getClient };

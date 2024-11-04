@@ -1,83 +1,75 @@
 import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { useWebSocket } from '../../context/WebSocketContext';
-import createGame from '../../services/game';
 import renderScreen from './renderScreen';
-
 
 interface ScreenProps {
 	setScreen: Dispatch<SetStateAction<string>>;
+	roomCode?: string;
 }
 
-const NewGameScreen: React.FC<ScreenProps> = ({ setScreen }) => {
+const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, roomCode }) => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const { socketId, gameState, movePlayer } = useWebSocket();
-	//const game = createGame();
-	const game = useRef(createGame()).current;
-	  // Estado para armazenar a imagem de fundo carregada
-	  const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
+	const { socketId, gameState, movePlayer, startGame } = useWebSocket();
+	const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
+	const [isHost, setIsHost] = useState(false);
 
-
+	// Load background image
 	useEffect(() => {
-		  const bgImage = '/assets/bg-space.svg';
+		const bgImage = '/assets/bg-space.svg';
+		const img = new Image();
+		img.src = bgImage;
 
-	      // Carregar a imagem de fundo uma vez
-		  const img = new Image();
-		  img.src = bgImage; // Usa a imagem importada
-  
-		  img.onload = () => {
-			  setBackgroundImage(img); // Armazena a imagem no estado assim que for carregada
-		  };
-  
-		  img.onerror = () => {
-			  console.error("Erro ao carregar a imagem de fundo.");
-		  };
-	  }, []);
+		img.onload = () => {
+			setBackgroundImage(img);
+		};
 
+		img.onerror = () => {
+			console.error("Error loading background image.");
+		};
+	}, []);
+
+	// Setup game rendering
 	useEffect(() => {
 		const canvas = canvasRef.current;
-		if (!canvas) {
-			console.error('Canvas não inciado');
-			return;
-		}
-		if (!socketId) {
-			console.error('Socket ID não encontrado');
-			return;
-		}
+		if (!canvas || !socketId || !gameState || !backgroundImage) return;
 
-		if (gameState) {
-			game.setState(gameState);
-		}
+		const animationFrameId = requestAnimationFrame(() => {
+			renderScreen(canvas, gameState, requestAnimationFrame, socketId, backgroundImage);
+		});
 
-		 // Passa a imagem de fundo para o renderScreen
-		 if (backgroundImage) {
-			renderScreen(canvas, game, requestAnimationFrame, socketId, backgroundImage);
-		  }
-
+		return () => {
+			cancelAnimationFrame(animationFrameId);
+		};
 	}, [gameState, socketId, backgroundImage]);
 
-
+	// Handle keyboard input
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			const keyPressed = e.key.toLowerCase();
-			const validKeys = ['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright']; // Adiciona as setas
+			const validKeys = ['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'];
 
 			if (validKeys.includes(keyPressed)) {
 				movePlayer(keyPressed);
 			}
 		};
 
-		// Adiciona o listener de evento quando o componente monta
 		document.addEventListener('keydown', handleKeyDown);
+		return () => document.removeEventListener('keydown', handleKeyDown);
+	}, [movePlayer]);
 
-		// Remove o listener quando o componente desmonta
-		return () => {
-			document.removeEventListener('keydown', handleKeyDown);
-		};
-	}, [])
-
-	return <canvas ref={canvasRef} width={800} height={600}/>;
+	return (
+		<div className="relative">
+			<canvas ref={canvasRef} width={800} height={600} className="border border-gray-600 rounded-lg" />
+			{isHost && (
+				<button
+					onClick={() => startGame()}
+					className="absolute top-4 right-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+				>
+					Start Game
+				</button>
+			)}
+		</div>
+	);
 };
 
 export default NewGameScreen;
-
-

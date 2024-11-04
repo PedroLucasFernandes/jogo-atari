@@ -1,4 +1,4 @@
-import { IGame, IPlayer, IWall, playersImages } from "../../interfaces/game"
+import { IGameState, IWall, playersImages } from "../../interfaces/game";
 
 function renderWalls(context: CanvasRenderingContext2D, walls: IWall[]) {
   walls.forEach((wall) => {
@@ -20,47 +20,44 @@ function renderWalls(context: CanvasRenderingContext2D, walls: IWall[]) {
 
 export default function renderScreen(
   canvasScreen: HTMLCanvasElement,
-  game: IGame,
+  gameState: IGameState,
   requestAnimationFrame: (callback: FrameRequestCallback) => number,
   currentPlayerId: string,
   backgroundImage: HTMLImageElement
 ) {
+  const context = canvasScreen.getContext('2d');
+  if (!context) throw new Error("Could not get 2D context from canvas.");
 
-  const context = canvasScreen.getContext('2d')
+  // Clear and draw background
+  context.clearRect(0, 0, gameState.canvas.width, gameState.canvas.height);
+  context.drawImage(backgroundImage, 0, 0, gameState.canvas.width, gameState.canvas.height);
 
-  if (!context) {
-    throw new Error("Não foi possível obter o contexto 2D do canvas.");
-  }
-
-  context.clearRect(0, 0, 800, 600);
-
-  // Desenha a imagem de fundo
-  context.drawImage(backgroundImage, 0, 0, game.gameState.canvas.width, game.gameState.canvas.height);
-
-
-  context.fillStyle = game.gameState.ball.color;
+  // Draw ball
+  context.fillStyle = gameState.ball.color;
   context.beginPath();
-  context.arc(game.gameState.ball.x, game.gameState.ball.y, game.gameState.ball.radius, 0, Math.PI * 2);
+  context.arc(gameState.ball.x, gameState.ball.y, gameState.ball.radius, 0, Math.PI * 2);
   context.fill();
 
-  // Renderiza as paredes
-  renderWalls(context, game.gameState.walls);
+  // Draw walls
+  renderWalls(context, gameState.walls);
 
-
-  const playerIds = Object.keys(game.gameState.players); // Lista de IDs dos jogadores
-
-  playerIds.forEach((playerId, index) => {
-    const player = game.gameState.players[playerId];
-
+  // Draw players
+  Object.entries(gameState.players).forEach(([playerId, player], index) => {
     const playerImage = playersImages[index % playersImages.length];
-    //const playerImage = player.isBot ? playersImages[4] : playersImages[index % playersImages.length];
-
     const centerX = player.x - player.size / 2;
     const centerY = player.y - player.size / 2;
+
+    // Highlight current player
+    if (playerId === currentPlayerId) {
+      context.strokeStyle = '#00ff00';
+      context.lineWidth = 2;
+      context.strokeRect(centerX, centerY, player.size, player.size);
+    }
+
     context.drawImage(playerImage, centerX, centerY, player.size, player.size);
   });
 
   requestAnimationFrame(() => {
-    renderScreen(canvasScreen, game, requestAnimationFrame, currentPlayerId, backgroundImage)
-  })
+    renderScreen(canvasScreen, gameState, requestAnimationFrame, currentPlayerId, backgroundImage);
+  });
 }

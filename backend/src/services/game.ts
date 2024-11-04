@@ -259,15 +259,24 @@ export default function createGame() {
   }
 
 
-  function addPlayer(playerId: string) {
-    const { bot3, ...remainingPlayers } = gameState.players;
+  function addPlayer(playerId: string, position: number) {
+    const positions = [
+      { x: 150, y: 150 },
+      { x: 630, y: 150 },
+      { x: 150, y: 430 },
+      { x: 630, y: 430 }
+    ];
 
-    const updatedPlayersState: PlayersRecord = {
-      ...remainingPlayers,
-      [playerId]: bot3
-    };
-
-    setState({ players: updatedPlayersState });
+    if (position >= 0 && position < positions.length) {
+      const { x, y } = positions[position];
+      gameState.players[playerId] = {
+        x,
+        y,
+        size: 80,
+        isBot: false,
+        imageSrc: ''
+      };
+    }
   }
 
   function stop() {

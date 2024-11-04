@@ -64,7 +64,7 @@ export interface IGame {
   movePlayer: (message: IGameMessage) => void;
   subscribe(observerFunction: (message: IGameMessage) => void): void;
   setState(newState: Partial<IGameState>): void;
-  addPlayer(playerId: string): void;
+  addPlayer(playerId: string, position: number): void;
   start: () => void;
   stop: () => void;
 }
