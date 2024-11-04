@@ -46,26 +46,17 @@ export default function renderScreen(
     // Renderiza as paredes
     renderWalls(context, game.gameState.walls);
 
-  // game.gameState.walls.forEach((wall) => {
-  //   if (wall.active) {
-  //     context.fillStyle = 'gray';
-  //     context.fillRect(wall.x, wall.y, wall.width, wall.height);
-  //   }
-  // });
 
   for (const playerId in game.gameState.players) {
     const player = game.gameState.players[playerId];
-    context.fillStyle = player.color
+    // context.fillStyle = player.color
+    const playerImage = new Image(300, 300);
+    playerImage.src = "/assets/p1.png";
     const centerX = player.x - player.size / 2;
     const centerY = player.y - player.size / 2;
-    context.fillRect(centerX, centerY, player.size, player.size);
-  }
+    context.drawImage(playerImage, centerX, centerY, player.size, player.size);
 
-  /* context.fillStyle = 'white';
-  context.font = '16px Arial';
-  lives.forEach((life, index) => {
-      context.fillText(`Player ${index + 1} Vidas: ${life}`, 10, 20 + index * 20);
-  }); */
+  }
 
   requestAnimationFrame(() => {
     renderScreen(canvasScreen, game, requestAnimationFrame, currentPlayerId, backgroundImage)

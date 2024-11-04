@@ -13,7 +13,7 @@ export interface IPlayer {
   x: number;
   y: number;
   size: number;
-  color: string;
+  imageSrc?: string;
   isBot: boolean;
 }
 
@@ -57,13 +57,6 @@ export interface IGame {
   movePlayer: (command: IGameMessage) => void;
 }
 
-// export const initialWallsState: IWall[] = [
-//   { x: 20, y: 20, width: 80, height: 80, active: true },
-//   { x: 700, y: 20, width: 80, height: 80, active: true },
-//   { x: 20, y: 500, width: 80, height: 80, active: true },
-//   { x: 700, y: 500, width: 80, height: 80, active: true }
-// ];
-
 export const initialWallsState: IWall[] = [
   { x: 20, y: 20, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] },
   { x: 700, y: 20, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] },
@@ -72,10 +65,10 @@ export const initialWallsState: IWall[] = [
 ];
 
 export const initialPlayersState: PlayersRecord = {
-  'bot0': { x: 110, y: 110, size: 20, color: 'blue', isBot: true },
-  'bot1': { x: 670, y: 110, size: 20, color: 'green', isBot: true },
-  'bot2': { x: 110, y: 470, size: 20, color: 'yellow', isBot: true },
-  'bot3': { x: 670, y: 470, size: 20, color: 'red', isBot: false }
+  'bot0': { x: 110, y: 110, size: 20, isBot: true, imageSrc: "/assets/p1.png" },
+  'bot1': { x: 670, y: 110, size: 20, isBot: true, imageSrc: "/assets/p1.png" },
+  'bot2': { x: 110, y: 470, size: 20, isBot: true, imageSrc: "/assets/p1.png" },
+  'bot3': { x: 670, y: 470, size: 20, isBot: false, imageSrc: "/assets/p1.png"}
 };
 
 export const initialBallState: IBall = {

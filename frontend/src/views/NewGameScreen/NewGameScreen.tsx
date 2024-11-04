@@ -2,8 +2,6 @@ import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 're
 import { useWebSocket } from '../../context/WebSocketContext';
 import createGame from '../../services/game';
 import renderScreen from './renderScreen';
-import bgImage from '../../assets/bg-space.svg';
-
 
 
 interface ScreenProps {
@@ -20,6 +18,8 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen }) => {
 
 
 	useEffect(() => {
+		  const bgImage = '/assets/bg-space.svg';
+
 	      // Carregar a imagem de fundo uma vez
 		  const img = new Image();
 		  img.src = bgImage; // Usa a imagem importada
