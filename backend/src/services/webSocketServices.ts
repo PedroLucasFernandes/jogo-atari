@@ -2,6 +2,7 @@ import { WebSocketServer, WebSocket } from 'ws';
 import createGame from './game';
 import { IGame, IGameMessage } from '../interfaces/game';
 import jwt from 'jsonwebtoken';
+import { v4 as uuidv4 } from 'uuid';
 
 interface ExtendedRequest extends Request {
 	user?: any;
@@ -9,7 +10,8 @@ interface ExtendedRequest extends Request {
 
 class WebSocketService {
 	private clients: { [key: string]: { ws: WebSocket, user: any } } = {};
-	private rooms: { [key: string]: string[] } = {}; // roomId -> array of client IDs
+	//private rooms: { [key: string]: string[] } = {}; // roomId -> array of client IDs
+	private rooms: { [key: string]: { players: { playerId: string; username: string; ready: boolean }[]; code: string } } = {};
 	private gamesByRoom: { [key: string]: IGame } = {}; // roomId -> game instance
 
 	constructor(private wss: WebSocketServer) {
@@ -84,10 +86,10 @@ class WebSocketService {
 	private handleMessage(clientId: string, message: any) {
 		switch (message.type) {
 			case 'createRoom':
-				this.createRoom(clientId, message.data.code);
+				this.createRoom(clientId, message.data.username, message.data.code);
 				break;
 			case 'joinRoom':
-				this.joinRoom(clientId, message.data.code);
+				this.joinRoom(clientId, message.data.username, message.data.roomId, message.data.code);
 				break;
 			case 'startGame':
 				this.startGame(clientId, message.data.roomId);
@@ -98,18 +100,31 @@ class WebSocketService {
 		}
 	}
 
-	private createRoom(clientId: string, roomId: string) {
-		console.log("creating room", roomId);
-		this.rooms[roomId] = [clientId];
+	private createRoom(clientId: string, username: string, code: string) {
+		console.log("creating room", code);
+
+		const roomId = uuidv4().slice(0, 6); // Gera uma chave única com 6 caracteres
+		if (!this.rooms[roomId]) {
+			this.rooms[roomId] = { players: [{ playerId: clientId, username: username, ready: false }], code };
+			console.log(`Sala criada: ${roomId}`);
+		} else {
+			console.log(`Erro: a sala ${roomId} já existe. Tente novamente.`);
+			//return this.createRoom(clientId, code);
+			return
+		}
+
 		this.notifyClient(clientId, {
 			type: 'roomCreated',
-			data: { roomId, players: [clientId] }
+			data: { roomId, players: [{ playerId: clientId, username: username, ready: false }] }
 		});
 	}
 
-	private joinRoom(clientId: string, roomId: string) {
-		console.log("joining room", roomId);
-		if (!this.rooms[roomId]) {
+	private joinRoom(clientId: string, username: string, roomId: string, code: string) {
+		console.log("joining room", roomId, code);
+
+		const room = this.rooms[roomId];
+
+		if (!room) {
 			this.notifyClient(clientId, {
 				type: 'error',
 				data: { message: 'Room not found' }
@@ -117,7 +132,14 @@ class WebSocketService {
 			return;
 		}
 
-		if (this.rooms[roomId].length >= 4) {
+		if (room.code !== code) {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Invalid code' }
+			});
+		}
+
+		if (room.players.length >= 4) {
 			this.notifyClient(clientId, {
 				type: 'error',
 				data: { message: 'Room is full' }
@@ -125,20 +147,28 @@ class WebSocketService {
 			return;
 		}
 
-		this.rooms[roomId].push(clientId);
+		room.players.push({ playerId: clientId, username: username, ready: false });
+		console.log(`Usuário ${clientId} adicionado à sala ${roomId}.`);
+		//const room = this.rooms[roomId];
+
 
 		// Notify all players in the room about the new player
-		this.rooms[roomId].forEach(playerId => {
-			this.notifyClient(playerId, {
+		room.players.forEach(player => {
+			this.notifyClient(player.playerId, {
 				type: 'playerJoined',
-				data: { roomId, players: this.rooms[roomId] }
+				data: { roomId, players: this.rooms[roomId].players }
 			});
 		});
 	}
 
 	private startGame(clientId: string, roomId: string) {
 		console.log("starting game", roomId);
-		if (!this.rooms[roomId]?.includes(clientId)) {
+		/* if (!this.rooms[roomId]?.includes(clientId)) {
+			return;
+		} */
+
+		if (!this.rooms[roomId].players[0] == !clientId) {
+			console.log("You are not the host of the room");
 			return;
 		}
 
@@ -146,22 +176,22 @@ class WebSocketService {
 		this.gamesByRoom[roomId] = game;
 
 		// Add all players from the room to the game
-		this.rooms[roomId].forEach((playerId, index) => {
-			game.addPlayer(playerId, index);
+		this.rooms[roomId].players.forEach((player, index) => {
+			game.addPlayer(player.playerId, player.username, index);
 		});
 
 		game.start();
 
 		// Subscribe to game events
 		game.subscribe((message: IGameMessage) => {
-			this.rooms[roomId].forEach(playerId => {
-				this.notifyClient(playerId, message);
+			this.rooms[roomId].players.forEach(player => {
+				this.notifyClient(player.playerId, message);
 			});
 		});
 
 		// Notify all players that the game has started
-		this.rooms[roomId].forEach(playerId => {
-			this.notifyClient(playerId, {
+		this.rooms[roomId].players.forEach(player => {
+			this.notifyClient(player.playerId, {
 				type: 'gameStarted',
 				data: { gameState: game.gameState }
 			});
@@ -171,7 +201,7 @@ class WebSocketService {
 	private handlePlayerMove(clientId: string, message: any) {
 		// Find the room this player is in
 		const roomId = Object.keys(this.rooms).find(roomId =>
-			this.rooms[roomId].includes(clientId)
+			this.rooms[roomId].players.some(player => player.playerId === clientId)
 		);
 
 		if (roomId && this.gamesByRoom[roomId]) {
@@ -186,29 +216,35 @@ class WebSocketService {
 	}
 
 	private handleDisconnect(clientId: string) {
-		// Find and clean up rooms where this client was present
-		Object.entries(this.rooms).forEach(([roomId, players]) => {
-			if (players.includes(clientId)) {
-				this.rooms[roomId] = players.filter(id => id !== clientId);
+		// Itera sobre cada sala e remove o usuário desconectado
+		Object.entries(this.rooms).forEach(([roomId, roomData]) => {
+			const { players } = roomData;
 
-				if (this.rooms[roomId].length === 0) {
+			// Verifica se o usuário está na sala
+			if (players.some(player => player.playerId === clientId)) {
+				// Remove o usuário da lista
+				this.rooms[roomId].players = players.filter(player => player.playerId !== clientId);
+
+				// Se a sala ficou vazia após a remoção, apaga a sala e para o jogo
+				if (this.rooms[roomId].players.length === 0) {
 					delete this.rooms[roomId];
 					if (this.gamesByRoom[roomId]) {
 						this.gamesByRoom[roomId].stop();
 						delete this.gamesByRoom[roomId];
 					}
 				} else {
-					// Notify remaining players about disconnection
-					this.rooms[roomId].forEach(playerId => {
-						this.notifyClient(playerId, {
+					// Notifica os demais usuários sobre a desconexão
+					this.rooms[roomId].players.forEach(player => {
+						this.notifyClient(player.playerId, {
 							type: 'playerLeft',
-							data: { roomId, players: this.rooms[roomId] }
+							data: { roomId, players: this.rooms[roomId].players }
 						});
 					});
 				}
 			}
 		});
 
+		// Remove o cliente da lista de clientes ativos
 		delete this.clients[clientId];
 	}
 

@@ -259,7 +259,7 @@ export default function createGame() {
   }
 
 
-  function addPlayer(playerId: string, position: number) {
+  function addPlayer(playerId: string, username: string, position: number) {
     const positions = [
       { x: 150, y: 150 },
       { x: 630, y: 150 },
@@ -270,6 +270,7 @@ export default function createGame() {
     if (position >= 0 && position < positions.length) {
       const { x, y } = positions[position];
       gameState.players[playerId] = {
+        username,
         x,
         y,
         size: 80,
