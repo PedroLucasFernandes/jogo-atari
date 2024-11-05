@@ -59,18 +59,18 @@ export interface IGame {
 }
 
 export const initialPlanetsState: IPlanet[] = [
-  { x: 20, y: 20, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true], imageSrc: '' },
-  { x: 700, y: 20, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] , imageSrc: ''},
-  { x: 20, y: 500, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] , imageSrc: ''},
-  { x: 700, y: 500, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] , imageSrc: ''}
+  { x: 0, y: 0, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '' },
+  { x: 650, y: 0, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '' },
+  { x: 0, y: 450, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '' },
+  { x: 650, y: 450, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '' }
 ];
 
 export const initialPlayersState: PlayersRecord = {
-  'bot0': { x: 150, y: 150, size: 80, isBot: true, imageSrc: '' }, // Movido mais para dentro do canvas
-  'bot1': { x: 630, y: 150, size: 80, isBot: true, imageSrc: '' }, // Movido mais para dentro do canvas
-  'bot2': { x: 150, y: 430, size: 80, isBot: true, imageSrc: '' }, // Movido mais para dentro do canvas
-  'bot3': { x: 630, y: 430, size: 80, isBot: false, imageSrc: '' } // Movido mais para dentro do canvas
-}
+  'bot0': { x: 170, y: 150, size: 80, isBot: true, imageSrc: '' }, // Centro do "L" frente ao planeta superior esquerdo
+  'bot1': { x: 630, y: 150, size: 80, isBot: true, imageSrc: '' }, // Centro do "L" frente ao planeta superior direito
+  'bot2': { x: 170, y: 450, size: 80, isBot: true, imageSrc: '' }, // Centro do "L" frente ao planeta inferior esquerdo
+  'bot3': { x: 630, y: 450, size: 80, isBot: false, imageSrc: '' }  // Centro do "L" frente ao planeta inferior direito
+};
 
 export const initialBallState: IBall = {
   x: 400,

@@ -10,7 +10,7 @@ export default function createGame() {
   }
 
   const speed = 10;
-  const initialY3 = 430;
+  const initialY3 = 450;
   const initialX3 = 630;
 
   const observers: Array<(message: IGameMessage) => void> = [];
@@ -198,11 +198,12 @@ export default function createGame() {
     for (const playerId in gameState.players) {
       const player = gameState.players[playerId];
 
+      const collisionMargin = 2; // Ajuste conforme necessário
       if (
-        gameState.ball.x + gameState.ball.radius > player.x &&
-        gameState.ball.x - gameState.ball.radius < player.x + player.size &&
-        gameState.ball.y + gameState.ball.radius > player.y &&
-        gameState.ball.y - gameState.ball.radius < player.y + player.size
+        gameState.ball.x + gameState.ball.radius > player.x - collisionMargin &&
+        gameState.ball.x - gameState.ball.radius < player.x + player.size + collisionMargin &&
+        gameState.ball.y + gameState.ball.radius > player.y - collisionMargin &&
+        gameState.ball.y - gameState.ball.radius < player.y + player.size + collisionMargin
       ) {
         // Rebater a bola ao detectar colisão
         gameState.ball.speedX *= -1; // Inverte a direção no eixo X
