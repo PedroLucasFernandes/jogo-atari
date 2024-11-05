@@ -7,7 +7,7 @@ interface LobbyScreenProps {
 
 const LobbyScreen: React.FC<LobbyScreenProps> = ({ setScreen }) => {
     const [roomCode, setRoomCode] = useState('');
-    const { createRoom, joinRoom, gameState } = useWebSocket();
+    const { createRoom, joinRoom, roomState } = useWebSocket();
     const [loading, setLoading] = useState(false);
 
     const handleCreateRoom = () => {
@@ -20,23 +20,20 @@ const LobbyScreen: React.FC<LobbyScreenProps> = ({ setScreen }) => {
     const handleJoinRoom = () => {
         if (!roomCode) return;
         setLoading(true);
-        joinRoom(roomCode);
+        //joinRoom(roomCode);
         //setScreen('game');
     };
 
     useEffect(() => {
-        if (!gameState) return;
-        if (gameState.room.status === 'lobby') {
+        if (!roomState) return;
+        if (roomState.status === 'waiting') {
             setScreen('waiting-room');
             console.log("Movido para a sala de espera");
-        }
 
-        return function cleanup() {
             setRoomCode('');
             setLoading(false);
         }
-
-    }, [gameState])
+    }, [roomState])
 
     return (
         <div id="loby-screen">
@@ -71,6 +68,7 @@ const LobbyScreen: React.FC<LobbyScreenProps> = ({ setScreen }) => {
                     Join Room
                 </button>
             </div>
+            <button onClick={() => setScreen('main-menu')}>Voltar ao menu</button>
 
         </div>
     );

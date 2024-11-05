@@ -1,6 +1,6 @@
 import { WebSocketServer, WebSocket } from 'ws';
 import createGame from './game';
-import { IGame, IGameMessage } from '../interfaces/game';
+import { gameStatus, IGame, IGameMessage, IRoomState } from '../interfaces/game';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -11,7 +11,14 @@ interface ExtendedRequest extends Request {
 class WebSocketService {
 	private clients: { [key: string]: { ws: WebSocket, user: any } } = {};
 	//private rooms: { [key: string]: string[] } = {}; // roomId -> array of client IDs
-	private rooms: { [key: string]: { players: { playerId: string; username: string; ready: boolean }[]; code: string } } = {};
+	private rooms: {
+		[key: string]: {
+			players: { playerId: string; username: string; ready: boolean, isHost: boolean }[];
+			code: string;
+			status: gameStatus,
+			host: string;
+		}
+	} = {};
 	private gamesByRoom: { [key: string]: IGame } = {}; // roomId -> game instance
 
 	constructor(private wss: WebSocketServer) {
@@ -85,6 +92,9 @@ class WebSocketService {
 
 	private handleMessage(clientId: string, message: any) {
 		switch (message.type) {
+			case 'getRooms':
+				this.getRooms(clientId);
+				break;
 			case 'createRoom':
 				this.createRoom(clientId, message.data.username, message.data.code);
 				break;
@@ -100,10 +110,33 @@ class WebSocketService {
 			case 'closeRoom':
 				// TODO: Caso o host deseja cancelar a sala
 				break;
-			case 'exitRoom':
+			case 'leaveRoom':
 				// TODO: Caso algum player saia da sala
 				break;
 		}
+	}
+
+	private getRoomStates() {
+		const roomStates: IRoomState[] = Object.entries(this.rooms).map(([roomId, room]) => ({
+			roomId, // A chave é o id da sala
+			status: room.status,
+			host: room.host,
+			players: room.players.map(player => ({
+				playerId: player.playerId,
+				username: player.username,
+				ready: player.ready,
+				isHost: player.isHost,
+			})),
+		}));
+
+		return roomStates;
+	}
+
+	private getRooms(clientId: string) {
+		this.notifyClient(clientId, {
+			type: 'roomsReceived',
+			data: { rooms: this.getRoomStates() }
+		});
 	}
 
 	private createRoom(clientId: string, username: string, code: string) {
@@ -111,7 +144,12 @@ class WebSocketService {
 
 		const roomId = uuidv4().slice(0, 6); // Gera uma chave única com 6 caracteres
 		if (!this.rooms[roomId]) {
-			this.rooms[roomId] = { players: [{ playerId: clientId, username: username, ready: false }], code };
+			this.rooms[roomId] = {
+				status: 'waiting',
+				host: clientId,
+				players: [{ playerId: clientId, username: username, ready: false, isHost: true }], code
+			};
+
 			console.log(`Sala criada: ${roomId}`);
 		} else {
 			console.log(`Erro: a sala ${roomId} já existe. Tente novamente.`);
@@ -120,9 +158,11 @@ class WebSocketService {
 		}
 
 		const data = {
-			gameState: {
-				players: [{ playerId: clientId, username: username, ready: false }],
-				room: { roomId: roomId, status: 'lobby' }
+			roomState: {
+				roomId: roomId,
+				status: 'waiting',
+				host: clientId,
+				players: [{ playerId: clientId, username: username, ready: false, isHost: true }],
 			}
 		}
 
@@ -164,16 +204,24 @@ class WebSocketService {
 			return;
 		}
 
-		room.players.push({ playerId: clientId, username: username, ready: false });
+		room.players.push({ playerId: clientId, username: username, ready: false, isHost: false });
 		console.log(`Usuário ${clientId} adicionado à sala ${roomId}.`);
 		//const room = this.rooms[roomId];
 
+		const data = {
+			roomState: {
+				roomId: roomId,
+				status: 'waiting',
+				host: clientId,
+				players: this.rooms[roomId].players
+			}
+		}
 
 		// Notify all players in the room about the new player
 		room.players.forEach(player => {
 			this.notifyClient(player.playerId, {
 				type: 'playerJoined',
-				data: { roomId, players: this.rooms[roomId].players }
+				data: data
 			});
 		});
 	}

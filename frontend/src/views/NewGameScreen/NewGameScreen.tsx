@@ -14,7 +14,7 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, roomCode }) => {
 	const [isHost, setIsHost] = useState(false);
 
 	// Load background image
-	useEffect(() => {
+	/* useEffect(() => {
 		const bgImage = '/assets/bg-space.svg';
 		const img = new Image();
 		img.src = bgImage;
@@ -55,7 +55,7 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, roomCode }) => {
 
 		document.addEventListener('keydown', handleKeyDown);
 		return () => document.removeEventListener('keydown', handleKeyDown);
-	}, [movePlayer]);
+	}, [movePlayer]); */
 
 	return (
 		<div className="relative">

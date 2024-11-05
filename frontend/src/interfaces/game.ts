@@ -1,5 +1,5 @@
 export type AcceptedMoves = 'w' | 'a' | 's' | 'd' | 'arrowup' | 'arrowleft' | 'arrowdown' | 'arrowright';
-export type gameStatus = 'lobby' | 'inprogress' | 'paused' | 'finished';
+export type gameStatus = 'lobby' | 'waiting' | 'inprogress' | 'paused' | 'finished';
 
 export interface IWall {
   x: number;
@@ -37,16 +37,26 @@ export interface ICanvas {
   height: number;
 }
 
-export interface IRoom {
+export interface IPlayerRoom {
+  playerId: string;
+  username: string;
+  ready: boolean;
+  isHost: boolean;
+}
+
+export interface IRoomState {
   roomId: string;
   status: gameStatus;
+  host: string;
+  players: IPlayerRoom[];
 }
+
 export interface IGameState {
   players: PlayersRecord;
   walls: IWall[];
   ball: IBall;
   canvas: ICanvas;
-  room: IRoom;
+  room: IRoomState;
 }
 
 export interface IGameMessage {
@@ -60,6 +70,8 @@ export interface IGameMessage {
     gameState?: IGameState;
     ball?: IBall;
     message?: string;
+    roomState?: IRoomState;
+    rooms?: IRoomState[];
   }
 }
 
@@ -96,9 +108,18 @@ export const initialCanvasState: ICanvas = {
   height: 600
 };
 
-export const initialRoomState: IRoom = {
+export const initialPlayersRoomState: IPlayerRoom[] = [
+  { playerId: 'bot0', username: 'Bot 0', ready: false, isHost: false },
+  { playerId: 'bot1', username: 'Bot 1', ready: false, isHost: false },
+  { playerId: 'bot2', username: 'Bot 2', ready: false, isHost: false },
+  { playerId: 'bot3', username: 'Bot 3', ready: false, isHost: false }
+]
+
+export const initialRoomState: IRoomState = {
   roomId: '',
-  status: 'lobby'
+  status: 'lobby',
+  host: '',
+  players: initialPlayersRoomState
 }
 
 

@@ -66,7 +66,7 @@ export async function enterRoom({ password }: { password: string }) {
 	}
 }
 
-export async function exitRoom({ roomId }: { roomId: string }) {
+export async function leaveRoom({ roomId }: { roomId: string }) {
 	const body = {
 		roomId,
 	}
@@ -84,7 +84,7 @@ export async function exitRoom({ roomId }: { roomId: string }) {
 		return { data: response.data, success: true, error: null as null };
 
 	} catch (error) {
-		return { data: null as null, success: false, error: "exitRoom : Um erro inesperado aconteceu" };
+		return { data: null as null, success: false, error: "leaveRoom : Um erro inesperado aconteceu" };
 	}
 }
 
