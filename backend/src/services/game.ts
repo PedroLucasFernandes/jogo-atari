@@ -146,10 +146,10 @@ export default function createGame() {
       },
     }
 
-    if (!message.data.keyPressed) return;
+    if (!message.data.keyPressed || !message.data.playerId) return;
     const keyPressed: string = message.data.keyPressed;
 
-    if (!message.data.playerId) return;
+    // if (!message.data.playerId) return; //(juntei ali em cima numa validação só)
     const playerId: string = message.data.playerId;
 
     if (keyPressed in acceptedMoves) {
@@ -158,13 +158,9 @@ export default function createGame() {
 
       if (player && moveFunction) {
         moveFunction(player);
+        notifyAll({ type: 'movePlayer', data: { gameState } })
       }
     }
-
-    const data = {
-      gameState
-    }
-    notifyAll({ type: 'movePlayer', data })
   }
 
   function notifyBallUpdate() {
