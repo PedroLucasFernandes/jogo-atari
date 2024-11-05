@@ -65,31 +65,29 @@ export const Login: React.FC = () => {
           onChange={(e) => setPassword(e.target.value)}
           type='password'
         />
-        <div className='div-button'>
-        <button
-          className='button'
-          disabled={!email || !password}
-          onClick={handleLogin}
-        >
-          Entrar
-        </button>
-        <LoginGoogleButton />
-        </div>
+          <button
+            className='button'
+            disabled={!email || !password}
+            onClick={handleLogin}
+          >
+            Entrar
+          </button>
+          <LoginGoogleButton />
         <div id='text-div'>
-        <h2 className='text'>
-          Não possui uma conta?
-          <Link
-          to="/register"
-          style={{ color: '#007bff', textDecoration: 'underline' }}
-          onClick={(e) => {
-          e.preventDefault();
-          navigate("/register");
-  }}
-  className="text"
->
-  Faça seu cadastro!
-</Link>
-        </h2>
+          <h2 className='text'>
+            Não possui uma conta?
+            <Link
+              to="/register"
+              style={{ color: '#007bff', textDecoration: 'underline' }}
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/register");
+              }}
+              className="text"
+            >
+              Faça seu cadastro!
+            </Link>
+          </h2>
         </div>
       </div>
       <Toast message={toastMessage} color={toastColor} isActive={toastVisible} />
