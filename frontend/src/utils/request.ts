@@ -19,7 +19,7 @@ export default async function request<T>({
     socketId,
 }: requestOptions): Promise<{
     data: T;
-    error: boolean;
+    error: string | string[] | undefined;  
     success: boolean;
     status: number;
     message?: string | string[];
@@ -34,17 +34,22 @@ export default async function request<T>({
         },
         cache: "no-store",
         credentials: 'include',
-
     };
 
     const response = await fetch(url, requestOptions);
     const data = await response.json();
 
+    let error: string | string[] | undefined = undefined;
+
+    if (!response.ok) {
+        error = data.error || 'Erro desconhecido. Tente novamente mais tarde.';
+    }
+
     return {
         data: data.data,
-        error: !response.ok,
+        error,
         success: data.success,
         status: response.status,
-        message: data.message ? data.message : null,
+        message: data.message || undefined, 
     };
 }
