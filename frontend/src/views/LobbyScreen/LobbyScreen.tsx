@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useWebSocket } from '../../context/WebSocketContext';
 
 interface LobbyScreenProps {
@@ -7,19 +7,36 @@ interface LobbyScreenProps {
 
 const LobbyScreen: React.FC<LobbyScreenProps> = ({ setScreen }) => {
     const [roomCode, setRoomCode] = useState('');
-    const { createRoom, joinRoom } = useWebSocket();
+    const { createRoom, joinRoom, gameState } = useWebSocket();
+    const [loading, setLoading] = useState(false);
 
     const handleCreateRoom = () => {
         if (!roomCode) return;
+        setLoading(true);
         createRoom(roomCode);
         //setScreen('game');
     };
 
     const handleJoinRoom = () => {
         if (!roomCode) return;
+        setLoading(true);
         joinRoom(roomCode);
         //setScreen('game');
     };
+
+    useEffect(() => {
+        if (!gameState) return;
+        if (gameState.room.status === 'lobby') {
+            setScreen('waiting-room');
+            console.log("Movido para a sala de espera");
+        }
+
+        return function cleanup() {
+            setRoomCode('');
+            setLoading(false);
+        }
+
+    }, [gameState])
 
     return (
         <div id="loby-screen">
@@ -41,7 +58,7 @@ const LobbyScreen: React.FC<LobbyScreenProps> = ({ setScreen }) => {
                 <button
                     onClick={handleCreateRoom}
                     className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded"
-                    disabled={!roomCode}
+                    disabled={!roomCode || loading}
                 >
                     Create New Room
                 </button>
@@ -49,7 +66,7 @@ const LobbyScreen: React.FC<LobbyScreenProps> = ({ setScreen }) => {
                 <button
                     onClick={handleJoinRoom}
                     className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-6 rounded"
-                    disabled={!roomCode}
+                    disabled={!roomCode || loading}
                 >
                     Join Room
                 </button>

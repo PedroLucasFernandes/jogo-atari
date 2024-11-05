@@ -1,4 +1,4 @@
-import { AcceptedMoves, IGameMessage, IGameState, initialBallState, initialCanvasState, initialPlayersState, initialWallsState, IPlayer, PlayersRecord } from "../interfaces/game"
+import { AcceptedMoves, IGameMessage, IGameState, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialWallsState, IPlayer, PlayersRecord } from "../interfaces/game"
 
 export default function createGame() {
 
@@ -7,6 +7,7 @@ export default function createGame() {
     walls: initialWallsState,
     ball: initialBallState,
     canvas: initialCanvasState,
+    room: initialRoomState
   }
 
   const speed = 10;
@@ -275,7 +276,8 @@ export default function createGame() {
         y,
         size: 80,
         isBot: false,
-        imageSrc: ''
+        imageSrc: '',
+        ready: true,
       };
     }
   }

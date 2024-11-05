@@ -119,10 +119,21 @@ class WebSocketService {
 			return
 		}
 
+		const data = {
+			gameState: {
+				players: [{ playerId: clientId, username: username, ready: false }],
+				room: { roomId: roomId, status: 'lobby' }
+			}
+		}
+
 		this.notifyClient(clientId, {
 			type: 'roomCreated',
-			data: { roomId, players: [{ playerId: clientId, username: username, ready: false }] }
+			data: data
 		});
+		/* this.notifyClient(clientId, {
+			type: 'roomCreated',
+			data: { roomId, gameState: { players: [{ playerId: clientId, username: username, ready: false }] } }
+		}); */
 	}
 
 	private joinRoom(clientId: string, username: string, roomId: string, code: string) {

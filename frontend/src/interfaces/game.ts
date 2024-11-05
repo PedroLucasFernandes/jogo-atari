@@ -1,4 +1,5 @@
 export type AcceptedMoves = 'w' | 'a' | 's' | 'd' | 'arrowup' | 'arrowleft' | 'arrowdown' | 'arrowright';
+export type gameStatus = 'lobby' | 'inprogress' | 'paused' | 'finished';
 
 export interface IWall {
   x: number;
@@ -10,11 +11,14 @@ export interface IWall {
 }
 
 export interface IPlayer {
+  //O id do player é a própria chave no PlayersRecord
+  username: string;
   x: number;
   y: number;
   size: number;
   isBot: boolean;
   imageSrc: string;
+  ready: boolean;
 }
 
 export type PlayersRecord = Record<string, IPlayer>;
@@ -33,22 +37,29 @@ export interface ICanvas {
   height: number;
 }
 
+export interface IRoom {
+  roomId: string;
+  status: gameStatus;
+}
 export interface IGameState {
   players: PlayersRecord;
   walls: IWall[];
   ball: IBall;
   canvas: ICanvas;
+  room: IRoom;
 }
 
 export interface IGameMessage {
   type: string;
   data: {
     playerId?: string;
+    username?: string;
     roomId?: string;
     code?: string;
     keyPressed?: string;
     gameState?: IGameState;
     ball?: IBall;
+    message?: string;
   }
 }
 
@@ -65,10 +76,10 @@ export const initialWallsState: IWall[] = [
 ];
 
 export const initialPlayersState: PlayersRecord = {
-  'bot0': { x: 150, y: 150, size: 80, isBot: true, imageSrc: '' }, // Movido mais para dentro do canvas
-  'bot1': { x: 630, y: 150, size: 80, isBot: true, imageSrc: '' }, // Movido mais para dentro do canvas
-  'bot2': { x: 150, y: 430, size: 80, isBot: true, imageSrc: '' }, // Movido mais para dentro do canvas
-  'bot3': { x: 630, y: 430, size: 80, isBot: false, imageSrc: '' } // Movido mais para dentro do canvas
+  'bot0': { username: 'Bot 0', x: 150, y: 150, size: 80, isBot: true, imageSrc: '', ready: false }, // Movido mais para dentro do canvas
+  'bot1': { username: 'Bot 1', x: 630, y: 150, size: 80, isBot: true, imageSrc: '', ready: false }, // Movido mais para dentro do canvas
+  'bot2': { username: 'Bot 2', x: 150, y: 430, size: 80, isBot: true, imageSrc: '', ready: false }, // Movido mais para dentro do canvas
+  'bot3': { username: 'Bot 3', x: 630, y: 430, size: 80, isBot: false, imageSrc: '', ready: false } // Movido mais para dentro do canvas
 }
 
 export const initialBallState: IBall = {
@@ -84,6 +95,11 @@ export const initialCanvasState: ICanvas = {
   width: 800,
   height: 600
 };
+
+export const initialRoomState: IRoom = {
+  roomId: '',
+  status: 'lobby'
+}
 
 
 export const playersImages = Array.from({ length: 5 }, (_, i) => {

@@ -1,4 +1,4 @@
-import { AcceptedMoves, IGameMessage, IGameState, initialBallState, initialCanvasState, initialPlayersState, initialWallsState, IPlayer } from "../interfaces/game"
+import { AcceptedMoves, IGameMessage, IGameState, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialWallsState, IPlayer } from "../interfaces/game"
 
 export default function createGame() {
 
@@ -13,6 +13,7 @@ export default function createGame() {
     walls: initialWallsState,
     ball: initialBallState,
     canvas: initialCanvasState,
+    room: initialRoomState,
   }
 
   const speed = 10;

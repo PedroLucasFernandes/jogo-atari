@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { webSocketService } from '../services/WebSocketService';
-import { IGameState, initialBallState, initialCanvasState, initialPlayersState, initialWallsState } from '../interfaces/game';
+import { IGameState, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialWallsState } from '../interfaces/game';
 import { useUser } from './UserContext';
 
 interface WebSocketContextType {
@@ -28,6 +28,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const { user } = useUser();
 
 
+
+
   useEffect(() => {
     const connectWebSocket = () => {
       webSocketService.connect();
@@ -38,6 +40,25 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       console.log(`UUID recebido: ${data.socketId}`);
       setSocketId(data.socketId);
       setStatus('online');
+    });
+
+    webSocketService.registerCallback('roomCreated', (data) => {
+      console.log(`Retorno - sala criada: ${data}`);
+
+      const gameState = data.data.gameState;
+
+      if (gameState.players.length === 0) {
+        console.log("Erro ao indentificar jogador na sala");
+        return;
+      }
+
+      if (gameState.rooms === 0) {
+        console.log("Erro ao indentificar sala");
+        return;
+      }
+
+      setGameState(data.data.gameState)
+      console.log("Retorno - sala criada: gameState setado");
     });
 
     webSocketService.registerCallback('gameStarted', (data) => {
@@ -62,6 +83,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
               walls: initialWallsState,
               ball: initialBallState,
               canvas: initialCanvasState,
+              room: initialRoomState,
             };
           }
 
