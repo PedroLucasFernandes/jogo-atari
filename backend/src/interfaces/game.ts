@@ -1,4 +1,5 @@
 export type AcceptedMoves = 'w' | 'a' | 's' | 'd' | 'arrowup' | 'arrowleft' | 'arrowdown' | 'arrowright';
+export type gameStatus = 'lobby' | 'inprogress' | 'paused' | 'finished';
 
 // export interface IWall {
 //   x: number;

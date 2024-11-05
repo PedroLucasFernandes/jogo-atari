@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { webSocketService } from '../services/WebSocketService';
 import { IGameState, initialBallState, initialCanvasState, initialPlayersState, initialWallsState } from '../interfaces/game';
+import { useUser } from './UserContext';
 
 interface WebSocketContextType {
   isConnected: boolean;
@@ -23,6 +24,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [socketId, setSocketId] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [gameState, setGameState] = useState<IGameState | null>(null);
+
+  const { user } = useUser();
 
 
   useEffect(() => {
@@ -80,13 +83,13 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
 
   const createRoom = (code: string) => {
-    if (!socketId) {
+    if (!socketId || !user) {
       //Todo: Alerta
-      console.log('Can\'t create room without a socketId');
+      console.log('Can\'t create room without a socketId or user context');
       return;
     }
 
-    const data = { code: code, playerId: socketId }
+    const data = { playerId: socketId, username: user.username, code: code, }
     webSocketService.send({ type: 'createRoom', data });
   }
 
@@ -102,13 +105,13 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }
 
   const joinRoom = (code: string) => {
-    if (!socketId) {
+    if (!socketId || !user) {
       //Todo: Alerta
-      console.log('Can\'t join in a room without a socketId');
+      console.log('Can\'t join in a room without a socketId or user context');
       return;
     }
 
-    const data = { code: code, playerId: socketId }
+    const data = { playerId: socketId, username: user.username, code: code }
     webSocketService.send({ type: 'joinRoom', data });
   }
 

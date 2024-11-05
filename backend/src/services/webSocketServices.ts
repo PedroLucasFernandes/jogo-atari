@@ -97,6 +97,12 @@ class WebSocketService {
 			case 'movePlayer':
 				this.handlePlayerMove(clientId, message);
 				break;
+			case 'closeRoom':
+				// TODO: Caso o host deseja cancelar a sala
+				break;
+			case 'exitRoom':
+				// TODO: Caso algum player saia da sala
+				break;
 		}
 	}
 
