@@ -37,7 +37,7 @@ const CreateRoomScreen: React.FC<CreateRoomScreenProps> = ({ setScreen }) => {
             <input
                 type="text"
                 value={roomCode}
-                onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+                onChange={(e) => setRoomCode(e.target.value)}
                 placeholder="Enter Room Code"
                 className="w-full p-3 rounded bg-gray-700 text-white placeholder-gray-400"
                 maxLength={6}

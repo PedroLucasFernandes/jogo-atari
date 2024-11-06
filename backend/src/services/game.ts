@@ -18,6 +18,14 @@ export default function createGame() {
     { x: 630, y: 430 },
   ];
 
+  const intersectionPoints = [
+    { x: 150, y: 300 },  // Jogador 1
+    { x: 470, y: 150 },  // Jogador 2
+    { x: 150, y: 300 },  // Jogador 3
+    { x: 470, y: 430 },  // Jogador 4
+  ];
+
+
   const observers: Array<(message: IGameMessage) => void> = [];
 
   let intervalId: NodeJS.Timeout | null = null;
@@ -152,18 +160,35 @@ export default function createGame() {
     //   },
     // }
 
+    const player = gameState.players[playerId];
+    if (!player || !keyPressed) return;
+
+    // Encontrar o índice do jogador para obter o ponto de interseção
+    const playerIndex = Object.keys(gameState.players).indexOf(playerId);
+    if (playerIndex === -1) return;
+
+    const intersection = intersectionPoints[playerIndex];
     const acceptedMoves: Record<AcceptedMoves, (player: IPlayer) => void> = {
       w(player: IPlayer) {
-        if (player.y > 0 && player.y >= player.initialY + 10) player.y -= speed;
+        if (
+          player.y > 0 &&
+          (player.x === intersection.x || player.y > intersection.y)
+        ) {
+          player.y -= speed;
+        }
       },
       a(player: IPlayer) {
-        if (player.x > 0 && player.x >= player.initialX + 10) player.x -= speed;
+        if (
+          player.x > 0 &&
+          (player.y === intersection.y || player.x > intersection.x)
+        ) {
+          player.x -= speed;
+        }
       },
       s(player: IPlayer) {
         if (
           player.y + player.size / 2 < gameState.canvas.height &&
-          player.y >= player.initialY &&
-          player.x <= player.initialX
+          (player.x === intersection.x || player.y < intersection.y)
         ) {
           player.y += speed;
         }
@@ -171,22 +196,31 @@ export default function createGame() {
       d(player: IPlayer) {
         if (
           player.x + player.size / 2 < gameState.canvas.width &&
-          player.y <= player.initialY
+          (player.y === intersection.y || player.x < intersection.x)
         ) {
           player.x += speed;
         }
       },
       arrowup(player: IPlayer) {
-        if (player.y > 0 && player.y >= player.initialY + 10) player.y -= speed;
+        if (
+          player.y > 0 &&
+          (player.x === intersection.x || player.y > intersection.y)
+        ) {
+          player.y -= speed;
+        }
       },
       arrowleft(player: IPlayer) {
-        if (player.x > 0 && player.x >= player.initialX + 10) player.x -= speed;
+        if (
+          player.x > 0 &&
+          (player.y === intersection.y || player.x > intersection.x)
+        ) {
+          player.x -= speed;
+        }
       },
       arrowdown(player: IPlayer) {
         if (
           player.y + player.size / 2 < gameState.canvas.height &&
-          player.y >= player.initialY &&
-          player.x <= player.initialX
+          (player.x === intersection.x || player.y < intersection.y)
         ) {
           player.y += speed;
         }
@@ -194,28 +228,16 @@ export default function createGame() {
       arrowright(player: IPlayer) {
         if (
           player.x + player.size / 2 < gameState.canvas.width &&
-          player.y <= player.initialY
+          (player.y === intersection.y || player.x < intersection.x)
         ) {
           player.x += speed;
         }
       },
     };
 
-    if (!keyPressed || !playerId) return;
-
-    const player = gameState.players[playerId];
-    if (!player) return;
-
-    /*     const playerIndex = Object.keys(gameState.players).indexOf(playerId);
-        if (playerIndex === -1) return; // Se não encontrar, retorna
-    
-        const initialPosition = initialPositions[playerIndex]; */
-
+    // Executa o movimento com base na tecla pressionada
     if (keyPressed in acceptedMoves) {
-      const player = gameState.players[playerId];
       const moveFunction = acceptedMoves[keyPressed as AcceptedMoves];
-
-      //moveFunction(player, initialPosition);
       moveFunction(player);
     }
 

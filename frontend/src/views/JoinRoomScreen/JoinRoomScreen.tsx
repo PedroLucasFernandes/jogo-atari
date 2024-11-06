@@ -33,6 +33,7 @@ export const JoinRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   };
 
   useEffect(() => {
+    console.log("roomState atualizou");
     if (!roomState) return;
     if (roomState.status === 'waiting') {
       setScreen('waiting-room');
