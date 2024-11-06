@@ -9,13 +9,15 @@ interface ScreenProps {
 }
 
 export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
-  const { startGame, socketId, roomState, closeRoom, leaveRoom } = useWebSocket();
+  const { startGame, socketId, roomState, toggleReadyStatus, removePlayer, closeRoom, leaveRoom } = useWebSocket();
   const [loading, setLoading] = useState(false);
   const [isHost, setIsHost] = useState(false);
 
   useEffect(() => {
     // Inicia o estado de carregamento
     setLoading(true);
+
+    console.log("estado de carregamento", JSON.stringify(roomState));
 
     // Configura o timeout para 5 segundos
     const timeoutId = setTimeout(() => {
@@ -51,27 +53,37 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   }, [roomState, roomState?.status, setScreen]);
 
 
-  const handleStartGame = () => {
-    if (isHost) {
+  const handleStartGame = (roomId: string) => {
+    if (!roomState) return;
+    if (isHost && roomState.players.every(player => player.ready)) {
       setLoading(true);
-      startGame();
+      startGame(roomId);
     } else {
-      console.log("Apenas o host pode iniciar o jogo.");
+      console.log("Apenas o host pode iniciar o jogo, e todos os jogadores devem estar prontos.");
     }
   };
 
-  const handleLeaveRoom = () => {
-    //TODO: Loading
-    console.log("Leave room ainda não implementado");
-    //leaveRoom();
+  const handleToggleReady = (roomId: string) => {
+    if (!roomState) return;
+    toggleReadyStatus(roomId);
   };
 
-  const handleCloseRoom = () => {
+  const handleRemovePlayer = (roomId: string, playerId: string) => {
+    if (!roomState) return;
+    if (isHost && playerId !== roomState.host) {
+      removePlayer(roomId, playerId);
+    }
+  };
+
+  const handleLeaveRoom = (roomId: string) => {
+    //TODO: Loading
+    leaveRoom(roomId);
+  };
+
+  const handleCloseRoom = (roomId: string) => {
     if (isHost) {
       //TODO: Loading
-
-      console.log("Close room ainda não implementado");
-      //closeRoom();
+      closeRoom(roomId);
     } else {
       console.log("Apenas o host pode iniciar o jogo.");
     }
@@ -81,39 +93,60 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
 
   return (
     <Box id="waiting-room">
-      <h2>Sala de espera</h2>
+      <h2>Sala de Espera</h2>
 
-      {loading && <p>Carregando...</p>}
-
-      {!loading && roomState && (
+      {!roomState ? (
+        <p>Carregando...</p>
+      ) : (
         <>
           <Box sx={{ mt: 2 }}>
             <p>Id da sala: {roomState.roomId}</p>
           </Box>
           <Box sx={{ mt: 2 }}>
-            {/* Exibir os jogadores existentes */}
-            {roomState.players.map((player, index) => (
-              <p key={player.playerId}>
-                {index + 1}º jogador: {player.username}
-                {player.isHost ? ' [Host]' : ''}
-              </p>
+            <h3>Jogadores</h3>
+            {roomState.players.map((player) => (
+              <Box key={player.playerId} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                <span>
+                  {player.username} {player.isHost ? '[Host]' : ''} - {player.ready ? 'Pronto' : 'Aguardando'}
+                </span>
+
+                {player.playerId === socketId ? (
+                  <Button variant="outlined" size="sm" onClick={() => handleToggleReady(roomState.roomId)}>
+                    {player.ready ? 'Desmarcar Pronto' : 'Marcar Pronto'}
+                  </Button>
+                ) : (
+                  isHost && (
+                    <Button variant="outlined" size="sm" color="danger" onClick={() => handleRemovePlayer(roomState.roomId, player.playerId)}>
+                      Remover
+                    </Button>
+                  )
+                )}
+              </Box>
             ))}
 
-            {/* Exibir placeholders para jogadores ausentes */}
             {[...Array(4 - roomState.players.length)].map((_, index) => (
               <p key={`waiting-${index}`}>Aguardando {roomState.players.length + index + 1}º jogador</p>
             ))}
           </Box>
 
-          <Box>
-            {/* Botão para sair da sala */}
-            <Button variant="solid" size="md" onClick={() => setScreen('main-menu')}>Sair da sala</Button>
+          <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
+            <Button variant="solid" size="md" onClick={() => handleLeaveRoom(roomState.roomId)}>
+              Sair da sala
+            </Button>
 
-            {/* Exibir o botão de iniciar jogo apenas para o host */}
             {isHost && (
               <>
-                <Button variant="solid" size="md" onClick={handleCloseRoom}>Cancelar sala</Button>
-                <Button variant="solid" size="md" onClick={handleStartGame}>Iniciar jogo</Button>
+                <Button variant="solid" size="md" onClick={() => handleCloseRoom(roomState.roomId)}>
+                  Cancelar sala
+                </Button>
+                <Button
+                  variant="solid"
+                  size="md"
+                  onClick={() => handleStartGame(roomState.roomId)}
+                  disabled={!roomState.players.every(player => player.ready)}
+                >
+                  Iniciar jogo
+                </Button>
               </>
             )}
           </Box>

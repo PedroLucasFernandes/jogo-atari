@@ -13,7 +13,7 @@ export const JogoSinglePlayer: React.FC<ScreenProps> = ({ setScreen }) => {
   const { startGame, gameState } = useWebSocket();
 
   const handleStartGame = () => {
-    startGame();
+    //startGame();
     //TODO: Loading
   };
 

@@ -62,7 +62,7 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, roomCode }) => {
 			<canvas ref={canvasRef} width={800} height={600} className="border border-gray-600 rounded-lg" />
 			{isHost && (
 				<button
-					onClick={() => startGame()}
+					//onClick={() => startGame()}
 					className="absolute top-4 right-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
 				>
 					Start Game

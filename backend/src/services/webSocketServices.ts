@@ -108,11 +108,18 @@ class WebSocketService {
 				this.handlePlayerMove(clientId, message);
 				break;
 			case 'closeRoom':
-				// TODO: Caso o host deseja cancelar a sala
+				this.closeRoom(clientId, message.data.roomId);
 				break;
 			case 'leaveRoom':
-				// TODO: Caso algum player saia da sala
+				this.leaveRoom(clientId, message.data.roomId);
 				break;
+			case 'toggleReadyStatus':
+				this.toggleReadyStatus(clientId, message.data.roomId, message.data.playerId);
+				break;
+			case 'removePlayer':
+				this.removePlayer(clientId, message.data.roomId, message.data.playerId);
+			default:
+				console.error(`Invalid message type received: ${message.type}`);
 		}
 	}
 
@@ -142,7 +149,7 @@ class WebSocketService {
 	private createRoom(clientId: string, username: string, code: string) {
 		console.log("creating room", code);
 
-		const roomId = uuidv4().slice(0, 6); // Gera uma chave única com 6 caracteres
+		const roomId = uuidv4().slice(0, 6).toLocaleUpperCase(); // Gera uma chave única com 6 caracteres
 		if (!this.rooms[roomId]) {
 			this.rooms[roomId] = {
 				status: 'waiting',
@@ -174,6 +181,38 @@ class WebSocketService {
 			type: 'roomCreated',
 			data: { roomId, gameState: { players: [{ playerId: clientId, username: username, ready: false }] } }
 		}); */
+	}
+
+	private closeRoom(clientId: string, roomId: string) {
+		console.log("closing room", roomId);
+		const room = this.rooms[roomId];
+		const playerIndex = room.players.findIndex(p => p.playerId === clientId);
+
+		if (playerIndex === -1) {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Player not found' }
+			});
+			return;
+		}
+
+		if (!room) {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Room not found' }
+			});
+			return;
+		}
+
+		if (room.host === clientId) {
+			this.notifyClient(clientId, {
+				type: 'roomClosed',
+				data: { roomId }
+			});
+			delete this.rooms[roomId];
+			console.log(`Sala ${roomId} fechada.`);
+			return;
+		}
 	}
 
 	private joinRoom(clientId: string, username: string, roomId: string, code: string) {
@@ -211,11 +250,13 @@ class WebSocketService {
 		const data = {
 			roomState: {
 				roomId: roomId,
-				status: 'waiting',
-				host: clientId,
+				status: room.status,
+				host: room.host,
 				players: this.rooms[roomId].players
 			}
 		}
+
+		console.log("joinroom console", JSON.stringify(data));
 
 		// Notify all players in the room about the new player
 		room.players.forEach(player => {
@@ -226,16 +267,167 @@ class WebSocketService {
 		});
 	}
 
-	private startGame(clientId: string, roomId: string) {
-		console.log("starting game", roomId);
-		/* if (!this.rooms[roomId]?.includes(clientId)) {
-			return;
-		} */
+	private leaveRoom(clientId: string, roomId: string) {
+		console.log("leaving room", roomId);
+		const room = this.rooms[roomId];
+		const playerIndex = room.players.findIndex(p => p.playerId === clientId);
 
-		if (!this.rooms[roomId].players[0] == !clientId) {
-			console.log("You are not the host of the room");
+		if (playerIndex === -1) {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Player not found' }
+			});
 			return;
 		}
+
+		if (!room) {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Room not found' }
+			});
+			return;
+		}
+
+		if (room.host === clientId) {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Cannot leave the room as the host' }
+				//TODO: Implementar outra alternativa depois, como repassar o host ou excluir a sala
+			});
+			return;
+		}
+
+		room.players.splice(playerIndex, 1);
+
+		const data = {
+			roomState: {
+				roomId: roomId,
+				status: room.status,
+				host: room.host,
+				players: this.rooms[roomId].players
+			}
+		}
+
+		// Notify all players in the room about the new player
+		room.players.forEach(player => {
+			this.notifyClient(player.playerId, {
+				type: 'playerLeft',
+				data: data
+			});
+		});
+	}
+
+	private toggleReadyStatus(clientId: string, roomId: string, playerId: string) {
+		console.log("toggling ready status", roomId, playerId);
+		const room = this.rooms[roomId];
+		const player = room.players.find(p => p.playerId === playerId);
+
+		if (!room) {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Room not found' }
+			});
+			return;
+		}
+
+		if (!player) {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Player not found' }
+			});
+			return;
+		}
+
+		player.ready = !player.ready;
+
+		const data = {
+			roomState: {
+				roomId: roomId,
+				status: room.status,
+				host: room.host,
+				players: this.rooms[roomId].players
+			}
+		}
+
+		// Notify all players in the room about the new player
+		room.players.forEach(player => {
+			this.notifyClient(player.playerId, {
+				type: 'playerStatusChanged',
+				data: data
+			});
+		});
+	}
+
+	private removePlayer(clientId: string, roomId: string, playerId: string) {
+		console.log("removing player", roomId, playerId);
+		const room = this.rooms[roomId];
+		const player = room.players.find(p => p.playerId === playerId);
+
+		if (room.host !== clientId) {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'You are not the host of the room' }
+			});
+			return;
+		}
+
+		if (!room) {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Room not found' }
+			});
+			return;
+		}
+
+		if (!player) {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Player not found' }
+			});
+			return;
+		}
+
+		room.players = room.players.filter(p => p.playerId !== playerId);
+
+		const data = {
+			roomState: {
+				roomId: roomId,
+				status: room.status,
+				host: room.host,
+				players: this.rooms[roomId].players
+			}
+		}
+
+		// Notify all players in the room about the new player
+		room.players.forEach(player => {
+			this.notifyClient(player.playerId, {
+				type: 'playerRemoved',
+				data: data
+			});
+		});
+	}
+
+	private startGame(clientId: string, roomId: string) {
+		console.log("starting game", roomId);
+		const room = this.rooms[roomId];
+
+		if (!room) {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Room not found' }
+			});
+			return;
+		}
+
+		if (room.host !== clientId) {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'You are not the host of the room' }
+			});
+			return;
+		}
+
+		room.status = 'inprogress';
 
 		const game = createGame();
 		this.gamesByRoom[roomId] = game;
@@ -247,6 +439,10 @@ class WebSocketService {
 
 		game.start();
 
+
+
+
+
 		// Subscribe to game events
 		game.subscribe((message: IGameMessage) => {
 			this.rooms[roomId].players.forEach(player => {
@@ -254,11 +450,21 @@ class WebSocketService {
 			});
 		});
 
+		const data = {
+			roomState: {
+				roomId: roomId,
+				status: room.status,
+				host: room.host,
+				players: this.rooms[roomId].players
+			},
+			gameState: game.gameState
+		}
+
 		// Notify all players that the game has started
 		this.rooms[roomId].players.forEach(player => {
 			this.notifyClient(player.playerId, {
 				type: 'gameStarted',
-				data: { gameState: game.gameState }
+				data: data
 			});
 		});
 	}
@@ -319,6 +525,10 @@ class WebSocketService {
 			client.ws.send(JSON.stringify(message));
 		}
 	}
+
+	//TODO: Modificar as mensagens de atualizações dos clientes para enviar somente
+	// os dados modificados ao invés de todo o estado.
+	// Da forma que está pode gerar inconsitência nas informações se as mensagens chegarem fora de ordem.
 }
 
 
