@@ -39,12 +39,12 @@ export const RankingScreen: React.FC<ScreenProps> = ({ setScreen }) => {
       <Box id="ranking-box">
         {topJogadores.map((jogador, index) => (
           <Box key={index} className="ranking-item">
-            <h2>{jogador.nome}</h2>
+            <h2>{index + 1}º {jogador.nome}</h2>
             <h2>{jogador.pontos}</h2>
           </Box>
         ))}
         <Box className="your-item">
-              <h2>Você</h2>
+              <h2>10º Você</h2>
               <h2>40</h2>
         </Box>
       </Box>
