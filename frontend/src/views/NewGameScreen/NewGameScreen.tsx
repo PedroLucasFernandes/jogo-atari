@@ -10,12 +10,11 @@ interface ScreenProps {
 
 const NewGameScreen: React.FC<ScreenProps> = ({ setScreen }) => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const { socketId, gameState, movePlayer } = useWebSocket();
+	const { socketId, gameState, movePlayer, planetImages, playerImages} = useWebSocket();
 	//const game = createGame();
 	const game = useRef(createGame()).current;
 	  // Estado para armazenar a imagem de fundo carregada
 	  const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
-
 
 	useEffect(() => {
 		  const bgImage = '/assets/bg-space.svg';
@@ -49,12 +48,10 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen }) => {
 		}
 
 		 // Passa a imagem de fundo para o renderScreen
-		 if (backgroundImage) {
-			renderScreen(canvas, game, requestAnimationFrame, socketId, backgroundImage);
+		 if (backgroundImage && planetImages.length > 0 && playerImages.length > 0) {
+			renderScreen(canvas, game, requestAnimationFrame, socketId, backgroundImage, planetImages, playerImages);
 		  }
-
-	}, [gameState, socketId, backgroundImage]);
-
+		}, [gameState, socketId, backgroundImage, planetImages, playerImages]);
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {

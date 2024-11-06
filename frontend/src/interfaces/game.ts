@@ -98,14 +98,3 @@ export const planetImages = Array.from({ length: 4 }, (_, i) => {
   img.src = `/assets/planet${i + 1}.svg`;
   return img;
 });
-
-// export const planetImages = Array.from({ length: 4 }, (_, i) => {
-//   const img = new Image();
-//   img.src = `/assets/planet${i + 1}.svg`;
-  
-//   // Adiciona um listener para debug
-//   img.onload = () => console.log(`Planet ${i + 1} loaded successfully`);
-//   img.onerror = (e) => console.error(`Error loading planet ${i + 1}:`, e);
-  
-//   return img;
-// });
