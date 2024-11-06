@@ -1,7 +1,6 @@
 import './RankingScreen.css'
 import Box from "@mui/joy/Box";
 import Button from "@mui/joy/Button";
-import Input from "@mui/joy/Input";
 import { Dispatch, SetStateAction } from 'react';
 
 interface ScreenProps {
@@ -28,6 +27,7 @@ export const RankingScreen: React.FC<ScreenProps> = ({ setScreen }) => {
     .slice(0, 5);
 
   return (
+
     <Box id="ranking-room">
       <h1>Ranking de jogadores</h1>
 
