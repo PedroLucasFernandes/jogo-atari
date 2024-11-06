@@ -66,18 +66,18 @@ export const initialPlanetsState: IPlanet[] = [
 ];
 
 export const initialPlayersState: PlayersRecord = {
-  'bot0': { x: 170, y: 150, size: 80, isBot: true, imageSrc: '' }, // Centro do "L" frente ao planeta superior esquerdo
-  'bot1': { x: 630, y: 150, size: 80, isBot: true, imageSrc: '' }, // Centro do "L" frente ao planeta superior direito
-  'bot2': { x: 170, y: 450, size: 80, isBot: true, imageSrc: '' }, // Centro do "L" frente ao planeta inferior esquerdo
-  'bot3': { x: 630, y: 450, size: 80, isBot: false, imageSrc: '' }  // Centro do "L" frente ao planeta inferior direito
+  'bot0': { x: 170, y: 150, size: 80, isBot: true, imageSrc: '' }, 
+  'bot1': { x: 630, y: 150, size: 80, isBot: true, imageSrc: '' }, 
+  'bot2': { x: 170, y: 450, size: 80, isBot: true, imageSrc: '' }, 
+  'bot3': { x: 630, y: 450, size: 80, isBot: false, imageSrc: '' } 
 };
 
 export const initialBallState: IBall = {
   x: 400,
   y: 300,
   radius: 10,
-  speedX: 3,
-  speedY: 3,
+  speedX: 5,
+  speedY: 5,
   color: 'white'
 };
 
@@ -98,14 +98,3 @@ export const planetImages = Array.from({ length: 4 }, (_, i) => {
   img.src = `/assets/planet${i + 1}.svg`;
   return img;
 });
-
-// export const planetImages = Array.from({ length: 4 }, (_, i) => {
-//   const img = new Image();
-//   img.src = `/assets/planet${i + 1}.svg`;
-  
-//   // Adiciona um listener para debug
-//   img.onload = () => console.log(`Planet ${i + 1} loaded successfully`);
-//   img.onerror = (e) => console.error(`Error loading planet ${i + 1}:`, e);
-  
-//   return img;
-// });

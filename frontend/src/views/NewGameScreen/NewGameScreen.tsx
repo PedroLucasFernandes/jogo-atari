@@ -48,9 +48,8 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen }) => {
 			game.setState(gameState);
 		}
 
-		 // Passa a imagem de fundo para o renderScreen
 		 if (backgroundImage) {
-			renderScreen(canvas, game, requestAnimationFrame, socketId, backgroundImage);
+			renderScreen(canvas, game, socketId, backgroundImage);
 		  }
 
 	}, [gameState, socketId, backgroundImage]);
@@ -79,5 +78,3 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen }) => {
 };
 
 export default NewGameScreen;
-
-
