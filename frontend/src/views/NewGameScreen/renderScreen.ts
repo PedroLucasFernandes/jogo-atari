@@ -57,7 +57,8 @@ export default function renderScreen(
     context.drawImage(playerImage, centerX, centerY, player.size, player.size);
   });
 
-  requestAnimationFrame(() => {
+  //Alteração temporário para contornar o problema com o lag
+  /* requestAnimationFrame(() => {
     renderScreen(canvasScreen, gameState, requestAnimationFrame, currentPlayerId, backgroundImage);
-  });
+  }); */
 }
