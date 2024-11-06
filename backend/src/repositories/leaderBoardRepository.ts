@@ -61,64 +61,55 @@ export const getUserById = async (userId: string) => {
     }
 };
 
-// Atualiza os dados do usuário
-export const updateUserLeaderboardData = async (userId: string, sortBy: string) => {
-    const column = sortBy === "total_score" ? "total_score" : "total_games_played";
-    const query = `UPDATE leaderboard SET ${column} = ${column} + 1 WHERE user_id = $1`;
+// Atualiza os dados do usuário no leaderboard
+export const updateUserLeaderboardData = async (userId: string, statType: string) => {
     try {
-        await pool.query(query, [userId]);
+        // Verifica se o statType é 'total_score' ou 'total_games_played'
+        if (statType === "total_score") {
+            // Se for total_score, atualiza ambos: pontuação e quantidade de jogos jogados
+            const query = `
+                UPDATE leaderboard 
+                SET total_score = total_score + 1, total_games_played = total_games_played + 1 
+                WHERE user_id = $1
+            `;
+            await pool.query(query, [userId]);
+        } else if (statType === "total_games_played") {
+            // Se for total_games_played, atualiza apenas a quantidade de jogos
+            const query = `
+                UPDATE leaderboard 
+                SET total_games_played = total_games_played + 1 
+                WHERE user_id = $1
+            `;
+            await pool.query(query, [userId]);
+        }
 
+        // Seleciona o registro atualizado do leaderboard
         const querySelect = `SELECT user_id, total_score, total_games_played FROM leaderboard WHERE user_id = $1`;
         const { rows } = await pool.query(querySelect, [userId]);
-        return rows[0]; // Retorna o registro do usuário atualizado
+
+        return rows[0]; // Retorna o registro atualizado
     } catch (error) {
         console.error("Error updating user leaderboard data:", error);
-        throw new Error("Database query failed while updating user leaderboard data."); // Repropaga o erro
+        throw new Error("Database query failed while updating user leaderboard data.");
     }
 };
 
-// Cria um novo registro de leaderboard
-export const createUserLeaderboardData = async (userId: string, sortBy: string) => {
-    const column = sortBy === "total_score" ? "total_score" : "total_games_played";
-    const query = `INSERT INTO leaderboard (user_id, ${column}) VALUES ($1, 1)`;
+// Cria um novo registro de leaderboard se o usuário não existir
+export const createUserLeaderboardData = async (userId: string, statType: string) => {
     try {
-        const { rows } = await pool.query(query, [userId]);
-        return rows[0];
+        if (statType === "total_score") {
+            // Se for total_score, cria com incremento de 1 em total_score e total_games_played
+            const query = `INSERT INTO leaderboard (user_id, total_score, total_games_played) VALUES ($1, 1, 1)`;
+            const { rows } = await pool.query(query, [userId]);
+            return rows[0];
+        } else if (statType === "total_games_played") {
+            // Se for total_games_played, cria com incremento apenas de total_games_played
+            const query = `INSERT INTO leaderboard (user_id, total_score, total_games_played) VALUES ($1, 0, 1)`;
+            const { rows } = await pool.query(query, [userId]);
+            return rows[0];
+        }
     } catch (error) {
         console.error("Error creating user leaderboard data:", error);
-        throw new Error("Database query failed while creating user leaderboard data."); // Repropaga o erro
-    }
-};
-
-
-export const incrementPoints = async (userId: string) => {
-    const query = `
-        UPDATE leaderboard
-        SET total_score = total_score + 1, last_updated = CURRENT_TIMESTAMP
-        WHERE user_id = $1
-    `;
-    try {
-        await pool.query(query, [userId]);
-        const user = await getUserPosition(userId, "total_score")
-        return user;
-    } catch (error) {
-        console.error("Error incrementing user points:", error);
-        throw new Error("Failed to update user points.");
-    }
-};
-
-export const incrementPlayedGames = async (userId: string) => {
-    const query = `
-        UPDATE leaderboard
-        SET total_games_played = total_games_played + 1, last_updated = CURRENT_TIMESTAMP
-        WHERE user_id = $1
-    `;
-    try {
-        await pool.query(query, [userId]);
-        const user = await getUserPosition(userId, "total_games_played")
-        return user;
-    } catch (error) {
-        console.error("Error incrementing user played games:", error);
-        throw new Error("Failed to update played games count.");
+        throw new Error("Database query failed while creating user leaderboard data.");
     }
 };

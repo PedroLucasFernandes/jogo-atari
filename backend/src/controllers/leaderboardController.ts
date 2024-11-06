@@ -45,15 +45,15 @@ export const getUserPosition = async (req: Request, res: Response): Promise<void
 export const saveOrUpdateUserLeaderboardData = async (req: Request, res: Response): Promise<void> => {
     try {
         const userId = req.params.userId;
-        const { sortBy } = req.query;
+        const { statType } = req.query;
 
-        if (sortBy !== "total_score" && sortBy !== "total_games_played") {
+        if (statType !== "total_score" && statType !== "total_games_played") {
             res.status(400).json({ message: "Invalid sort parameter. Use 'total_score' or 'total_games_played'." });
             return;
         }
 
         // Chama o serviço que irá verificar se o usuário existe e irá salvar ou atualizar
-        const result = await leaderboardServices.saveOrUpdateUserLeaderboardData(userId, sortBy as string);
+        const result = await leaderboardServices.saveOrUpdateUserLeaderboardData(userId, statType as string);
 
         // Responde com o resultado adequado
         res.status(201).json({ success: true, message: "User leaderboard position updated", data: result });

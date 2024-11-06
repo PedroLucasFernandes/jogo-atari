@@ -18,32 +18,18 @@ export const getUserPosition = async (userId: string, sortBy: string) => {
     }
 };
 
-export const incrementUserStat = async (userId: string, statType: string) => {
-    try {
-        if (statType === "total_score") {
-            const results = await leaderboardRepository.incrementPoints(userId);
-            return results;
-        } else if (statType === "total_games_played") {
-            const results = await leaderboardRepository.incrementPlayedGames(userId);
-            return results;
-        }
-    } catch (error) {
-        throw error;
-    }
-};
-
-export const saveOrUpdateUserLeaderboardData = async (userId: string, sortBy: string) => {
+export const saveOrUpdateUserLeaderboardData = async (userId: string, statType: string) => {
     try {
         // Verifica se o registro do usuário já existe
         const existingRecord = await leaderboardRepository.getUserById(userId);
 
         if (existingRecord) {
             // Se o registro existe, atualiza
-            const userData = await leaderboardRepository.updateUserLeaderboardData(userId, sortBy);
+            const userData = await leaderboardRepository.updateUserLeaderboardData(userId, statType);
             return userData;
         } else {
             // Se não existe, cria um novo registro
-            const userData = await leaderboardRepository.createUserLeaderboardData(userId, sortBy);
+            const userData = await leaderboardRepository.createUserLeaderboardData(userId, statType);
             return userData;
         }
     } catch (error) {
