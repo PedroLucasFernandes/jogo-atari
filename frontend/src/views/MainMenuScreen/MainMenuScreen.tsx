@@ -34,7 +34,7 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
 
     if (success) {
       console.log("Deslogado com sucesso");
-      navigate('/login');
+      navigate('/');
     }
   }
 

@@ -9,6 +9,7 @@ import { Login } from './views/Login/Login';
 import { Register } from './views/Register/Register';
 import { UserProvider } from './context/UserContext';
 import ProtectedRoute from './components/ProtectedRoutes/ProtectedRoutes';
+import { ToastContainer } from 'react-toastify';
 
 function App() {
   const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
@@ -21,14 +22,13 @@ function App() {
     <WebSocketProvider>
       <GoogleOAuthProvider clientId={clientId}>
         <UserProvider>
-          <Router>
+        <Router>
+            <ToastContainer />
             <Routes>
               <Route path='/' element={<Home />} />
               <Route path='/login' element={<Login />} />
               <Route path='/register' element={<Register />} />
-
               <Route path="/game" element={<Game />} />
-
               <Route path="/monolito" element={<ProtectedRoute children={<GameMonolito />} />} />
             </Routes>
           </Router>
