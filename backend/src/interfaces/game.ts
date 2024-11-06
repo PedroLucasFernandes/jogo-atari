@@ -23,10 +23,10 @@ export interface IPlayer {
   username: string;
   x: number;
   y: number;
+  initialX: number;
+  initialY: number;
   size: number;
   isBot: boolean;
-  imageSrc: string;
-  ready: boolean;
 }
 
 export type PlayersRecord = Record<string, IPlayer>;
@@ -85,10 +85,10 @@ export interface IGameMessage {
 
 export interface IGame {
   gameState: IGameState;
-  movePlayer: (message: IGameMessage) => void;
+  movePlayer: (playerId: string, keyPressed: string) => void;
   subscribe(observerFunction: (message: IGameMessage) => void): void;
   setState(newState: Partial<IGameState>): void;
-  addPlayer(playerId: string, username: string, position: number): void;
+  addPlayers(players: IPlayerRoom[]): void;
   start: () => void;
   stop: () => void;
 }
@@ -101,10 +101,10 @@ export const initialWallsState: IWall[] = [
 ];
 
 export const initialPlayersState: PlayersRecord = {
-  'bot0': { username: 'Bot 0', x: 150, y: 150, size: 80, isBot: true, imageSrc: '', ready: false }, // Movido mais para dentro do canvas
-  'bot1': { username: 'Bot 1', x: 630, y: 150, size: 80, isBot: true, imageSrc: '', ready: false }, // Movido mais para dentro do canvas
-  'bot2': { username: 'Bot 2', x: 150, y: 430, size: 80, isBot: true, imageSrc: '', ready: false }, // Movido mais para dentro do canvas
-  'bot3': { username: 'Bot 3', x: 630, y: 430, size: 80, isBot: false, imageSrc: '', ready: false } // Movido mais para dentro do canvas
+  'bot0': { username: 'Bot 0', x: 150, y: 150, initialX: 150, initialY: 150, size: 80, isBot: true }, // Movido mais para dentro do canvas
+  'bot1': { username: 'Bot 1', x: 630, y: 150, initialX: 630, initialY: 150, size: 80, isBot: true }, // Movido mais para dentro do canvas
+  'bot2': { username: 'Bot 2', x: 150, y: 430, initialX: 150, initialY: 430, size: 80, isBot: true }, // Movido mais para dentro do canvas
+  'bot3': { username: 'Bot 3', x: 630, y: 430, initialX: 630, initialY: 430, size: 80, isBot: false } // Movido mais para dentro do canvas
 };
 
 

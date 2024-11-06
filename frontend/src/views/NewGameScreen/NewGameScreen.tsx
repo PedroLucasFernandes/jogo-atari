@@ -9,12 +9,11 @@ interface ScreenProps {
 
 const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, roomCode }) => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const { socketId, gameState, movePlayer, startGame } = useWebSocket();
+	const { socketId, roomState, gameState, movePlayer } = useWebSocket();
 	const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
-	const [isHost, setIsHost] = useState(false);
 
 	// Load background image
-	/* useEffect(() => {
+	useEffect(() => {
 		const bgImage = '/assets/bg-space.svg';
 		const img = new Image();
 		img.src = bgImage;
@@ -31,7 +30,7 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, roomCode }) => {
 	// Setup game rendering
 	useEffect(() => {
 		const canvas = canvasRef.current;
-		if (!canvas || !socketId || !gameState || !backgroundImage) return;
+		if (!canvas || !socketId || !roomState || !gameState || !backgroundImage) return;
 
 		const animationFrameId = requestAnimationFrame(() => {
 			renderScreen(canvas, gameState, requestAnimationFrame, socketId, backgroundImage);
@@ -40,34 +39,27 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, roomCode }) => {
 		return () => {
 			cancelAnimationFrame(animationFrameId);
 		};
-	}, [gameState, socketId, backgroundImage]);
+	}, [roomState, gameState, socketId, backgroundImage]);
 
 	// Handle keyboard input
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
+			if (!roomState) return;
 			const keyPressed = e.key.toLowerCase();
 			const validKeys = ['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'];
 
 			if (validKeys.includes(keyPressed)) {
-				movePlayer(keyPressed);
+				movePlayer(roomState.roomId, keyPressed);
 			}
 		};
 
 		document.addEventListener('keydown', handleKeyDown);
 		return () => document.removeEventListener('keydown', handleKeyDown);
-	}, [movePlayer]); */
+	}, [movePlayer]);
 
 	return (
 		<div className="relative">
 			<canvas ref={canvasRef} width={800} height={600} className="border border-gray-600 rounded-lg" />
-			{isHost && (
-				<button
-					//onClick={() => startGame()}
-					className="absolute top-4 right-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-				>
-					Start Game
-				</button>
-			)}
 		</div>
 	);
 };

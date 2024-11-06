@@ -1,4 +1,4 @@
-import { AcceptedMoves, IGameMessage, IGameState, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialWallsState, IPlayer, PlayersRecord } from "../interfaces/game"
+import { AcceptedMoves, IGameMessage, IGameState, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialWallsState, IPlayer, IPlayerRoom, PlayersRecord } from "../interfaces/game"
 
 export default function createGame() {
 
@@ -11,8 +11,12 @@ export default function createGame() {
   }
 
   const speed = 10;
-  const initialY3 = 430;
-  const initialX3 = 630;
+  const initialPositions = [
+    { x: 150, y: 150 },
+    { x: 630, y: 150 },
+    { x: 150, y: 430 },
+    { x: 630, y: 430 },
+  ];
 
   const observers: Array<(message: IGameMessage) => void> = [];
 
@@ -90,7 +94,7 @@ export default function createGame() {
   //   notifyAll({ type: 'movePlayer', data })
   // }
 
-  function movePlayer(message: IGameMessage) {
+  function movePlayer(playerId: string, keyPressed: string) {
 
     // VOU DEIXAR AQUI COMENTADO UMA OPÇÃO PARA DEIXAR O MOVIMENTO DOS JOGADORES LIVRE PELA TELA
     // const acceptedMoves: Record<AcceptedMoves, (player: IPlayer) => void> = {
@@ -120,52 +124,105 @@ export default function createGame() {
     //   },
     // };
 
+    // MOVIMENTO SINGLE PLAYER
+    // const acceptedMoves: Record<AcceptedMoves, (player: IPlayer) => void> = {
+    //   w(player: IPlayer) {
+    //     if (player.y > 0 && player.y >= initialY3 + 10) player.y -= speed
+    //   },
+    //   a(player: IPlayer) {
+    //     if (player.x > 0 && player.x >= initialX3 + 10) player.x -= speed;
+    //   },
+    //   s(player: IPlayer) {
+    //     if (player.y + player.size / 2 < gameState.canvas.height && player.y >= initialY3 && player.x <= initialX3) player.y += speed;
+    //   },
+    //   d(player: IPlayer) {
+    //     if (player.x + player.size / 2 < gameState.canvas.width && player.y <= initialY3) player.x += speed;
+    //   },
+    //   arrowup(player: IPlayer) {
+    //     if (player.y > 0 && player.y >= initialY3 + 10) player.y -= speed
+    //   },
+    //   arrowleft(player: IPlayer) {
+    //     if (player.x > 0 && player.x >= initialX3 + 10) player.x -= speed;
+    //   },
+    //   arrowdown(player: IPlayer) {
+    //     if (player.y + player.size / 2 < gameState.canvas.height && player.y >= initialY3 && player.x <= initialX3) player.y += speed;
+    //   },
+    //   arrowright(player: IPlayer) {
+    //     if (player.x + player.size / 2 < gameState.canvas.width && player.y <= initialY3) player.x += speed;
+    //   },
+    // }
+
     const acceptedMoves: Record<AcceptedMoves, (player: IPlayer) => void> = {
       w(player: IPlayer) {
-        if (player.y > 0 && player.y >= initialY3 + 10) player.y -= speed
+        if (player.y > 0 && player.y >= player.initialY + 10) player.y -= speed;
       },
       a(player: IPlayer) {
-        if (player.x > 0 && player.x >= initialX3 + 10) player.x -= speed;
+        if (player.x > 0 && player.x >= player.initialX + 10) player.x -= speed;
       },
       s(player: IPlayer) {
-        if (player.y + player.size / 2 < gameState.canvas.height && player.y >= initialY3 && player.x <= initialX3) player.y += speed;
+        if (
+          player.y + player.size / 2 < gameState.canvas.height &&
+          player.y >= player.initialY &&
+          player.x <= player.initialX
+        ) {
+          player.y += speed;
+        }
       },
       d(player: IPlayer) {
-        if (player.x + player.size / 2 < gameState.canvas.width && player.y <= initialY3) player.x += speed;
+        if (
+          player.x + player.size / 2 < gameState.canvas.width &&
+          player.y <= player.initialY
+        ) {
+          player.x += speed;
+        }
       },
       arrowup(player: IPlayer) {
-        if (player.y > 0 && player.y >= initialY3 + 10) player.y -= speed
+        if (player.y > 0 && player.y >= player.initialY + 10) player.y -= speed;
       },
       arrowleft(player: IPlayer) {
-        if (player.x > 0 && player.x >= initialX3 + 10) player.x -= speed;
+        if (player.x > 0 && player.x >= player.initialX + 10) player.x -= speed;
       },
       arrowdown(player: IPlayer) {
-        if (player.y + player.size / 2 < gameState.canvas.height && player.y >= initialY3 && player.x <= initialX3) player.y += speed;
+        if (
+          player.y + player.size / 2 < gameState.canvas.height &&
+          player.y >= player.initialY &&
+          player.x <= player.initialX
+        ) {
+          player.y += speed;
+        }
       },
       arrowright(player: IPlayer) {
-        if (player.x + player.size / 2 < gameState.canvas.width && player.y <= initialY3) player.x += speed;
+        if (
+          player.x + player.size / 2 < gameState.canvas.width &&
+          player.y <= player.initialY
+        ) {
+          player.x += speed;
+        }
       },
-    }
+    };
 
-    if (!message.data.keyPressed) return;
-    const keyPressed: string = message.data.keyPressed;
+    if (!keyPressed || !playerId) return;
 
-    if (!message.data.playerId) return;
-    const playerId: string = message.data.playerId;
+    const player = gameState.players[playerId];
+    if (!player) return;
+
+    /*     const playerIndex = Object.keys(gameState.players).indexOf(playerId);
+        if (playerIndex === -1) return; // Se não encontrar, retorna
+    
+        const initialPosition = initialPositions[playerIndex]; */
 
     if (keyPressed in acceptedMoves) {
       const player = gameState.players[playerId];
       const moveFunction = acceptedMoves[keyPressed as AcceptedMoves];
 
-      if (player && moveFunction) {
-        moveFunction(player);
-      }
+      //moveFunction(player, initialPosition);
+      moveFunction(player);
     }
 
     const data = {
       gameState,
     };
-    notifyAll({ type: 'movePlayer', data });
+    notifyAll({ type: 'playerMoved', data });
   }
 
 
@@ -260,27 +317,61 @@ export default function createGame() {
   }
 
 
-  function addPlayer(playerId: string, username: string, position: number) {
+  function addPlayers(players: IPlayerRoom[]) {
     const positions = [
       { x: 150, y: 150 },
       { x: 630, y: 150 },
       { x: 150, y: 430 },
-      { x: 630, y: 430 }
+      { x: 630, y: 430 },
     ];
 
-    if (position >= 0 && position < positions.length) {
-      const { x, y } = positions[position];
-      gameState.players[playerId] = {
-        username,
+    // Limpa todos os jogadores atuais de gameState.players
+    gameState.players = {};
+
+    // Embaralha as posições para alocar jogadores aleatoriamente
+    const shuffledPlayers = [...players];
+    shuffledPlayers.sort(() => Math.random() - 0.5);
+
+    // Preenche as posições com os jogadores reais (primeiras posições da lista)
+    shuffledPlayers.forEach((player, index) => {
+      const { x, y } = positions[index]; // Usa as posições fixas
+
+      gameState.players[player.playerId] = {
+        username: player.username,
         x,
         y,
+        initialX: x,
+        initialY: y,
         size: 80,
         isBot: false,
-        imageSrc: '',
-        ready: true,
+      };
+    });
+
+    // Quantidade total de jogadores (real + bots)
+    const totalPlayers = 4;
+
+    // Adiciona bots nas posições restantes
+    const botEntries = Object.entries(initialPlayersState);
+    const remainingBots = totalPlayers - players.length;
+
+    for (let i = 0; i < remainingBots; i++) {
+      const botId = botEntries[i][0];
+      const botData = botEntries[i][1];
+      const positionIndex = players.length + i;
+
+      const { x, y } = positions[positionIndex]; // Usa as posições fixas para bots também
+
+      gameState.players[botId] = {
+        ...botData,
+        x,
+        y,
+        initialX: x,
+        initialY: y,
       };
     }
+    console.log("addPlayers", JSON.stringify(gameState.players));
   }
+
 
   function stop() {
     // Interrompe o intervalo se ele estiver ativo
@@ -296,7 +387,7 @@ export default function createGame() {
     subscribe,
     setState,
     start,
-    addPlayer,
+    addPlayers,
     stop
   }
 }

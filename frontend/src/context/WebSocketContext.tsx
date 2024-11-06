@@ -15,7 +15,7 @@ interface WebSocketContextType {
   leaveRoom: (roomId: string) => void;
   toggleReadyStatus: (roomId: string) => void;
   removePlayer: (roomId: string, playerId: string) => void;
-  movePlayer: (keyPressed: string) => void;
+  movePlayer: (roomId: string, keyPressed: string) => void;
   startGame: (roomId: string) => void;
   gameState: IGameState | null;
   roomState: IRoomState | null;
@@ -188,7 +188,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setGameState(data.data.gameState)
     });
 
-    webSocketService.registerCallback('movePlayer', (data) => {
+    webSocketService.registerCallback('playerMoved', (data) => {
       console.log(`Jogador se moveu: ${JSON.stringify(data)}`);
       setGameState(data.data.gameState)
     });
@@ -319,14 +319,14 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     webSocketService.send({ type: 'startGame', data });
   }
 
-  const movePlayer = (keyPressed: string) => {
+  const movePlayer = (roomId: string, keyPressed: string) => {
     if (!socketId) {
       //Todo: Alerta
       console.log('Can\'t move player without a socketId');
       return;
     }
 
-    const data = { keyPressed: keyPressed, playerId: socketId }
+    const data = { roomId: roomId, keyPressed: keyPressed, playerId: socketId }
     webSocketService.send({ type: 'movePlayer', data });
   }
 

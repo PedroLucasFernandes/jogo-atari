@@ -105,7 +105,7 @@ class WebSocketService {
 				this.startGame(clientId, message.data.roomId);
 				break;
 			case 'movePlayer':
-				this.handlePlayerMove(clientId, message);
+				this.handlePlayerMove(clientId, message.data.roomId, message.data.keyPressed);
 				break;
 			case 'closeRoom':
 				this.closeRoom(clientId, message.data.roomId);
@@ -433,15 +433,13 @@ class WebSocketService {
 		this.gamesByRoom[roomId] = game;
 
 		// Add all players from the room to the game
-		this.rooms[roomId].players.forEach((player, index) => {
+		/* this.rooms[roomId].players.forEach((player, index) => {
 			game.addPlayer(player.playerId, player.username, index);
-		});
+		}); */
+
+		game.addPlayers(this.rooms[roomId].players);
 
 		game.start();
-
-
-
-
 
 		// Subscribe to game events
 		game.subscribe((message: IGameMessage) => {
@@ -469,9 +467,38 @@ class WebSocketService {
 		});
 	}
 
-	private handlePlayerMove(clientId: string, message: any) {
-		// Find the room this player is in
-		const roomId = Object.keys(this.rooms).find(roomId =>
+	private handlePlayerMove(clientId: string, roomId: string, keyPressed: string) {
+
+		const room = this.rooms[roomId];
+		const gameRoom = this.gamesByRoom[roomId]
+
+		if (!room) {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Room not found' }
+			});
+			return;
+		}
+
+		if (!gameRoom) {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Game not found' }
+			});
+			return;
+		}
+
+		gameRoom.movePlayer(clientId, keyPressed)
+
+
+
+
+
+
+
+
+
+		/* const roomId = Object.keys(this.rooms).find(roomId =>
 			this.rooms[roomId].players.some(player => player.playerId === clientId)
 		);
 
@@ -483,7 +510,7 @@ class WebSocketService {
 					keyPressed: message.data.keyPressed
 				}
 			});
-		}
+		} */
 	}
 
 	private handleDisconnect(clientId: string) {
