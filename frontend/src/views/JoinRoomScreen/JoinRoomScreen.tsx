@@ -98,7 +98,7 @@ export const JoinRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenModal(false)}>Cancelar</Button>
-          <Button onClick={handleJoinRoom} disabled={!code || loading}>Entrar</Button>
+          <Button onClick={handleJoinRoom} disabled={!code}>Entrar</Button>
         </DialogActions>
       </Dialog>
     </Box>

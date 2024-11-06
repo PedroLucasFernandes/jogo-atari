@@ -233,6 +233,7 @@ class WebSocketService {
 				type: 'error',
 				data: { message: 'Invalid code' }
 			});
+			return;
 		}
 
 		if (room.players.length >= 4) {

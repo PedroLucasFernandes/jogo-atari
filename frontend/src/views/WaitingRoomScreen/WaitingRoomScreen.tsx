@@ -23,7 +23,7 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
     const timeoutId = setTimeout(() => {
       if (!roomState) {
         console.log("Não foi possível carregar a sala ou o usuário não pertence a ela");
-        setScreen('lobby-screen'); // Redireciona ou notifica
+        setScreen('create-room'); // Redireciona ou notifica
       }
       setLoading(false); // Desativa o loading após a verificação
     }, 5000);
