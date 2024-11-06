@@ -166,71 +166,149 @@ export default function createGame() {
     // Encontrar o índice do jogador para obter o ponto de interseção
     const playerIndex = Object.keys(gameState.players).indexOf(playerId);
     if (playerIndex === -1) return;
+    console.log("index", playerIndex);
+    //const intersection = intersectionPoints[playerIndex];
+    const toleranceX = speed;
+    const toleranceY = speed;
+    const acceptedMoves: Record<AcceptedMoves, (player: IPlayer, index: number) => void> = {
 
-    const intersection = intersectionPoints[playerIndex];
-    const acceptedMoves: Record<AcceptedMoves, (player: IPlayer) => void> = {
-      w(player: IPlayer) {
-        if (
-          player.y > 0 &&
-          (player.x === intersection.x || player.y > intersection.y)
-        ) {
-          player.y -= speed;
+
+      w(player: IPlayer, index: number) {
+        if (index === 0 || index === 1) {
+          if (player.y > 0) {
+            // Verifica se o jogador está dentro da zona de tolerância no eixo X
+            if (Math.abs(player.x - player.initialX) <= toleranceX) {
+              player.x = player.initialX; // Corrige a posição no eixo X
+              player.y = Math.max(player.y - speed, 0);
+            }
+          }
+        } else {
+          if (player.y > player.initialY) {
+            if (Math.abs(player.x - player.initialX) <= toleranceX) {
+              player.x = player.initialX;
+              player.y = Math.max(player.y - speed, player.initialY);
+            }
+          }
         }
       },
-      a(player: IPlayer) {
-        if (
-          player.x > 0 &&
-          (player.y === intersection.y || player.x > intersection.x)
-        ) {
-          player.x -= speed;
+      a(player: IPlayer, index: number) {
+        if (index === 0 || index === 2) {
+          if (player.x > 0) {
+            if (Math.abs(player.y - player.initialY) <= toleranceY) {
+              player.y = player.initialY;
+              player.x = Math.max(player.x - speed, 0);
+            }
+          }
+        } else {
+          if (player.x > player.initialX) {
+            if (Math.abs(player.y - player.initialY) <= toleranceY) {
+              player.y = player.initialY;
+              player.x = Math.max(player.x - speed, player.initialX);
+            }
+          }
         }
       },
-      s(player: IPlayer) {
-        if (
-          player.y + player.size / 2 < gameState.canvas.height &&
-          (player.x === intersection.x || player.y < intersection.y)
-        ) {
-          player.y += speed;
+      s(player: IPlayer, index: number) {
+        if (index === 0 || index === 1) {
+          if (player.y < player.initialY) {
+            if (Math.abs(player.x - player.initialX) <= toleranceX) {
+              player.x = player.initialX;
+              player.y = Math.min(player.y + speed, player.initialY);
+            }
+          }
+        } else {
+          if (player.y < gameState.canvas.height) {
+            if (Math.abs(player.x - player.initialX) <= toleranceX) {
+              player.x = player.initialX;
+              player.y = Math.min(player.y + speed, gameState.canvas.height);
+            }
+          }
         }
       },
-      d(player: IPlayer) {
-        if (
-          player.x + player.size / 2 < gameState.canvas.width &&
-          (player.y === intersection.y || player.x < intersection.x)
-        ) {
-          player.x += speed;
+      d(player: IPlayer, index: number) {
+        if (index === 1 || index === 3) {
+          if (player.x < gameState.canvas.width) {
+            if (Math.abs(player.y - player.initialY) <= toleranceY) {
+              player.y = player.initialY;
+              player.x = Math.min(player.x + speed, gameState.canvas.width);
+            }
+          }
+        } else {
+          if (player.x < player.initialX) {
+            if (Math.abs(player.y - player.initialY) <= toleranceY) {
+              player.y = player.initialY;
+              player.x = Math.min(player.x + speed, player.initialX);
+            }
+          }
         }
       },
-      arrowup(player: IPlayer) {
-        if (
-          player.y > 0 &&
-          (player.x === intersection.x || player.y > intersection.y)
-        ) {
-          player.y -= speed;
+      arrowup(player: IPlayer, index: number) {
+        if (index === 0 || index === 1) {
+          if (player.y > 0) {
+            // Verifica se o jogador está dentro da zona de tolerância no eixo X
+            if (Math.abs(player.x - player.initialX) <= toleranceX) {
+              player.x = player.initialX; // Corrige a posição no eixo X
+              player.y = Math.max(player.y - speed, 0);
+            }
+          }
+        } else {
+          if (player.y > player.initialY) {
+            if (Math.abs(player.x - player.initialX) <= toleranceX) {
+              player.x = player.initialX;
+              player.y = Math.max(player.y - speed, player.initialY);
+            }
+          }
         }
       },
-      arrowleft(player: IPlayer) {
-        if (
-          player.x > 0 &&
-          (player.y === intersection.y || player.x > intersection.x)
-        ) {
-          player.x -= speed;
+      arrowleft(player: IPlayer, index: number) {
+        if (index === 0 || index === 2) {
+          if (player.x > 0) {
+            if (Math.abs(player.y - player.initialY) <= toleranceY) {
+              player.y = player.initialY;
+              player.x = Math.max(player.x - speed, 0);
+            }
+          }
+        } else {
+          if (player.x > player.initialX) {
+            if (Math.abs(player.y - player.initialY) <= toleranceY) {
+              player.y = player.initialY;
+              player.x = Math.max(player.x - speed, player.initialX);
+            }
+          }
         }
       },
-      arrowdown(player: IPlayer) {
-        if (
-          player.y + player.size / 2 < gameState.canvas.height &&
-          (player.x === intersection.x || player.y < intersection.y)
-        ) {
-          player.y += speed;
+      arrowdown(player: IPlayer, index: number) {
+        if (index === 0 || index === 1) {
+          if (player.y < player.initialY) {
+            if (Math.abs(player.x - player.initialX) <= toleranceX) {
+              player.x = player.initialX;
+              player.y = Math.min(player.y + speed, player.initialY);
+            }
+          }
+        } else {
+          if (player.y < gameState.canvas.height) {
+            if (Math.abs(player.x - player.initialX) <= toleranceX) {
+              player.x = player.initialX;
+              player.y = Math.min(player.y + speed, gameState.canvas.height);
+            }
+          }
         }
       },
-      arrowright(player: IPlayer) {
-        if (
-          player.x + player.size / 2 < gameState.canvas.width &&
-          (player.y === intersection.y || player.x < intersection.x)
-        ) {
-          player.x += speed;
+      arrowright(player: IPlayer, index: number) {
+        if (index === 1 || index === 3) {
+          if (player.x < gameState.canvas.width) {
+            if (Math.abs(player.y - player.initialY) <= toleranceY) {
+              player.y = player.initialY;
+              player.x = Math.min(player.x + speed, gameState.canvas.width);
+            }
+          }
+        } else {
+          if (player.x < player.initialX) {
+            if (Math.abs(player.y - player.initialY) <= toleranceY) {
+              player.y = player.initialY;
+              player.x = Math.min(player.x + speed, player.initialX);
+            }
+          }
         }
       },
     };
@@ -238,7 +316,7 @@ export default function createGame() {
     // Executa o movimento com base na tecla pressionada
     if (keyPressed in acceptedMoves) {
       const moveFunction = acceptedMoves[keyPressed as AcceptedMoves];
-      moveFunction(player);
+      moveFunction(player, playerIndex);
     }
 
     const data = {
@@ -413,3 +491,57 @@ export default function createGame() {
     stop
   }
 }
+
+//Sem tolerância
+/* w(player: IPlayer, index: number) {
+  if (index === 0 || index === 1) {
+    // Movimento entre 0 e initialY no eixo Y
+    if (player.y > 0 && player.x === player.initialX) {
+        player.y = Math.max(player.y - speed, 0);
+    }
+} else {
+    // Movimento entre initialY e altura do canvas no eixo Y
+    if (player.y > player.initialY && player.x === player.initialX) {
+        player.y = Math.max(player.y - speed, player.initialY);
+    }
+}
+},
+a(player: IPlayer, index: number) {
+  if (index === 0 || index === 2) {
+    // Movimento entre 0 e initialX no eixo X
+    if (player.x > 0 && player.y === player.initialY) {
+        player.x = Math.max(player.x - speed, 0);
+    }
+} else {
+    // Movimento entre initialX e largura do canvas no eixo X
+    if (player.x > player.initialX && player.y === player.initialY) {
+        player.x = Math.max(player.x - speed, player.initialX);
+    }
+}
+},
+s(player: IPlayer, index: number) {
+  if (index === 0 || index === 1) {
+    // Movimento entre 0 e initialY no eixo Y
+    if (player.y < player.initialY && player.x === player.initialX) {
+        player.y = Math.min(player.y + speed, player.initialY);
+    }
+} else {
+    // Movimento entre initialY e altura do canvas no eixo Y
+    if (player.y < gameState.canvas.height && player.x === player.initialX) {
+        player.y = Math.min(player.y + speed, gameState.canvas.height);
+    }
+}
+},
+d(player: IPlayer, index: number) {
+  if (index === 1 || index === 3) {
+    // Movimento entre initialX e largura do canvas no eixo X
+    if (player.x < gameState.canvas.width && player.y === player.initialY) {
+        player.x = Math.min(player.x + speed, gameState.canvas.width);
+    }
+} else {
+    // Movimento entre 0 e initialX no eixo X
+    if (player.x < player.initialX && player.y === player.initialY) {
+        player.x = Math.min(player.x + speed, player.initialX);
+    }
+}
+}, */
