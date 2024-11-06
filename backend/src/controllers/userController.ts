@@ -16,7 +16,7 @@ export const getAllUsers = async (
         res.status(200).json(response);
     } catch (error: any) {
         console.error(error);
-        res.status(500).json({ data: null, error: "Internal server erro" });
+        res.status(500).json({ data: null, error: "Erro interno do servidor" });
     }
 };
 
@@ -35,7 +35,7 @@ export const getUserById = async (
         res.status(200).json(response);
     } catch (error: any) {
         console.error(error);
-        res.status(500).json({ data: null, error: "Internal server erro" });
+        res.status(500).json({ data: null, error: "Erro interno do servidor" });
     }
 };
 
@@ -55,7 +55,7 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
         res.status(201).json(response);
     } catch (error: any) {
         response.error = error.message;
-        response.message = "Failed to register the user!";
+        response.message = "Falha no registro do usuário!";
         res.status(400).json(response);
     }
 };
@@ -70,11 +70,11 @@ export const deleteUser = async (
         const user: IUser = await userServices.deleteUser(userId);
         response.data = user;
         response.success = true;
-        response.message = "User deleted successfully!";
+        response.message = "Usuário deletado com sucesso!";
         res.status(200).json(response);
     } catch (error: any) {
         console.error(error);
-        response.message = "Unable to delete user!";
+        response.message = "Não é possível deletar usuário";
         res.status(500).json({ data: null, error: "Internal server erro" });
     }
 };
