@@ -24,14 +24,6 @@ export default function createGame() {
     { x: 550, y: 370 },
   ];
 
-  const intersectionPoints = [
-    { x: 150, y: 300 },  // Jogador 1
-    { x: 470, y: 150 },  // Jogador 2
-    { x: 150, y: 300 },  // Jogador 3
-    { x: 470, y: 430 },  // Jogador 4
-  ];
-
-
   const observers: Array<(message: IGameMessage) => void> = [];
 
   let intervalId: NodeJS.Timeout | null = null;
@@ -64,7 +56,6 @@ export default function createGame() {
     const playerIndex = Object.keys(gameState.players).indexOf(playerId);
     if (playerIndex === -1) return;
     console.log("index", playerIndex);
-    //const intersection = intersectionPoints[playerIndex];
     const toleranceX = speed;
     const toleranceY = speed;
     const acceptedMoves: Record<AcceptedMoves, (player: IPlayer, index: number) => void> = {
