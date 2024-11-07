@@ -18,11 +18,11 @@ function App() {
   }
 
   return (
-    <WebSocketProvider>
-      <GoogleOAuthProvider clientId={clientId}>
-        <UserProvider>
-        <Router>
-            <ToastContainer />
+    
+    <GoogleOAuthProvider clientId={clientId}>
+      <UserProvider>
+        <WebSocketProvider> {/* Passei o websocket para dentro, reverter se aparecer algum problema */}
+          <Router>
             <Routes>
               <Route path='/' element={<Login />} />
               <Route path='/register' element={<Register />} />
@@ -30,9 +30,9 @@ function App() {
               <Route path="/monolito" element={<ProtectedRoute children={<GameMonolito />} />} />
             </Routes>
           </Router>
-        </UserProvider>
-      </GoogleOAuthProvider>
-    </WebSocketProvider>
+        </WebSocketProvider>
+      </UserProvider>
+    </GoogleOAuthProvider>
   );
 }
 
