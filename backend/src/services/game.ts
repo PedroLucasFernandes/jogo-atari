@@ -1,7 +1,9 @@
 import { AcceptedMoves, IGameMessage, IGameState, initialBallState, initialCanvasState, initialPlayersState, initialPlanetsState, IPlayer, PlayersRecord } from "../interfaces/game"
 
 
+
 export default function createGame() {
+
 
 
   const gameState: IGameState = {
@@ -122,11 +124,31 @@ export default function createGame() {
     notifyAll({ type: 'updateBall', data });
   }
 
-  function notifyPlanetUpdate() {
+  // function notifyPlanetUpdate() {
+  //   const data = {
+  //     planets: gameState.planets,
+  //   };
+  //   notifyAll({ type: 'updatePlanet', data });
+  // }
+
+
+  function notifyPlanetUpdate(isInitial: boolean = false) {
     const data = {
       planets: gameState.planets,
     };
-    notifyAll({ type: 'updatePlanet', data });
+
+    // Enviar notificação inicial se todas as partes do planeta ainda estiverem ativas
+    if (isInitial) {
+      for (const planet of gameState.planets) {
+        if (planet.active && planet.parts.every(part => part)) {
+          notifyAll({ type: 'updatePlanet', data });
+          break; // Notificar apenas uma vez
+        }
+      }
+    } else {
+      // Notificar após colisões
+      notifyAll({ type: 'updatePlanet', data });
+    }
   }
 
   function moveBall() {

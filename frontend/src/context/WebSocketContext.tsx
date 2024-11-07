@@ -14,6 +14,21 @@ interface WebSocketContextType {
   movePlayer: (keyPressed: string) => void;
   startGame: () => void;
   gameState: IGameState | null;
+  planetImages: HTMLImageElement[]; // Adicionado
+  playerImages: HTMLImageElement[];
+}
+
+function preloadImages(imagePaths: string[]): Promise<HTMLImageElement[]> {
+  return Promise.all(
+    imagePaths.map((path) => {
+      return new Promise<HTMLImageElement>((resolve, reject) => {
+        const img = new Image();
+        img.src = path;
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error(`Failed to load image: ${path}`));
+      });
+    })
+  );
 }
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
@@ -23,6 +38,39 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [socketId, setSocketId] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [gameState, setGameState] = useState<IGameState | null>(null);
+  const [planetImages, setPlanetImages] = useState<HTMLImageElement[]>([]);
+  const [playerImages, setPlayerImages] = useState<HTMLImageElement[]>([]);
+
+  useEffect(() => {
+    const planetPaths = [
+      '/assets/planet1.svg',
+      '/assets/planet2.svg',
+      '/assets/planet3.svg',
+      '/assets/planet4.svg'
+    ];
+    const playerPaths = [
+      '/assets/player1.svg',
+      '/assets/player2.svg',
+      '/assets/player3.svg',
+      '/assets/player4.svg',
+      '/assets/player5.svg'
+    ];
+  
+    preloadImages(planetPaths)
+      .then((loadedPlanetImages) => {
+        // Armazene as imagens carregadas em um estado global ou variável
+        setPlanetImages(loadedPlanetImages);
+      })
+      .catch((error) => console.error('Erro ao carregar imagens dos planetas:', error));
+  
+    preloadImages(playerPaths)
+      .then((loadedPlayerImages) => {
+        // Armazene as imagens carregadas em um estado global ou variável
+        setPlayerImages(loadedPlayerImages);
+      })
+      .catch((error) => console.error('Erro ao carregar imagens dos jogadores:', error));
+  }, []);
+
 
 
   useEffect(() => {
@@ -170,7 +218,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   return (
     <WebSocketContext.Provider value={{
       isConnected, socketId, webSocketService, status,
-      createRoom, closeRoom, joinRoom, exitRoom, movePlayer, startGame, gameState
+      createRoom, closeRoom, joinRoom, exitRoom, movePlayer, startGame, gameState, planetImages, playerImages 
     }}>
       {children}
     </WebSocketContext.Provider>

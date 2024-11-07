@@ -5,8 +5,11 @@ export default function renderScreen(
   canvasScreen: HTMLCanvasElement,
   game: IGame,
   currentPlayerId: string,
-  backgroundImage: HTMLImageElement
+  backgroundImage: HTMLImageElement,
+  planetImages: HTMLImageElement[],
+  playerImages: HTMLImageElement[]
 ) {
+ 
 
   const context = canvasScreen.getContext('2d')
 
@@ -26,37 +29,36 @@ export default function renderScreen(
   context.fill();
 
   const planets = game.gameState.planets;
-
-  planets.forEach((planet, index)=>{
-    if (planet.active) {
-      const image = planetImages[index % planetImages.length]; // Seleciona a imagem do planeta correspondente
+  planets.forEach((planet, index) => {
+    if (planet.active && planetImages.length > index) {
+      const image = planetImages[index]; // Use as imagens pré-carregadas
       const partWidth = planet.width / 2;
       const partHeight = planet.height / 3;
-
+  
       for (let i = 0; i < planet.parts.length; i++) {
-        if (planet.parts[i]) {
+        if (planet.parts[i]) { // Verifica se a parte está ativa
           const partX = planet.x + (i % 2) * partWidth;
           const partY = planet.y + Math.floor(i / 2) * partHeight;
-
+  
           // Desenha a parte da imagem
           context.drawImage(
             image,
-            (i % 2) * (image.width / 2), // X de origem na imagem
-            Math.floor(i / 2) * (image.height / 3), // Y de origem na imagem
-            image.width / 2, // Largura da parte da imagem
-            image.height / 3, // Altura da parte da imagem
-            partX, // X de destino no canvas
-            partY, // Y de destino no canvas
-            partWidth, // Largura no canvas
-            partHeight // Altura no canvas
+            (i % 2) * (image.width / 2),
+            Math.floor(i / 2) * (image.height / 3),
+            image.width / 2,
+            image.height / 3,
+            partX,
+            partY,
+            partWidth,
+            partHeight
           );
         }
       }
     }
-  })
+  });
+  
 
-  const playerIds = Object.keys(game.gameState.players); // Lista de IDs dos jogadores
-
+  const playerIds = Object.keys(game.gameState.players);
   playerIds.forEach((playerId, index) => {
     const player = game.gameState.players[playerId];
 
