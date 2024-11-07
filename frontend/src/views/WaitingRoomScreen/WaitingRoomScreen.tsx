@@ -8,17 +8,23 @@ interface ScreenProps {
 }
 
 export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
-  const { startGame, socketId, roomState, toggleReadyStatus, removePlayer, closeRoom, leaveRoom } = useWebSocket();
+  const { startGame, socketId, roomState, toggleReadyStatus, removePlayer, closeRoom, leaveRoom, lastMessage } = useWebSocket();
   const [loading, setLoading] = useState(true);  // Mantemos o loading como true inicialmente
   const [isHost, setIsHost] = useState(false);
 
   useEffect(() => {
+    console.log(lastMessage);
+    if (lastMessage && lastMessage.type === 'yosuLeft') {
+      console.log(lastMessage.data.message);
+      setScreen('join-room');
+      return;
+    }
     // Configura o timeout para 5 segundos
     const timeoutId = setTimeout(() => {
-      if (!roomState) {
+      /* if (!roomState) {
         console.log("Não foi possível carregar a sala ou o usuário não pertence a ela");
         setScreen('create-room'); // Redireciona ou notifica
-      }
+      } */
       setLoading(false); // Desativa o loading após a verificação
     }, 5000);
 
@@ -92,12 +98,17 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
           <h2 className='title-create'>Sala de Espera</h2>
 
           {!roomState ? (
-            <p>Não foi possível carregar a sala.</p>
+            <>
+              <p>Não foi possível carregar a sala.</p>
+              <Button variant="solid" size="md" onClick={() => setScreen('main-menu')}>
+                Voltar
+              </Button>
+            </>
           ) : (
             <>
               <p>Id da sala: {roomState.roomId}</p>
               <div className="player-list">
-                <h3 className='title-create' style={{margin:'10px'}}>Jogadores</h3>
+                <h3 className='title-create' style={{ margin: '10px' }}>Jogadores</h3>
                 {roomState.players.map((player) => (
                   <div key={player.playerId} className="player-item">
                     <span>
@@ -105,7 +116,7 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
                     </span>
 
                     {player.playerId === socketId ? (
-                      <Button variant="outlined"  size="sm" onClick={() => handleToggleReady(roomState.roomId)}>
+                      <Button variant="outlined" size="sm" onClick={() => handleToggleReady(roomState.roomId)}>
                         {player.ready ? 'Desmarcar Pronto' : 'Marcar Pronto'}
                       </Button>
                     ) : (
@@ -130,7 +141,7 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
 
                 {isHost && (
                   <>
-                    <button className='button-waiting-final'  onClick={() => handleCloseRoom(roomState.roomId)}>
+                    <button className='button-waiting-final' onClick={() => handleCloseRoom(roomState.roomId)}>
                       Cancelar sala
                     </button>
                     <button

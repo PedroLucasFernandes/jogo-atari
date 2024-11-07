@@ -205,9 +205,11 @@ class WebSocketService {
 		}
 
 		if (room.host === clientId) {
-			this.notifyClient(clientId, {
-				type: 'roomClosed',
-				data: { roomId }
+			room.players.forEach(player => {
+				this.notifyClient(player.playerId, {
+					type: 'roomClosed',
+					data: { roomId }
+				});
 			});
 			delete this.rooms[roomId];
 			console.log(`Sala ${roomId} fechada.`);
@@ -271,16 +273,6 @@ class WebSocketService {
 	private leaveRoom(clientId: string, roomId: string) {
 		console.log("leaving room", roomId);
 		const room = this.rooms[roomId];
-		const playerIndex = room.players.findIndex(p => p.playerId === clientId);
-
-		if (playerIndex === -1) {
-			this.notifyClient(clientId, {
-				type: 'error',
-				data: { message: 'Player not found' }
-			});
-			return;
-		}
-
 		if (!room) {
 			this.notifyClient(clientId, {
 				type: 'error',
@@ -289,13 +281,29 @@ class WebSocketService {
 			return;
 		}
 
-		if (room.host === clientId) {
+		const playerIndex = room.players.findIndex(p => p.playerId === clientId);
+		if (playerIndex === -1) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Cannot leave the room as the host' }
-				//TODO: Implementar outra alternativa depois, como repassar o host ou excluir a sala
+				data: { message: 'Player not found' }
 			});
 			return;
+		}
+
+
+		if (room.host === clientId) {
+			// Se houver outros jogadores na sala, transfere o host para o próximo jogador
+			if (room.players.length > 1) {
+				const newHost = room.players.find(player => player.playerId !== clientId);
+				if (newHost) {
+					room.host = newHost.playerId;
+					newHost.isHost = true;
+				}
+			} else {
+				// Se não houver outros jogadores, a sala é removida
+				delete this.rooms[roomId];
+				return;
+			}
 		}
 
 		room.players.splice(playerIndex, 1);
@@ -309,7 +317,11 @@ class WebSocketService {
 			}
 		}
 
-		// Notify all players in the room about the new player
+		this.notifyClient(clientId, {
+			type: 'youLeft',
+			data: { message: 'Você saiu da sala' }
+		});
+
 		room.players.forEach(player => {
 			this.notifyClient(player.playerId, {
 				type: 'playerLeft',

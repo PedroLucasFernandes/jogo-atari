@@ -106,6 +106,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         return;
       }
 
+      console.log("roomstate", JSON.stringify(roomState));
+
       if (!roomState) {
         console.log("Erro, estado da sala não existe");
         return;
@@ -116,7 +118,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         return;
       }
 
-      setLastMessage(data.data);
+      setLastMessage(data);
       setRoomState(null);
     });
 
@@ -135,7 +137,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         return;
       }
 
-      setLastMessage(data.data);
+      setLastMessage(data);
       setRoomState(roomState)
       console.log("Retorno - entrou na sala: roomState setado");
     });
@@ -149,8 +151,15 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         return;
       }
 
-      setLastMessage(data.data);
+      setLastMessage(data);
       setRoomState(roomState)
+    });
+
+    webSocketService.registerCallback('youLeft', (data) => {
+      console.log(`Retorno - youLeft: ${data}`);
+
+      setLastMessage(data);
+      setRoomState(null)
     });
 
     webSocketService.registerCallback('playerStatusChanged', (data) => {
@@ -163,7 +172,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         return;
       }
 
-      setLastMessage(data.data);
+      setLastMessage(data);
       setRoomState(roomState)
     });
 
@@ -176,7 +185,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         return;
       }
 
-      setLastMessage(data.data);
+      setLastMessage(data);
       setRoomState(roomState)
     })
 
@@ -196,7 +205,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         return;
       }
 
-      setLastMessage(data.data);
+      setLastMessage(data);
       setRoomState(roomState);
       setGameState(data.data.gameState)
     });
