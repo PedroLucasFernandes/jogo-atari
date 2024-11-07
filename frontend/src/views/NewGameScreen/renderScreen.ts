@@ -6,8 +6,6 @@ export default function renderScreen(
   game: IGame,
   currentPlayerId: string,
   backgroundImage: HTMLImageElement,
-  planetImages: HTMLImageElement[],
-  playerImages: HTMLImageElement[]
 ) {
  
 
