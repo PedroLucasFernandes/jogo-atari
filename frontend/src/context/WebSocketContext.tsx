@@ -4,7 +4,7 @@ import { IGameMessage, IGameState, initialBallState, initialCanvasState, initial
 import { useUser } from './UserContext';
 
 interface WebSocketContextType {
-  isConnected: boolean;
+  //isConnected: boolean; // removido, socketId já faz essa função
   socketId: string | null;
   webSocketService: typeof webSocketService;
   status: string | null;  //'offline' | 'online' | 'finding' | 'room' | 'game' | 'disconnected';
@@ -26,7 +26,7 @@ interface WebSocketContextType {
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
 
 export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isConnected, setIsConnected] = useState(false);
+  //const [isConnected, setIsConnected] = useState(false);
   const [socketId, setSocketId] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [gameState, setGameState] = useState<IGameState | null>(null);
@@ -36,10 +36,23 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const { user } = useUser();
 
-
-
-
   useEffect(() => {
+    if (!user) {
+      if (socketId) {
+        webSocketService.disconnect();
+        setStatus(null);
+        setGameState(null);
+        setRoomState(null);
+        setRooms(null);
+        setLastMessage(null);
+        console.log("Disconnecting websocket and clearing data");
+        return;
+      }
+
+      console.log("User is not logged in, websocket will not connect");
+      return;
+    }
+
     const connectWebSocket = () => {
       webSocketService.connect();
     };
@@ -220,7 +233,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         console.error('Erro ao atualizar o estado da bola:', data);
       }
     });
-  
+
     webSocketService.registerCallback('updatePlanet', (data) => {
       if (data.data && data.data.planets) {
         setGameState(prevGameState => {
@@ -245,7 +258,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         console.error('Erro ao atualizar o estado das paredes:', data);
       }
     });
-  }, []);
+  }, [user]);
 
 
   const getRooms = () => {
@@ -355,7 +368,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   return (
     <WebSocketContext.Provider value={{
-      isConnected, socketId, webSocketService, status, gameState, roomState, rooms, lastMessage,
+      socketId, webSocketService, status, gameState, roomState, rooms, lastMessage,
       getRooms, createRoom, closeRoom, joinRoom, leaveRoom, toggleReadyStatus, removePlayer, movePlayer, startGame,
     }}>
       {children}

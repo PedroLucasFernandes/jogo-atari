@@ -16,7 +16,7 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   const navigate = useNavigate();
   const { webSocketService, socketId } = useWebSocket();
   const [showLogout, setShowLogout] = useState(false);
-  const { user } = useUser();
+  const { user, setUser } = useUser();
 
   useEffect(() => {
     webSocketService.registerCallback('something', (data) => {
@@ -36,6 +36,7 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
 
     if (success) {
       console.log("Deslogado com sucesso");
+      setUser(null);
       navigate('/');
     }
   }
