@@ -12,8 +12,8 @@ export default function createGame() {
   }
 
   const speed = 10;
-  const initialY3 = 450;
-  const initialX3 = 630;
+  const initialY3 = 370;
+  const initialX3 = 550;
   const MAX_SPEED = 10; // Limite de velocidade
 
 
@@ -73,28 +73,28 @@ export default function createGame() {
 
     const acceptedMoves: Record<AcceptedMoves, (player: IPlayer) => void> = {
       w(player: IPlayer) {
-        if (player.y > 0 && player.y >= initialY3 + 10) player.y -= speed
+        if (player.y > 0 && player.y >= initialY3 + 10) player.y -= 10
       },
       a(player: IPlayer) {
-        if (player.x > 0 && player.x >= initialX3 + 10) player.x -= speed;
+        if (player.x > 0 && player.x >= initialX3 + 10) player.x -= 10;
       },
       s(player: IPlayer) {
-        if (player.y + player.size / 2 < gameState.canvas.height && player.y >= initialY3 && player.x <= initialX3) player.y += speed;
+        if (player.y + player.size < gameState.canvas.height && player.y >= initialY3 && player.x <= initialX3) player.y += 10;
       },
       d(player: IPlayer) {
-        if (player.x + player.size / 2 < gameState.canvas.width && player.y <= initialY3) player.x += speed;
+        if (player.x + player.size < gameState.canvas.width && player.y <= initialY3) player.x += 10;
       },
       arrowup(player: IPlayer) {
-        if (player.y > 0 && player.y >= initialY3 + 10) player.y -= speed
+        if (player.y > 0 && player.y >= initialY3 + 10) player.y -= 10
       },
       arrowleft(player: IPlayer) {
-        if (player.x > 0 && player.x >= initialX3 + 10) player.x -= speed;
+        if (player.x > 0 && player.x >= initialX3 + 10) player.x -= 10;
       },
       arrowdown(player: IPlayer) {
-        if (player.y + player.size / 2 < gameState.canvas.height && player.y >= initialY3 && player.x <= initialX3) player.y += speed;
+        if (player.y + player.size < gameState.canvas.height && player.y >= initialY3 && player.x <= initialX3) player.y += 10;
       },
       arrowright(player: IPlayer) {
-        if (player.x + player.size / 2 < gameState.canvas.width && player.y <= initialY3) player.x += speed;
+        if (player.x + player.size < gameState.canvas.width && player.y <= initialY3) player.x += 10;
       },
     }
 
@@ -148,12 +148,12 @@ export default function createGame() {
     for (const playerId in gameState.players) {
       const player = gameState.players[playerId];
 
-      const collisionMargin = 2; // Ajuste conforme necessário
+      // Ajuste conforme necessário
       if (
-        gameState.ball.x + gameState.ball.radius > player.x - collisionMargin &&
-        gameState.ball.x - gameState.ball.radius < player.x + player.size + collisionMargin &&
-        gameState.ball.y + gameState.ball.radius > player.y - collisionMargin &&
-        gameState.ball.y - gameState.ball.radius < player.y + player.size + collisionMargin
+        gameState.ball.x + gameState.ball.radius > player.x &&
+        gameState.ball.x - gameState.ball.radius < player.x + player.size &&
+        gameState.ball.y + gameState.ball.radius > player.y &&
+        gameState.ball.y - gameState.ball.radius < player.y + player.size
       ) {
         // Rebater a bola ao detectar colisão
         gameState.ball.speedX *= -1; // Inverte a direção no eixo X

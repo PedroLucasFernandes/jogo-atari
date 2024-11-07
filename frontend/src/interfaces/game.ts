@@ -67,9 +67,9 @@ export const initialPlanetsState: IPlanet[] = [
 
 export const initialPlayersState: PlayersRecord = {
   'bot0': { x: 170, y: 150, size: 80, isBot: true, imageSrc: '' }, 
-  'bot1': { x: 630, y: 150, size: 80, isBot: true, imageSrc: '' }, 
-  'bot2': { x: 170, y: 450, size: 80, isBot: true, imageSrc: '' }, 
-  'bot3': { x: 630, y: 450, size: 80, isBot: false, imageSrc: '' } 
+  'bot1': { x: 550, y: 150, size: 80, isBot: true, imageSrc: '' }, 
+  'bot2': { x: 170, y: 370, size: 80, isBot: true, imageSrc: '' }, 
+  'bot3': { x: 550, y: 370, size: 80, isBot: false, imageSrc: '' } 
 };
 
 export const initialBallState: IBall = {

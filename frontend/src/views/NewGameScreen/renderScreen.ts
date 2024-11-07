@@ -62,8 +62,9 @@ export default function renderScreen(
 
     const playerImage = playersImages[index % playersImages.length];
 
-    const centerX = player.x - player.size / 2;
-    const centerY = player.y - player.size / 2;
+    const centerX = player.x; 
+    const centerY = player.y;
+
     context.drawImage(playerImage, centerX, centerY, player.size, player.size);
   });
 }
