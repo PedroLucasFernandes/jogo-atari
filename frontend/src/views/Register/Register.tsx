@@ -37,7 +37,7 @@ export const Register: React.FC = () => {
 
       if (data) {
         console.log("Registrado com sucesso:", data);
-        navigate('/login');
+        navigate('/');
       }
     } catch (err) {
       console.error('Erro ao conectar à API:', err);

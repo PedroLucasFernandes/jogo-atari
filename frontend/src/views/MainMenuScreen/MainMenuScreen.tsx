@@ -78,8 +78,6 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
       <div id='modal'>
         <h1>Olá, navegante {user?.username}!</h1>
         <h2>Qual será a aventura de hoje?</h2>
-        {socketId ? 'Socket Connected' : 'Socket not Connected'}
-        <Button className='button-menu' onClick={() => navigate('/game') }>Jogo - sem validação</Button>
         <Button className='button-menu'
           onClick={() => setScreen('create-room')}
           sx={{ backgroundColor: '#9D00FF', color: 'white', '&:hover': { backgroundColor: '#ff69b4' } }}
@@ -91,6 +89,12 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
           sx={{ backgroundColor: '#FF0062', color: 'white', '&:hover': { backgroundColor: '#800080' } }}
         >
           Encontrar partida
+        </Button>
+        <Button className='button-menu'
+          onClick={() => setScreen('waiting-room')}
+          sx={{ backgroundColor: '#03B46D', color: 'white', '&:hover': { backgroundColor: '#006400' } }}
+        >
+          Sala de espera
         </Button>
         <Button className='button-menu'
           onClick={() => setScreen('ranking-room')}

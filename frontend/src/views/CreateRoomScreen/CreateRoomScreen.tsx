@@ -1,6 +1,7 @@
 import './CreateRoomScreen.css'
 import React, { useEffect, useState } from 'react';
 import { useWebSocket } from '../../context/WebSocketContext';
+import CustomInput from '../../components/CustomInput/CustomInput';
 
 interface CreateRoomScreenProps {
     setScreen: (screen: string) => void;
@@ -31,30 +32,29 @@ const CreateRoomScreen: React.FC<CreateRoomScreenProps> = ({ setScreen }) => {
 
     return (
         <div id="create-room">
-            <h2 className="text-3xl font-bold text-white mb-8">Criar sala</h2>
+            <div className='square-create-room'>
+            <h2 className="title-create">Criar sala</h2>
             <p>Informe um código para criar uma sala</p>
 
             <input
                 type="text"
                 value={roomCode}
                 onChange={(e) => setRoomCode(e.target.value)}
-                placeholder="Enter Room Code"
-                className="w-full p-3 rounded bg-gray-700 text-white placeholder-gray-400"
+                placeholder="Código"
+                className="input-create"
                 maxLength={6}
             />
 
-
-
-            <div className="flex flex-col space-y-2">
                 <button
                     onClick={handleCreateRoom}
-                    className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded"
+                    className="button-create"
                     disabled={!roomCode || loading}
+                    style={{backgroundColor: "#00a447"}}
                 >
-                    Create New Room
+                    Criar nova sala
                 </button>
+            <button className="button-create" onClick={() => setScreen('main-menu')}>Voltar ao menu</button>
             </div>
-            <button onClick={() => setScreen('main-menu')}>Voltar ao menu</button>
 
         </div>
     );
