@@ -1,8 +1,7 @@
 #monolito {
+  background-image: url('../../assets/home_background.png');
   width: 100%;
   display: flex;
-  flex: 1 1;
-
   flex-direction: column;
   justify-content: center;
   align-items: center;

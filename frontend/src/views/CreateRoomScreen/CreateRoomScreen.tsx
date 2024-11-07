@@ -1,26 +1,63 @@
 import './CreateRoomScreen.css'
-import Box from "@mui/joy/Box";
-import Button from "@mui/joy/Button";
-import Input from "@mui/joy/Input";
-import { Dispatch, SetStateAction } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useWebSocket } from '../../context/WebSocketContext';
+import CustomInput from '../../components/CustomInput/CustomInput';
 
-interface ScreenProps {
-  setScreen: Dispatch<SetStateAction<string>>;
+interface CreateRoomScreenProps {
+    setScreen: (screen: string) => void;
 }
 
-export const CreateRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
+const CreateRoomScreen: React.FC<CreateRoomScreenProps> = ({ setScreen }) => {
+    const [roomCode, setRoomCode] = useState('');
+    const { createRoom, roomState } = useWebSocket();
+    const [loading, setLoading] = useState(false);
 
-  return (
-    <Box id="create-room">
-      <h2>Criar sala</h2>
+    const handleCreateRoom = () => {
+        if (!roomCode) return;
+        setLoading(true);
+        createRoom(roomCode);
+        //setScreen('game');
+    };
 
+    useEffect(() => {
+        if (!roomState) return;
+        if (roomState.status === 'waiting') {
+            setScreen('waiting-room');
+            console.log("Movido para a sala de espera");
 
-      <Box sx={{ mt: 2 }}>
-        <Input type="text" placeholder="Código da sala" />
-      </Box>
-      <Button variant="solid" size="md" onClick={() => console.log('Criar sala')}>Criar sala</Button>
-      <Button variant="solid" size="md" onClick={() => setScreen('main-menu')}>Voltar ao menu</Button>
+            setRoomCode('');
+            setLoading(false);
+        }
+    }, [roomState])
 
-    </Box>
-  );
-}
+    return (
+        <div id="create-room">
+            <div className='square-create-room'>
+            <h2 className="title-create">Criar sala</h2>
+            <p>Informe um código para criar uma sala</p>
+
+            <input
+                type="text"
+                value={roomCode}
+                onChange={(e) => setRoomCode(e.target.value)}
+                placeholder="Código"
+                className="input-create"
+                maxLength={6}
+            />
+
+                <button
+                    onClick={handleCreateRoom}
+                    className="button-create"
+                    disabled={!roomCode || loading}
+                    style={{backgroundColor: "#00a447"}}
+                >
+                    Criar nova sala
+                </button>
+            <button className="button-create" onClick={() => setScreen('main-menu')}>Voltar ao menu</button>
+            </div>
+
+        </div>
+    );
+};
+
+export default CreateRoomScreen;
