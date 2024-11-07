@@ -3,7 +3,6 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import Game from './components/Game';
 import LoginButton from './components/LoginGoogleButton/LoginGoogleButton';
 import { WebSocketProvider } from './context/WebSocketContext';
-import { Home } from './views/Home/Home';
 import { GameMonolito } from './views/GameMonolito/GameMonolito';
 import { Login } from './views/Login/Login';
 import { Register } from './views/Register/Register';
@@ -25,8 +24,7 @@ function App() {
         <Router>
             <ToastContainer />
             <Routes>
-              <Route path='/' element={<Home />} />
-              <Route path='/login' element={<Login />} />
+              <Route path='/' element={<Login />} />
               <Route path='/register' element={<Register />} />
               <Route path="/game" element={<Game />} />
               <Route path="/monolito" element={<ProtectedRoute children={<GameMonolito />} />} />

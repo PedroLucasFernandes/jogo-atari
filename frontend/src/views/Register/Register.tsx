@@ -85,11 +85,11 @@ export const Register: React.FC = () => {
             <h2 className="text">
               Já possui uma conta? 
               <Link
-                to="/login"
+                to="/"
                 style={{ color: '#007bff', textDecoration: 'underline' }}
                 onClick={(e) => {
                   e.preventDefault();
-                  navigate("/login");
+                  navigate("/");
                 }}
                 className="text"
               >

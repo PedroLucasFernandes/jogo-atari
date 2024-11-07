@@ -4,6 +4,7 @@ import Button from "@mui/joy/Button";
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useWebSocket } from '../../context/WebSocketContext';
+import { useUser } from '../../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { logoutApi } from '../../api/logoutApi';
 
@@ -15,6 +16,7 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   const navigate = useNavigate();
   const { webSocketService, socketId } = useWebSocket();
   const [showLogout, setShowLogout] = useState(false);
+  const { user } = useUser();
 
   useEffect(() => {
     webSocketService.registerCallback('something', (data) => {
@@ -74,7 +76,7 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
       )}
 
       <div id='modal'>
-        <h1>Olá, navegante usuario!</h1>
+        <h1>Olá, navegante {user?.username}!</h1>
         <h2>Qual será a aventura de hoje?</h2>
         {socketId ? 'Socket Connected' : 'Socket not Connected'}
         <Button onClick={() => navigate('/game')}>Jogo - sem validação</Button>
