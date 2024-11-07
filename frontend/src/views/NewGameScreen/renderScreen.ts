@@ -21,7 +21,7 @@ export default function renderScreen(
   context.arc(gameState.ball.x, gameState.ball.y, gameState.ball.radius, 0, Math.PI * 2);
   context.fill();
 
-  const planets = game.gameState.planets;
+  const planets = gameState.planets;
   planets.forEach((planet, index) => {
     if (planet.active && planetImages.length > index) {
       const image = planetImages[index]; // Use as imagens pré-carregadas

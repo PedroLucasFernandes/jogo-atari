@@ -231,6 +231,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
               planets: initialPlanetsState,
               ball: initialBallState,
               canvas: initialCanvasState,
+              room: initialRoomState
             };
           }
 
