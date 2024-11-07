@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import Game from './components/Game';
+// import Game from './components/Game';
 import LoginButton from './components/LoginGoogleButton/LoginGoogleButton';
 import { WebSocketProvider } from './context/WebSocketContext';
 import { Home } from './views/Home/Home';
@@ -27,7 +27,7 @@ function App() {
               <Route path='/login' element={<Login />} />
               <Route path='/register' element={<Register />} />
 
-              <Route path="/game" element={<Game />} />
+              {/* <Route path="/game" element={<Game />} /> */}
 
               <Route path="/monolito" element={<ProtectedRoute children={<GameMonolito />} />} />
             </Routes>

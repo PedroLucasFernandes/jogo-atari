@@ -1,21 +1,27 @@
-import { AcceptedMoves, IGameMessage, IGameState, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialWallsState, IPlayer, IPlayerRoom, PlayersRecord } from "../interfaces/game"
+import { AcceptedMoves, IGameMessage, IGameState, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialPlanetsState, IPlayer, IPlayerRoom, PlayersRecord } from "../interfaces/game"
+
+
 
 export default function createGame() {
 
+
+
   const gameState: IGameState = {
     players: initialPlayersState,
-    walls: initialWallsState,
+    planets: initialPlanetsState,
     ball: initialBallState,
     canvas: initialCanvasState,
     room: initialRoomState
   }
 
+  // REFACTOR, ARRUMAR COM OS VALORES DAS NOVAS POSIÇÕES DOS PLAYERS!!
   const speed = 10;
+  const MAX_SPEED = 10; // Limite de velocidade
   const initialPositions = [
-    { x: 150, y: 150 },
-    { x: 630, y: 150 },
-    { x: 150, y: 430 },
-    { x: 630, y: 430 },
+    { x: 170, y: 150 },
+    { x: 550, y: 150 },
+    { x: 170, y: 370 },
+    { x: 550, y: 370 },
   ];
 
   const intersectionPoints = [
@@ -50,116 +56,7 @@ export default function createGame() {
     Object.assign(gameState, newState)
   }
 
-  // function movePlayer(message: IGameMessage) {
-
-  //   const acceptedMoves: Record<AcceptedMoves, (player: IPlayer) => void> = {
-  //     w(player: IPlayer) {
-  //       if (player.y > 0 && player.y >= initialY3 + 10) player.y -= speed
-  //     },
-  //     a(player: IPlayer) {
-  //       if (player.x > 0 && player.x >= initialX3 + 10) player.x -= speed;
-  //     },
-  //     s(player: IPlayer) {
-  //       if (player.y + player.size / 2 < gameState.canvas.height && player.y >= initialY3 && player.x <= initialX3) player.y += speed;
-  //     },
-  //     d(player: IPlayer) {
-  //       if (player.x + player.size / 2 < gameState.canvas.width && player.y <= initialY3) player.x += speed;
-  //     },
-  //     arrowup(player: IPlayer) {
-  //       if (player.y > 0 && player.y >= initialY3 + 10) player.y -= speed
-  //     },
-  //     arrowleft(player: IPlayer) {
-  //       if (player.x > 0 && player.x >= initialX3 + 10) player.x -= speed;
-  //     },
-  //     arrowdown(player: IPlayer) {
-  //       if (player.y + player.size / 2 < gameState.canvas.height && player.y >= initialY3 && player.x <= initialX3) player.y += speed;
-  //     },
-  //     arrowright(player: IPlayer) {
-  //       if (player.x + player.size / 2 < gameState.canvas.width && player.y <= initialY3) player.x += speed;
-  //     },
-  //   }
-
-  //   if (!message.data.keyPressed) return;
-  //   const keyPressed: string = message.data.keyPressed;
-
-  //   if (!message.data.playerId) return;
-  //   const playerId: string = message.data.playerId
-
-  //   if (keyPressed in acceptedMoves) {
-  //     //const player = gameState.players[playerId]; // Use o playerId do comando
-  //     const player = gameState.players[playerId];
-  //     const moveFunction = acceptedMoves[keyPressed as AcceptedMoves];
-
-  //     if (player && moveFunction) {
-  //       moveFunction(player);
-  //     }
-  //   }
-
-
-  //   const data = {
-  //     gameState
-  //   }
-  //   notifyAll({ type: 'movePlayer', data })
-  // }
-
   function movePlayer(playerId: string, keyPressed: string) {
-
-    // VOU DEIXAR AQUI COMENTADO UMA OPÇÃO PARA DEIXAR O MOVIMENTO DOS JOGADORES LIVRE PELA TELA
-    // const acceptedMoves: Record<AcceptedMoves, (player: IPlayer) => void> = {
-    //   w(player: IPlayer) {
-    //     if (player.y > 0) player.y -= speed; // Remova as restrições específicas de posição aqui
-    //   },
-    //   a(player: IPlayer) {
-    //     if (player.x > 0) player.x -= speed;
-    //   },
-    //   s(player: IPlayer) {
-    //     if (player.y + player.size < gameState.canvas.height) player.y += speed;
-    //   },
-    //   d(player: IPlayer) {
-    //     if (player.x + player.size < gameState.canvas.width) player.x += speed;
-    //   },
-    //   arrowup(player: IPlayer) {
-    //     if (player.y > 0) player.y -= speed;
-    //   },
-    //   arrowleft(player: IPlayer) {
-    //     if (player.x > 0) player.x -= speed;
-    //   },
-    //   arrowdown(player: IPlayer) {
-    //     if (player.y + player.size < gameState.canvas.height) player.y += speed;
-    //   },
-    //   arrowright(player: IPlayer) {
-    //     if (player.x + player.size < gameState.canvas.width) player.x += speed;
-    //   },
-    // };
-
-    // MOVIMENTO SINGLE PLAYER
-    // const acceptedMoves: Record<AcceptedMoves, (player: IPlayer) => void> = {
-    //   w(player: IPlayer) {
-    //     if (player.y > 0 && player.y >= initialY3 + 10) player.y -= speed
-    //   },
-    //   a(player: IPlayer) {
-    //     if (player.x > 0 && player.x >= initialX3 + 10) player.x -= speed;
-    //   },
-    //   s(player: IPlayer) {
-    //     if (player.y + player.size / 2 < gameState.canvas.height && player.y >= initialY3 && player.x <= initialX3) player.y += speed;
-    //   },
-    //   d(player: IPlayer) {
-    //     if (player.x + player.size / 2 < gameState.canvas.width && player.y <= initialY3) player.x += speed;
-    //   },
-    //   arrowup(player: IPlayer) {
-    //     if (player.y > 0 && player.y >= initialY3 + 10) player.y -= speed
-    //   },
-    //   arrowleft(player: IPlayer) {
-    //     if (player.x > 0 && player.x >= initialX3 + 10) player.x -= speed;
-    //   },
-    //   arrowdown(player: IPlayer) {
-    //     if (player.y + player.size / 2 < gameState.canvas.height && player.y >= initialY3 && player.x <= initialX3) player.y += speed;
-    //   },
-    //   arrowright(player: IPlayer) {
-    //     if (player.x + player.size / 2 < gameState.canvas.width && player.y <= initialY3) player.x += speed;
-    //   },
-    // }
-
     const player = gameState.players[playerId];
     if (!player || !keyPressed) return;
 
@@ -325,8 +222,43 @@ export default function createGame() {
     notifyAll({ type: 'playerMoved', data });
   }
 
+  function notifyBallUpdate() {
+    const data = {
+      ball: gameState.ball,
+    };
+
+    notifyAll({ type: 'updateBall', data });
+  }
+
+  // function notifyPlanetUpdate() {
+  //   const data = {
+  //     planets: gameState.planets,
+  //   };
+  //   notifyAll({ type: 'updatePlanet', data });
+  // }
+
+  function notifyPlanetUpdate(isInitial: boolean = false) {
+    const data = {
+      planets: gameState.planets,
+    };
+
+    // Enviar notificação inicial se todas as partes do planeta ainda estiverem ativas
+    if (isInitial) {
+      for (const planet of gameState.planets) {
+        if (planet.active && planet.parts.every(part => part)) {
+          notifyAll({ type: 'updatePlanet', data });
+          break; // Notificar apenas uma vez
+        }
+      }
+    } else {
+      // Notificar após colisões
+      notifyAll({ type: 'updatePlanet', data });
+    }
+  }
 
   function moveBall() {
+    let collisionDetected = false;
+
     // Atualiza a posição da bola
     gameState.ball.x += gameState.ball.speedX;
     gameState.ball.y += gameState.ball.speedY;
@@ -343,6 +275,7 @@ export default function createGame() {
     for (const playerId in gameState.players) {
       const player = gameState.players[playerId];
 
+      // Ajuste conforme necessário
       if (
         gameState.ball.x + gameState.ball.radius > player.x &&
         gameState.ball.x - gameState.ball.radius < player.x + player.size &&
@@ -364,34 +297,16 @@ export default function createGame() {
       }
     }
 
+    for (const planet of gameState.planets) {
+      if (planet.active) {
+        notifyPlanetUpdate();
+        const partWidth = planet.width / 2;
+        const partHeight = planet.height / 3;
 
-    // // Verifica colisão da bola com cada jogador
-    // for (const playerId in gameState.players) {
-    //   const player = gameState.players[playerId];
-
-    //   if (
-    //     gameState.ball.x + gameState.ball.radius > player.x &&
-    //     gameState.ball.x - gameState.ball.radius < player.x + player.size &&
-    //     gameState.ball.y + gameState.ball.radius > player.y &&
-    //     gameState.ball.y - gameState.ball.radius < player.y + player.size
-    //   ) {
-    //     // Rebater a bola ao detectar colisão
-    //     gameState.ball.speedX *= -1; // Inverte a direção no eixo X
-    //     gameState.ball.speedY *= -1; // Inverte a direção no eixo Y
-
-    //     break; // Sai do loop após detectar a colisão com um jogador
-    //   }
-    // }
-
-    for (const wall of gameState.walls) {
-      if (wall.active) {
-        const partWidth = wall.width / 2;
-        const partHeight = wall.height / 3;
-
-        for (let i = 0; i < wall.parts.length; i++) {
-          if (wall.parts[i]) {
-            const partX = wall.x + (i % 2) * partWidth;
-            const partY = wall.y + Math.floor(i / 2) * partHeight;
+        for (let i = 0; i < planet.parts.length; i++) {
+          if (planet.parts[i]) {
+            const partX = planet.x + (i % 2) * partWidth;
+            const partY = planet.y + Math.floor(i / 2) * partHeight;
 
             if (
               gameState.ball.x + gameState.ball.radius > partX &&
@@ -400,29 +315,36 @@ export default function createGame() {
               gameState.ball.y - gameState.ball.radius < partY + partHeight
             ) {
 
-              wall.parts[i] = false;
+              planet.parts[i] = false;
               gameState.ball.speedX *= -1;
               gameState.ball.speedY *= -1;
+
+
+              collisionDetected = true;
               break;
             }
           }
         }
       }
     }
-    // Notifica os observadores com o novo estado da bola
-    const data = {
-      ball: gameState.ball,
-    };
-    notifyAll({ type: 'moveBall', data });
+
+    gameState.ball.speedX = Math.min(Math.max(gameState.ball.speedX, -MAX_SPEED), MAX_SPEED);
+    gameState.ball.speedY = Math.min(Math.max(gameState.ball.speedY, -MAX_SPEED), MAX_SPEED);
+
+    if (collisionDetected) {
+      notifyPlanetUpdate();
+    }
+
+    notifyBallUpdate();
   }
 
 
   function addPlayers(players: IPlayerRoom[]) {
     const positions = [
-      { x: 150, y: 150 },
-      { x: 630, y: 150 },
-      { x: 150, y: 430 },
-      { x: 630, y: 430 },
+      { x: 170, y: 150 },
+      { x: 550, y: 150 },
+      { x: 150, y: 370 },
+      { x: 550, y: 370 },
     ];
 
     // Limpa todos os jogadores atuais de gameState.players
@@ -444,6 +366,7 @@ export default function createGame() {
         initialY: y,
         size: 80,
         isBot: false,
+        imageSrc: ""
       };
     });
 
@@ -491,57 +414,3 @@ export default function createGame() {
     stop
   }
 }
-
-//Sem tolerância
-/* w(player: IPlayer, index: number) {
-  if (index === 0 || index === 1) {
-    // Movimento entre 0 e initialY no eixo Y
-    if (player.y > 0 && player.x === player.initialX) {
-        player.y = Math.max(player.y - speed, 0);
-    }
-} else {
-    // Movimento entre initialY e altura do canvas no eixo Y
-    if (player.y > player.initialY && player.x === player.initialX) {
-        player.y = Math.max(player.y - speed, player.initialY);
-    }
-}
-},
-a(player: IPlayer, index: number) {
-  if (index === 0 || index === 2) {
-    // Movimento entre 0 e initialX no eixo X
-    if (player.x > 0 && player.y === player.initialY) {
-        player.x = Math.max(player.x - speed, 0);
-    }
-} else {
-    // Movimento entre initialX e largura do canvas no eixo X
-    if (player.x > player.initialX && player.y === player.initialY) {
-        player.x = Math.max(player.x - speed, player.initialX);
-    }
-}
-},
-s(player: IPlayer, index: number) {
-  if (index === 0 || index === 1) {
-    // Movimento entre 0 e initialY no eixo Y
-    if (player.y < player.initialY && player.x === player.initialX) {
-        player.y = Math.min(player.y + speed, player.initialY);
-    }
-} else {
-    // Movimento entre initialY e altura do canvas no eixo Y
-    if (player.y < gameState.canvas.height && player.x === player.initialX) {
-        player.y = Math.min(player.y + speed, gameState.canvas.height);
-    }
-}
-},
-d(player: IPlayer, index: number) {
-  if (index === 1 || index === 3) {
-    // Movimento entre initialX e largura do canvas no eixo X
-    if (player.x < gameState.canvas.width && player.y === player.initialY) {
-        player.x = Math.min(player.x + speed, gameState.canvas.width);
-    }
-} else {
-    // Movimento entre 0 e initialX no eixo X
-    if (player.x < player.initialX && player.y === player.initialY) {
-        player.x = Math.min(player.x + speed, player.initialX);
-    }
-}
-}, */

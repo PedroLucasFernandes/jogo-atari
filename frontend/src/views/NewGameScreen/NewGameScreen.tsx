@@ -12,7 +12,6 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, roomCode }) => {
 	const { socketId, roomState, gameState, movePlayer } = useWebSocket();
 	const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
 
-	// Load background image
 	useEffect(() => {
 		const bgImage = '/assets/bg-space.svg';
 		const img = new Image();

@@ -1,21 +1,14 @@
 export type AcceptedMoves = 'w' | 'a' | 's' | 'd' | 'arrowup' | 'arrowleft' | 'arrowdown' | 'arrowright';
 export type gameStatus = 'lobby' | 'waiting' | 'inprogress' | 'paused' | 'finished';
 
-// export interface IWall {
-//   x: number;
-//   y: number;
-//   width: number;
-//   height: number;
-//   active: boolean;
-// }
-
-export interface IWall {
+export interface IPlanet {
   x: number;
   y: number;
   width: number;
   height: number;
   active: boolean; // Para saber se a parede está ativa
-  parts: boolean[]; // Representa se cada parte está ativa (true) ou removida (false)
+  parts: boolean[]; // Cada parte representará um fragmento da imagem
+  imageSrc: string; // Caminho da imagem do planeta
 }
 
 export interface IPlayer {
@@ -27,6 +20,7 @@ export interface IPlayer {
   initialY: number;
   size: number;
   isBot: boolean;
+  imageSrc: string;
 }
 
 export type PlayersRecord = Record<string, IPlayer>;
@@ -61,7 +55,7 @@ export interface IRoomState {
 
 export interface IGameState {
   players: PlayersRecord;
-  walls: IWall[];
+  planets: IPlanet[];
   ball: IBall;
   canvas: ICanvas;
   room: IRoomState;
@@ -80,6 +74,8 @@ export interface IGameMessage {
     message?: string;
     roomState?: IRoomState;
     rooms?: IRoomState[];
+    planets?: IPlanet[];
+    player?: IPlayer;
   }
 }
 
@@ -93,27 +89,26 @@ export interface IGame {
   stop: () => void;
 }
 
-export const initialWallsState: IWall[] = [
-  { x: 20, y: 20, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] },
-  { x: 700, y: 20, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] },
-  { x: 20, y: 500, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] },
-  { x: 700, y: 500, width: 80, height: 80, active: true, parts: [true, true, true, true, true, true] }
+export const initialPlanetsState: IPlanet[] = [
+  { x: 0, y: 0, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '' },
+  { x: 650, y: 0, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '' },
+  { x: 0, y: 450, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '' },
+  { x: 650, y: 450, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '' }
 ];
 
 export const initialPlayersState: PlayersRecord = {
-  'bot0': { username: 'Bot 0', x: 150, y: 150, initialX: 150, initialY: 150, size: 80, isBot: true }, // Movido mais para dentro do canvas
-  'bot1': { username: 'Bot 1', x: 630, y: 150, initialX: 630, initialY: 150, size: 80, isBot: true }, // Movido mais para dentro do canvas
-  'bot2': { username: 'Bot 2', x: 150, y: 430, initialX: 150, initialY: 430, size: 80, isBot: true }, // Movido mais para dentro do canvas
-  'bot3': { username: 'Bot 3', x: 630, y: 430, initialX: 630, initialY: 430, size: 80, isBot: false } // Movido mais para dentro do canvas
+  'bot0': { username: 'Bot 0', x: 170, y: 150, initialX: 170, initialY: 150, size: 80, isBot: true, imageSrc: '' },
+  'bot1': { username: 'Bot 1', x: 550, y: 150, initialX: 550, initialY: 150, size: 80, isBot: true, imageSrc: '' },
+  'bot2': { username: 'Bot 2', x: 170, y: 370, initialX: 170, initialY: 370, size: 80, isBot: true, imageSrc: '' },
+  'bot3': { username: 'Bot 3', x: 550, y: 370, initialX: 550, initialY: 370, size: 80, isBot: false, imageSrc: '' }
 };
-
 
 export const initialBallState: IBall = {
   x: 400,
   y: 300,
   radius: 10,
-  speedX: 3,
-  speedY: 3,
+  speedX: 5,
+  speedY: 5,
   color: 'white'
 };
 
