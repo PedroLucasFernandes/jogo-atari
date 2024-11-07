@@ -3,12 +3,12 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 // import Game from './components/Game';
 import LoginButton from './components/LoginGoogleButton/LoginGoogleButton';
 import { WebSocketProvider } from './context/WebSocketContext';
-import { Home } from './views/Home/Home';
 import { GameMonolito } from './views/GameMonolito/GameMonolito';
 import { Login } from './views/Login/Login';
 import { Register } from './views/Register/Register';
 import { UserProvider } from './context/UserContext';
 import ProtectedRoute from './components/ProtectedRoutes/ProtectedRoutes';
+import { ToastContainer } from 'react-toastify';
 
 function App() {
   const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
@@ -23,8 +23,7 @@ function App() {
         <WebSocketProvider> {/* Passei o websocket para dentro, reverter se aparecer algum problema */}
           <Router>
             <Routes>
-              <Route path='/' element={<Home />} />
-              <Route path='/login' element={<Login />} />
+              <Route path='/' element={<Login />} />
               <Route path='/register' element={<Register />} />
 
               {/* <Route path="/game" element={<Game />} /> */}

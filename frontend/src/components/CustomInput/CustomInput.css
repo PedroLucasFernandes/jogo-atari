@@ -1,0 +1,17 @@
+.custom-input {
+    padding: 10px;
+    padding-left: 1rem;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 2rem;
+    width: 50%;
+    align-self: center;
+    color: #333; 
+    font-size: 16px; 
+    font-family: Arial, sans-serif; 
+    line-height: 1.5; 
+}
+
+.custom-input::placeholder {
+    color: #aaa;
+}

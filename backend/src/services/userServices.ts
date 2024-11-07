@@ -37,29 +37,29 @@ export const createUser = async (
 ) => {
     try {
         if (!username) {
-            throw new Error("The username cannot be empty.");
+            throw new Error("O nome de usuário não deve estar vazio");
         }
 
         if (!email) {
-            throw new Error("Email cannot be empty.");
+            throw new Error("O e-mail não deve estar vazio");
         }
 
         if (!validateEmail(email)) {
-            throw new Error("Invalid email format. (example@example.com) ");
+            throw new Error("Formato de e-mail inválido(example@example.com) ");
         }
 
         if (!password) {
-            throw new Error("Password cannot be empty.");
+            throw new Error("Senha não pode estar vazia");
         }
 
         const existingUser = await userRepository.getUserByUsername(username);
         if (existingUser.length > 0) {
-            throw new Error("Username already registered!");
+            throw new Error("Nome de usuário já registrado!");
         }
 
         const existingEmail = await userRepository.getUserByEmail(email);
         if (existingEmail) {
-            throw new Error("Email already registered.");
+            throw new Error("E-mail já registrado!");
         }
 
         const hashedPassword = await hashPassword(password);
@@ -86,7 +86,7 @@ export const deleteUser = async (userId: string): Promise<IUser> => {
         const currentUser: IUser | null = await userRepository.getUserById(userId);
 
         if (!currentUser) {
-            throw new Error("User not registered");
+            throw new Error("Usuário não registrado");
         }
 
         const user = await userRepository.deleteUserById(userId);
@@ -101,7 +101,7 @@ export const updateUser = async (userId: string, fields: Partial<IUser>): Promis
         const currentUser: IUser | null = await userRepository.getUserById(userId);
 
         if (!currentUser) {
-            throw new Error("User not registered");
+            throw new Error("Usuário não registrado");
         }
 
         const newUser: IUser = {

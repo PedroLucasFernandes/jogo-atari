@@ -7,7 +7,7 @@ export const authenticate = async (req: Request, res: Response) => {
         const { auth, token, user } = await loginServices.authenticateUser(email, password);
 
         if (!auth) {
-            res.status(400).json({ error: "Invalid username and/or password." });
+            res.status(400).json({ error: "Nome de usuário ou senha incorretos!" });
             return;
         }
 
@@ -17,7 +17,7 @@ export const authenticate = async (req: Request, res: Response) => {
         // Retornando os dados do usuário junto com o token de autenticação
         res.status(200).json({ data: user, auth, message: "User successfully authenticated!" });
     } catch (error) {
-        res.status(500).json({ error: "Failed to authenticate user, server error." });
+        res.status(500).json({ error: "Falha na autenticação: erro no servidor" });
     }
 };
 
