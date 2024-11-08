@@ -253,6 +253,22 @@ class WebSocketService {
 			return;
 		}
 
+		if (room.status === 'inprogress') {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Esta partida já está em andamento' }
+			});
+			return;
+		}
+
+		if (room.status === 'finished') {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Esta partida já terminou' }
+			});
+			return;
+		}
+
 		room.players.push({ playerId: clientId, username: username, ready: false, isHost: false });
 		console.log(`Usuário ${clientId} adicionado à sala ${roomId}.`);
 		//const room = this.rooms[roomId];
