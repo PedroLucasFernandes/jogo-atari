@@ -40,7 +40,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     if (!user) {
       if (socketId) {
         webSocketService.disconnect();
-        setStatus(null);
+        setStatus('offline');
         setGameState(null);
         setRoomState(null);
         setRooms(null);
@@ -71,6 +71,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
       if (!rooms) {
         console.log("Erro ao receber salas");
+        setLastMessage({ type: 'error', data: { message: 'Erro ao carregar salas' } });
         return;
       }
 
@@ -85,11 +86,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
       if (!roomState) {
         console.log("Erro ao indentificar estado da sala");
-        return;
-      }
-
-      if (roomState.players.length === 0) {
-        console.log("Erro ao indentificar jogador na sala");
+        setLastMessage({ type: 'error', data: { message: 'Erro ao criar sala. Unexpected server response' } });
         return;
       }
 
@@ -127,11 +124,13 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
       if (!roomState) {
         console.log("Erro ao indentificar estado da sala");
+        setLastMessage({ type: 'error', data: { message: 'Erro ao receber novo jogador. Unexpected server response' } });
         return;
       }
 
       if (roomState.players.length === 0) {
         console.log("Erro ao indentificar jogadores na sala");
+        setLastMessage({ type: 'error', data: { message: 'Erro ao receber novo jogador. Unexpected server response' } });
         return;
       }
 
@@ -146,6 +145,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
       if (!roomState) {
         console.log("Erro ao indentificar estado da sala");
+        setLastMessage({ type: 'error', data: { message: 'Erro ao atualizar jogadores. Unexpected server response' } });
         return;
       }
 
@@ -174,6 +174,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
       if (!roomState) {
         console.log("Erro ao indentificar estado da sala");
+        setLastMessage({ type: 'error', data: { message: 'Erro ao atualizar jogadores. Unexpected server response' } });
         return;
       }
 
@@ -187,6 +188,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
       if (!roomState) {
         console.log("Erro ao indentificar estado da sala");
+        setLastMessage({ type: 'error', data: { message: 'Erro ao atualizar jogadores. Unexpected server response' } });
         return;
       }
 
@@ -202,11 +204,13 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
       if (!roomState) {
         console.log("Erro ao indentificar estado da sala");
+        setLastMessage({ type: 'error', data: { message: 'Erro ao iniciar jogo. Unexpected server response' } });
         return;
       }
 
       if (!gameState) {
         console.log("Erro ao identificar estado do jogo");
+        setLastMessage({ type: 'error', data: { message: 'Erro ao iniciar jogo. Unexpected server response' } });
         return;
       }
 
@@ -245,6 +249,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         });
       } else {
         console.error('Erro ao atualizar o estado da bola:', data);
+        setLastMessage({ type: 'error', data: { message: 'Erro ao processar jogo. Unexpected server response' } });
       }
     });
 
@@ -270,6 +275,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         });
       } else {
         console.error('Erro ao atualizar o estado das paredes:', data);
+        setLastMessage({ type: 'error', data: { message: 'Erro ao processar jogo. Unexpected server response' } });
       }
     });
   }, [user]);
@@ -277,7 +283,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const getRooms = () => {
     if (!socketId) {
-      //Todo: Alerta
+      setLastMessage({ type: 'error', data: { message: 'Falha ao conectar com o servidor' } });
       console.log('Can\'t request rooms without a socketId');
       return;
     }
@@ -287,7 +293,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const createRoom = (code: string) => {
     if (!socketId || !user) {
-      //Todo: Alerta
+      setLastMessage({ type: 'error', data: { message: 'Falha ao conectar com o servidor' } });
       console.log('Can\'t create room without a socketId or user context');
       return;
     }
@@ -298,7 +304,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const closeRoom = (roomId: string) => {
     if (!socketId) {
-      //Todo: Alerta
+      setLastMessage({ type: 'error', data: { message: 'Falha ao identificar sala' } });
       console.log('Can\'t close a room without a socketId');
       return;
     }
@@ -309,13 +315,19 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const joinRoom = (roomId: string, code: string) => {
     if (!socketId || !user) {
-      //Todo: Alerta
+      setLastMessage({ type: 'error', data: { message: 'Falha ao conectar com o servidor' } });
       console.log('Can\'t join in a room without a socketId or user context');
       return;
     }
 
-    if (!roomId || !code) {
-      //Todo: Alerta
+    if (!roomId) {
+      setLastMessage({ type: 'error', data: { message: 'Falha ao identificar' } });
+      console.log('Id da sala ou código não informados ou nulos');
+      return;
+    }
+
+    if (!code) {
+      setLastMessage({ type: 'error', data: { message: 'Código inválido' } });
       console.log('Id da sala ou código não informados ou nulos');
       return;
     }
@@ -326,7 +338,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const leaveRoom = (roomId: string) => {
     if (!socketId) {
-      //Todo: Alerta
+      setLastMessage({ type: 'error', data: { message: 'Falha ao conectar com o servidor' } });
       console.log('Can\'t leave room without a socketId');
       return;
     }
@@ -337,7 +349,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const toggleReadyStatus = (roomId: string) => {
     if (!socketId) {
-      //Todo: Alerta
+      setLastMessage({ type: 'error', data: { message: 'Falha ao conectar com o servidor' } });
       console.log('Can\'t toggle ready status without a socketId');
       return;
     }
@@ -348,7 +360,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const removePlayer = (roomId: string, playerId: string) => {
     if (!socketId) {
-      //Todo: Alerta
+      setLastMessage({ type: 'error', data: { message: 'Falha ao conectar com o servidor' } });
       console.log('Can\'t remove player without a socketId');
       return;
     }
@@ -359,7 +371,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const startGame = (roomId: string) => { // Primeiro teste websocket
     if (!socketId) {
-      //Todo: Alerta
+      setLastMessage({ type: 'error', data: { message: 'Falha ao conectar com o servidor' } });
       console.log('Can\'t start game without a socketId');
       return;
     }
@@ -370,7 +382,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const movePlayer = (roomId: string, keyPressed: string) => {
     if (!socketId) {
-      //Todo: Alerta
+      setLastMessage({ type: 'error', data: { message: 'Falha ao conectar com o servidor' } });
       console.log('Can\'t move player without a socketId');
       return;
     }

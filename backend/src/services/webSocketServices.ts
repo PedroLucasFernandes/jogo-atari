@@ -162,6 +162,10 @@ class WebSocketService {
 		} else {
 			console.log(`Erro: a sala ${roomId} já existe. Tente novamente.`);
 			//return this.createRoom(clientId, code);
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Falha ao criar sala, tente novamente' }
+			});
 			return
 		}
 
@@ -172,7 +176,8 @@ class WebSocketService {
 				status: 'waiting',
 				host: clientId,
 				players: [{ playerId: clientId, username: username, ready: false, isHost: true }],
-			}
+			},
+			message: `Sala #${roomId} criada`
 		}
 
 		this.notifyClient(clientId, {
@@ -193,7 +198,7 @@ class WebSocketService {
 		if (playerIndex === -1) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Player not found' }
+				data: { message: 'Falha ao encerrar sala. Unidentified Host' }
 			});
 			return;
 		}
@@ -201,7 +206,7 @@ class WebSocketService {
 		if (!room) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Room not found' }
+				data: { message: 'Falha ao encerrar sala. Unidentified Room' }
 			});
 			return;
 		}
@@ -210,7 +215,7 @@ class WebSocketService {
 			room.players.forEach(player => {
 				this.notifyClient(player.playerId, {
 					type: 'roomClosed',
-					data: { roomId }
+					data: { roomId, message: `Sala #${roomId} encerrada pelo host` }
 				});
 			});
 			delete this.rooms[roomId];
@@ -227,7 +232,7 @@ class WebSocketService {
 		if (!room) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Room not found' }
+				data: { message: 'Falha ao entrar na sala. Unidentified Room' }
 			});
 			return;
 		}
@@ -235,7 +240,7 @@ class WebSocketService {
 		if (room.code !== code) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Invalid code' }
+				data: { message: 'Código inválido' }
 			});
 			return;
 		}
@@ -243,7 +248,7 @@ class WebSocketService {
 		if (room.players.length >= 4) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Room is full' }
+				data: { message: 'Esta sala já está cheia' }
 			});
 			return;
 		}
@@ -259,7 +264,8 @@ class WebSocketService {
 				status: room.status,
 				host: room.host,
 				players: this.rooms[roomId].players
-			}
+			},
+			message: `${username} entrou na sala`
 		}
 
 		console.log("joinroom console", JSON.stringify(data));
@@ -279,7 +285,7 @@ class WebSocketService {
 		if (!room) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Room not found' }
+				data: { message: 'Falha ao sair da sala. Unidentified Room' }
 			});
 			return;
 		}
@@ -288,7 +294,7 @@ class WebSocketService {
 		if (playerIndex === -1) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Player not found' }
+				data: { message: 'Falha ao sair da sala. Unidentified Player' }
 			});
 			return;
 		}
@@ -309,8 +315,8 @@ class WebSocketService {
 			}
 		}
 
+		const client = room.players[playerIndex];
 		room.players.splice(playerIndex, 1);
-
 
 		this.notifyClient(clientId, {
 			type: 'youLeft',
@@ -324,7 +330,8 @@ class WebSocketService {
 				status: room.status,
 				host: room.host,
 				players: this.rooms[roomId].players
-			}
+			},
+			message: `${client.username} saiu da sala`
 		}
 
 		room.players.forEach(player => {
@@ -343,7 +350,7 @@ class WebSocketService {
 		if (!room) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Room not found' }
+				data: { message: 'Falha ao se preparar. Unidentified Room' }
 			});
 			return;
 		}
@@ -351,7 +358,7 @@ class WebSocketService {
 		if (!player) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Player not found' }
+				data: { message: 'Falha ao se preparar. Unidentified Player' }
 			});
 			return;
 		}
@@ -385,7 +392,7 @@ class WebSocketService {
 		if (room.host !== clientId) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'You are not the host of the room' }
+				data: { message: 'Você não é o host desta sala' }
 			});
 			return;
 		}
@@ -393,7 +400,7 @@ class WebSocketService {
 		if (!room) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Room not found' }
+				data: { message: 'Falha ao remover jogador. Unidentified Room' }
 			});
 			return;
 		}
@@ -401,7 +408,7 @@ class WebSocketService {
 		if (!player) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Player not found' }
+				data: { message: 'Falha ao remover jogador. Unidentified Player' }
 			});
 			return;
 		}
@@ -420,7 +427,8 @@ class WebSocketService {
 				status: room.status,
 				host: room.host,
 				players: this.rooms[roomId].players
-			}
+			},
+			message: `${player.username} foi removido da sala`
 		}
 
 		// Notify all players in the room about the new player
@@ -439,7 +447,7 @@ class WebSocketService {
 		if (!room) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Room not found' }
+				data: { message: 'Falha ao inciar partida. Unidentified Room' }
 			});
 			return;
 		}
@@ -447,7 +455,7 @@ class WebSocketService {
 		if (room.host !== clientId) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'You are not the host of the room' }
+				data: { message: 'Você não é host desta sala' }
 			});
 			return;
 		}
@@ -501,7 +509,7 @@ class WebSocketService {
 		if (!room) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Room not found' }
+				data: { message: 'Falha no jogo. Unidentified Room' }
 			});
 			return;
 		}
@@ -509,7 +517,7 @@ class WebSocketService {
 		if (!gameRoom) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Game not found' }
+				data: { message: 'Falha no jogo. Match not found' }
 			});
 			return;
 		}
@@ -546,6 +554,7 @@ class WebSocketService {
 
 			// Verifica se o usuário está na sala
 			if (players.some(player => player.playerId === clientId)) {
+				const client = players.find(player => player.playerId === clientId);
 				// Remove o usuário da lista
 				this.rooms[roomId].players = players.filter(player => player.playerId !== clientId);
 
@@ -572,6 +581,7 @@ class WebSocketService {
 									host: this.rooms[roomId].host,
 									players: this.rooms[roomId].players
 								},
+								message: `${client?.username} saiu da sala`
 							}
 						});
 
