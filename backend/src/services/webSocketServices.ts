@@ -147,8 +147,6 @@ class WebSocketService {
 	}
 
 	private createRoom(clientId: string, username: string, code: string) {
-		console.log("creating room", code);
-
 		const roomId = uuidv4().slice(0, 6).toLocaleUpperCase(); // Gera uma chave única com 6 caracteres
 		if (!this.rooms[roomId]) {
 			this.rooms[roomId] = {
@@ -157,10 +155,7 @@ class WebSocketService {
 				players: [{ playerId: clientId, username: username, ready: false, isHost: true }], code
 			};
 
-			console.log(`Sala criada: ${roomId}`);
 		} else {
-			console.log(`Erro: a sala ${roomId} já existe. Tente novamente.`);
-			//return this.createRoom(clientId, code);
 			return
 		}
 
@@ -184,7 +179,6 @@ class WebSocketService {
 	}
 
 	private closeRoom(clientId: string, roomId: string) {
-		console.log("closing room", roomId);
 		const room = this.rooms[roomId];
 		const playerIndex = room.players.findIndex(p => p.playerId === clientId);
 
@@ -210,13 +204,11 @@ class WebSocketService {
 				data: { roomId }
 			});
 			delete this.rooms[roomId];
-			console.log(`Sala ${roomId} fechada.`);
 			return;
 		}
 	}
 
 	private joinRoom(clientId: string, username: string, roomId: string, code: string) {
-		console.log("joining room", roomId, code);
 
 		const room = this.rooms[roomId];
 
@@ -245,8 +237,6 @@ class WebSocketService {
 		}
 
 		room.players.push({ playerId: clientId, username: username, ready: false, isHost: false });
-		console.log(`Usuário ${clientId} adicionado à sala ${roomId}.`);
-		//const room = this.rooms[roomId];
 
 		const data = {
 			roomState: {
@@ -257,9 +247,6 @@ class WebSocketService {
 			}
 		}
 
-		console.log("joinroom console", JSON.stringify(data));
-
-		// Notify all players in the room about the new player
 		room.players.forEach(player => {
 			this.notifyClient(player.playerId, {
 				type: 'playerJoined',
@@ -269,7 +256,6 @@ class WebSocketService {
 	}
 
 	private leaveRoom(clientId: string, roomId: string) {
-		console.log("leaving room", roomId);
 		const room = this.rooms[roomId];
 		const playerIndex = room.players.findIndex(p => p.playerId === clientId);
 
@@ -319,7 +305,6 @@ class WebSocketService {
 	}
 
 	private toggleReadyStatus(clientId: string, roomId: string, playerId: string) {
-		console.log("toggling ready status", roomId, playerId);
 		const room = this.rooms[roomId];
 		const player = room.players.find(p => p.playerId === playerId);
 
@@ -360,7 +345,6 @@ class WebSocketService {
 	}
 
 	private removePlayer(clientId: string, roomId: string, playerId: string) {
-		console.log("removing player", roomId, playerId);
 		const room = this.rooms[roomId];
 		const player = room.players.find(p => p.playerId === playerId);
 
@@ -409,7 +393,6 @@ class WebSocketService {
 	}
 
 	private startGame(clientId: string, roomId: string) {
-		console.log("starting game", roomId);
 		const room = this.rooms[roomId];
 
 		if (!room) {

@@ -52,10 +52,8 @@ export default function createGame() {
     const player = gameState.players[playerId];
     if (!player || !keyPressed) return;
 
-    // Encontrar o índice do jogador para obter o ponto de interseção
     const playerIndex = Object.keys(gameState.players).indexOf(playerId);
     if (playerIndex === -1) return;
-    console.log("index", playerIndex);
     const toleranceX = speed;
     const toleranceY = speed;
     const acceptedMoves: Record<AcceptedMoves, (player: IPlayer, index: number) => void> = {
@@ -255,12 +253,24 @@ export default function createGame() {
     gameState.ball.y += gameState.ball.speedY;
 
     // Verifica colisão com as bordas do canvas
-    if (gameState.ball.x <= 0 || gameState.ball.x >= gameState.canvas.width) {
+    if (gameState.ball.x <= 0 || gameState.ball.x + gameState.ball.radius >= gameState.canvas.width) {
+      // Inverte a direção no eixo X ao colidir com as bordas esquerda ou direita
       gameState.ball.speedX *= -1;
+
+      // Adiciona uma variação leve à velocidade X para evitar trajetórias muito previsíveis
+      const randomVariation = (Math.random() - 0.5) * 0.5; // Variação entre -0.25 e 0.25 (ajuste conforme necessário)
+      gameState.ball.speedX += randomVariation;
     }
-    if (gameState.ball.y <= 0 || gameState.ball.y >= gameState.canvas.height) {
+
+    if (gameState.ball.y <= 0 || gameState.ball.y + gameState.ball.radius >= gameState.canvas.height) {
+      // Inverte a direção no eixo Y ao colidir com as bordas superior ou inferior
       gameState.ball.speedY *= -1;
+
+      // Adiciona uma variação leve à direção Y para evitar trajetórias muito previsíveis
+      const randomAngle = (Math.random() - 0.5) * 0.3; // Variação entre -0.15 e 0.15 (ajuste conforme necessário)
+      gameState.ball.speedY += randomAngle;
     }
+
 
     // Verifica colisão da bola com cada jogador
     for (const playerId in gameState.players) {
@@ -290,7 +300,7 @@ export default function createGame() {
 
     for (const planet of gameState.planets) {
       if (planet.active) {
-        notifyPlanetUpdate();
+        // notifyPlanetUpdate();
         const partWidth = planet.width / 2;
         const partHeight = planet.height / 3;
 
@@ -327,6 +337,8 @@ export default function createGame() {
     }
 
     notifyBallUpdate();
+    // Chama a função para verificar se há um vencedor
+    checkForWinner();
   }
 
 
@@ -357,9 +369,15 @@ export default function createGame() {
         initialY: y,
         size: 80,
         isBot: false,
-        imageSrc: ""
+        imageSrc: "",
+        defendingPlanetId: index,
       };
+      const planet = initialPlanetsState[index];
+      planet.ownerId = player.playerId;
+
     });
+
+
 
     // Quantidade total de jogadores (real + bots)
     const totalPlayers = 4;
@@ -381,9 +399,40 @@ export default function createGame() {
         y,
         initialX: x,
         initialY: y,
+        defendingPlanetId: positionIndex,
       };
+      // Associa o bot ao planeta
+      const planet = initialPlanetsState[positionIndex];
+      planet.ownerId = botId;
     }
-    console.log("addPlayers", JSON.stringify(gameState.players));
+  }
+
+  function checkForWinner() {
+    const activePlanets = gameState.planets.filter(planet => planet.active);
+
+    // Verifica se há apenas um planeta ativo com partes restantes
+    const remainingPlayers = activePlanets.filter(planet =>
+      planet.parts.some(part => part)
+    );
+
+    if (remainingPlayers.length === 1) {
+      const winningPlanet = remainingPlayers[0];
+      const winnerPlayerId = winningPlanet.ownerId;
+
+      // Obtém o nome do jogador com base no ID
+      const winnerPlayerName = gameState.players[winnerPlayerId]?.username || 'Unknown Player';
+
+      // Notifica todos os observadores sobre o vencedor
+      notifyAll({ type: 'gameOver', data: { winner: winnerPlayerName } });
+
+      // Para o jogo após encontrar um vencedor
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+
+      console.log(`Player ${winnerPlayerName} venceu o jogo!`);
+    }
   }
 
 
