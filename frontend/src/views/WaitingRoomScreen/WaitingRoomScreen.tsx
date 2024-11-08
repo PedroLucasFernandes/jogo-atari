@@ -13,7 +13,7 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   const [isHost, setIsHost] = useState(false);
 
   useEffect(() => {
-    if (lastMessage && (lastMessage.type === 'youLeft' || lastMessage.type === 'roomClosed')) {
+    if (lastMessage && (lastMessage.type === 'youLeft' || lastMessage.type === 'roomClosed' || lastMessage.type === 'youAreRemoved')) {
       setScreen('join-room');
       return;
     }
@@ -105,6 +105,7 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
           ) : (
             <>
               <p>Id da sala: {roomState.roomId}</p>
+              <p>Código da sala: {roomState.code}</p>
               <div className="player-list">
                 <h3 className='title-create' style={{ margin: '10px' }}>Jogadores</h3>
                 {roomState.players.map((player) => (

@@ -47,6 +47,7 @@ export interface IPlayerRoom {
 
 export interface IRoomState {
   roomId: string;
+  code: string | null;
   status: gameStatus;
   host: string;
   players: IPlayerRoom[];
@@ -89,10 +90,10 @@ export const initialPlanetsState: IPlanet[] = [
 ];
 
 export const initialPlayersState: PlayersRecord = {
-  'bot0': { username: 'Bot 0', x: 170, y: 150, initialX: 170, initialY: 150, size: 80, isBot: true }, 
-  'bot1': { username: 'Bot 1', x: 550, y: 150, initialX: 550, initialY: 150, size: 80, isBot: true }, 
-  'bot2': { username: 'Bot 2', x: 170, y: 370, initialX: 170, initialY: 370, size: 80, isBot: true }, 
-  'bot3': { username: 'Bot 3', x: 550, y: 370, initialX: 550, initialY: 370, size: 80, isBot: false } 
+  'bot0': { username: 'Bot 0', x: 170, y: 150, initialX: 170, initialY: 150, size: 80, isBot: true },
+  'bot1': { username: 'Bot 1', x: 550, y: 150, initialX: 550, initialY: 150, size: 80, isBot: true },
+  'bot2': { username: 'Bot 2', x: 170, y: 370, initialX: 170, initialY: 370, size: 80, isBot: true },
+  'bot3': { username: 'Bot 3', x: 550, y: 370, initialX: 550, initialY: 370, size: 80, isBot: false }
 };;
 
 export const initialBallState: IBall = {
@@ -118,6 +119,7 @@ export const initialPlayersRoomState: IPlayerRoom[] = [
 
 export const initialRoomState: IRoomState = {
   roomId: '',
+  code: '',
   status: 'lobby',
   host: '',
   players: initialPlayersRoomState

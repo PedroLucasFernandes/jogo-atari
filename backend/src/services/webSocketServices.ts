@@ -126,6 +126,7 @@ class WebSocketService {
 	private getRoomStates() {
 		const roomStates: IRoomState[] = Object.entries(this.rooms).map(([roomId, room]) => ({
 			roomId, // A chave é o id da sala
+			code: null,
 			status: room.status,
 			host: room.host,
 			players: room.players.map(player => ({
@@ -167,6 +168,7 @@ class WebSocketService {
 		const data = {
 			roomState: {
 				roomId: roomId,
+				code: code,
 				status: 'waiting',
 				host: clientId,
 				players: [{ playerId: clientId, username: username, ready: false, isHost: true }],
@@ -253,6 +255,7 @@ class WebSocketService {
 		const data = {
 			roomState: {
 				roomId: roomId,
+				code: room.code,
 				status: room.status,
 				host: room.host,
 				players: this.rooms[roomId].players
@@ -308,19 +311,21 @@ class WebSocketService {
 
 		room.players.splice(playerIndex, 1);
 
-		const data = {
-			roomState: {
-				roomId: roomId,
-				status: room.status,
-				host: room.host,
-				players: this.rooms[roomId].players
-			}
-		}
 
 		this.notifyClient(clientId, {
 			type: 'youLeft',
 			data: { message: 'Você saiu da sala' }
 		});
+
+		const data = {
+			roomState: {
+				roomId: roomId,
+				code: room.code,
+				status: room.status,
+				host: room.host,
+				players: this.rooms[roomId].players
+			}
+		}
 
 		room.players.forEach(player => {
 			this.notifyClient(player.playerId, {
@@ -356,6 +361,7 @@ class WebSocketService {
 		const data = {
 			roomState: {
 				roomId: roomId,
+				code: room.code,
 				status: room.status,
 				host: room.host,
 				players: this.rooms[roomId].players
@@ -402,9 +408,15 @@ class WebSocketService {
 
 		room.players = room.players.filter(p => p.playerId !== playerId);
 
+		this.notifyClient(playerId, {
+			type: 'youAreRemoved',
+			data: { message: 'Você foi removido da sala' }
+		});
+
 		const data = {
 			roomState: {
 				roomId: roomId,
+				code: room.code,
 				status: room.status,
 				host: room.host,
 				players: this.rooms[roomId].players
@@ -464,6 +476,7 @@ class WebSocketService {
 		const data = {
 			roomState: {
 				roomId: roomId,
+				code: room.code,
 				status: room.status,
 				host: room.host,
 				players: this.rooms[roomId].players
@@ -539,17 +552,29 @@ class WebSocketService {
 				// Se a sala ficou vazia após a remoção, apaga a sala e para o jogo
 				if (this.rooms[roomId].players.length === 0) {
 					delete this.rooms[roomId];
+
 					if (this.gamesByRoom[roomId]) {
 						this.gamesByRoom[roomId].stop();
 						delete this.gamesByRoom[roomId];
 					}
+
 				} else {
 					// Notifica os demais usuários sobre a desconexão
 					this.rooms[roomId].players.forEach(player => {
+
 						this.notifyClient(player.playerId, {
 							type: 'playerLeft',
-							data: { roomId, players: this.rooms[roomId].players }
+							data: {
+								roomState: {
+									roomId: roomId,
+									code: this.rooms[roomId].code,
+									status: this.rooms[roomId].status,
+									host: this.rooms[roomId].host,
+									players: this.rooms[roomId].players
+								},
+							}
 						});
+
 					});
 				}
 			}

@@ -160,6 +160,13 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setRoomState(null)
     });
 
+    webSocketService.registerCallback('youAreRemoved', (data) => {
+      console.log(`Retorno - youLeft: ${data}`);
+
+      setLastMessage(data);
+      setRoomState(null)
+    });
+
     webSocketService.registerCallback('playerStatusChanged', (data) => {
       console.log(`Retorno - playerStatusChanged: ${data}`);
 
