@@ -17,6 +17,7 @@ interface WebSocketContextType {
   removePlayer: (roomId: string, playerId: string) => void;
   movePlayer: (roomId: string, keyPressed: string) => void;
   startGame: (roomId: string) => void;
+  leaveGame: (roomId: string) => void;
   gameState: IGameState | null;
   roomState: IRoomState | null;
   rooms: IRoomState[] | null;
@@ -224,6 +225,36 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setGameState(data.data.gameState)
     });
 
+    webSocketService.registerCallback('playerLeftGame', (data) => {
+      console.log(`Retorno - playerLeftGame: ${data}`);
+      const roomState = data.data.roomState;
+      const gameState = data.data.gameState;
+
+      if (!roomState) {
+        console.log("Erro ao indentificar estado da sala");
+        setLastMessage({ type: 'error', data: { message: 'Erro ao atualizar jogadores. Unexpected server response' } });
+        return;
+      }
+
+      if (!gameState) {
+        console.log("Erro ao indentificar estado do jogo");
+        setLastMessage({ type: 'error', data: { message: 'Erro ao atualizar jogadores. Unexpected server response' } });
+        return;
+      }
+
+      setLastMessage(data);
+      setRoomState(roomState);
+      setGameState(gameState);
+    });
+
+    webSocketService.registerCallback('youLeftGame', (data) => {
+      console.log(`Retorno - youLeftGame: ${data}`);
+
+      setLastMessage(data);
+      setRoomState(null);
+      setGameState(null);
+    });
+
     webSocketService.registerCallback('updateBall', (data) => {
       if (data.data && data.data.ball) {
         setGameState(prevGameState => {
@@ -391,11 +422,22 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     webSocketService.send({ type: 'movePlayer', data });
   }
 
+  const leaveGame = (roomId: string) => {
+    if (!socketId) {
+      setLastMessage({ type: 'error', data: { message: 'Falha ao conectar com o servidor' } });
+      console.log('Can\'t leave match without a socketId');
+      return;
+    }
+
+    const data = { roomId: roomId, playerId: socketId }
+    webSocketService.send({ type: 'leaveGame', data });
+  }
+
 
   return (
     <WebSocketContext.Provider value={{
       socketId, webSocketService, status, gameState, roomState, rooms, lastMessage,
-      getRooms, createRoom, closeRoom, joinRoom, leaveRoom, toggleReadyStatus, removePlayer, movePlayer, startGame,
+      getRooms, createRoom, closeRoom, joinRoom, leaveRoom, toggleReadyStatus, removePlayer, movePlayer, startGame, leaveGame
     }}>
       {children}
     </WebSocketContext.Provider>

@@ -92,6 +92,9 @@ class WebSocketService {
 
 	private handleMessage(clientId: string, message: any) {
 		switch (message.type) {
+			case 'movePlayer':
+				this.handlePlayerMove(clientId, message.data.roomId, message.data.keyPressed);
+				break;
 			case 'getRooms':
 				this.getRooms(clientId);
 				break;
@@ -104,9 +107,6 @@ class WebSocketService {
 			case 'startGame':
 				this.startGame(clientId, message.data.roomId);
 				break;
-			case 'movePlayer':
-				this.handlePlayerMove(clientId, message.data.roomId, message.data.keyPressed);
-				break;
 			case 'closeRoom':
 				this.closeRoom(clientId, message.data.roomId);
 				break;
@@ -118,6 +118,10 @@ class WebSocketService {
 				break;
 			case 'removePlayer':
 				this.removePlayer(clientId, message.data.roomId, message.data.playerId);
+				break;
+			case 'leaveGame':
+				this.leaveGame(clientId, message.data.roomId);
+				break;
 			default:
 				console.error(`Invalid message type received: ${message.type}`);
 		}
@@ -561,6 +565,72 @@ class WebSocketService {
 				}
 			});
 		} */
+	}
+
+	private leaveGame(clientId: string, roomId: string) {
+		console.log("leaving game", roomId);
+		const room = this.rooms[roomId];
+
+		if (!room) {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Falha ao deixar sala do jogo. Unidentified Room' }
+			});
+			return;
+		}
+
+		const game = this.gamesByRoom[roomId];
+		if (!game) {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Falha ao sair da partida. Match not found' }
+			});
+			return;
+		}
+
+		// Remover jogador da sala
+		const playerIndex = room.players.findIndex(player => player.playerId === clientId);
+		if (playerIndex !== -1) {
+			const removedPlayer = room.players.splice(playerIndex, 1)[0];
+
+			// Remover jogador do estado do jogo
+			const updatedPlayers = { ...game.gameState.players };
+			delete updatedPlayers[clientId]; // Remove o jogador pelo clientId
+
+			game.setState({
+				players: updatedPlayers // Atualiza o estado do jogo com o jogador removido
+			});
+
+			this.notifyClient(clientId, {
+				type: 'youLeftGame',
+				data: {
+					roomId, message: `Você abandonou a partida`
+				}
+			});
+
+			// Notificar os demais jogadores sobre a saída
+			room.players.forEach(player => {
+				this.notifyClient(player.playerId, {
+					type: 'playerLeftGame',
+					data: {
+						roomState: {
+							roomId: roomId,
+							code: room.code,
+							status: room.status,
+							host: room.host,
+							players: room.players
+						},
+						gameState: game.gameState,
+						message: `${removedPlayer.username} abandonou a partida`
+					}
+				});
+			});
+		} else {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Falha ao sair do jogo. Unidentified Player' }
+			});
+		}
 	}
 
 	private handleDisconnect(clientId: string) {
