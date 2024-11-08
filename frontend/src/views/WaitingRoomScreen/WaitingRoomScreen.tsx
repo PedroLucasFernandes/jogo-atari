@@ -13,9 +13,7 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   const [isHost, setIsHost] = useState(false);
 
   useEffect(() => {
-    console.log(lastMessage);
-    if (lastMessage && lastMessage.type === 'yosuLeft') {
-      console.log(lastMessage.data.message);
+    if (lastMessage && (lastMessage.type === 'youLeft' || lastMessage.type === 'roomClosed')) {
       setScreen('join-room');
       return;
     }
@@ -39,7 +37,7 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
 
     // Cleanup para evitar vazamentos de memória ao desmontar o componente
     return () => clearTimeout(timeoutId);
-  }, [roomState, socketId, setScreen]);
+  }, [roomState, socketId, setScreen, lastMessage]);
 
   useEffect(() => {
     if (!roomState) return;

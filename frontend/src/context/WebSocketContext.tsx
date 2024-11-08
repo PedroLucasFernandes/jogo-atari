@@ -101,12 +101,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       console.log(`Retorno - roomClosed: ${data}`);
       const roomId = data.data.roomId;
 
-      if (!roomId) {
+      /* if (!roomId) {
         console.log("Erro ao identificar salas");
         return;
       }
-
-      console.log("roomstate", JSON.stringify(roomState));
 
       if (!roomState) {
         console.log("Erro, estado da sala não existe");
@@ -116,8 +114,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       if (roomState.roomId !== roomId) {
         console.log("Erro, o id da sala removida não se refere a sala no estado");
         return;
-      }
-
+      } */
+      console.log("roomState: " + JSON.stringify(roomState));
       setLastMessage(data);
       setRoomState(null);
     });
