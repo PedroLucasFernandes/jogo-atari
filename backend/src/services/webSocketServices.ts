@@ -20,6 +20,7 @@ class WebSocketService {
 		}
 	} = {};
 	private gamesByRoom: { [key: string]: IGame } = {}; // roomId -> game instance
+	private roomObservers: Set<string> = new Set(); // Armazena os clientIds dos observadores
 
 	constructor(private wss: WebSocketServer) {
 		this.initialize();
@@ -149,6 +150,29 @@ class WebSocketService {
 			type: 'roomsReceived',
 			data: { rooms: this.getRoomStates() }
 		});
+		this.subscribeToRoomUpdates(clientId);
+	}
+
+	// Adiciona um cliente ao observer
+	public subscribeToRoomUpdates(clientId: string) {
+		this.roomObservers.add(clientId);
+		//this.getRooms(clientId); // Envia o estado inicial das salas para o cliente
+	}
+
+	// Remove um cliente do observer
+	public unsubscribeFromRoomUpdates(clientId: string) {
+		this.roomObservers.delete(clientId);
+	}
+
+	// Notifica todos os observadores sobre a atualização das salas
+	private notifyRoomObservers() {
+		const roomStates = this.getRoomStates();
+		this.roomObservers.forEach(observerId => {
+			this.notifyClient(observerId, {
+				type: 'roomsReceived', //Adicionar outra mensagem diferente se for preciso
+				data: { rooms: roomStates }
+			});
+		});
 	}
 
 	private createRoom(clientId: string, username: string, code: string) {
@@ -188,10 +212,8 @@ class WebSocketService {
 			type: 'roomCreated',
 			data: data
 		});
-		/* this.notifyClient(clientId, {
-			type: 'roomCreated',
-			data: { roomId, gameState: { players: [{ playerId: clientId, username: username, ready: false }] } }
-		}); */
+
+		this.notifyRoomObservers();
 	}
 
 	private closeRoom(clientId: string, roomId: string) {
@@ -224,6 +246,8 @@ class WebSocketService {
 			});
 			delete this.rooms[roomId];
 			console.log(`Sala ${roomId} fechada.`);
+
+			this.notifyRoomObservers();
 			return;
 		}
 	}
@@ -297,6 +321,9 @@ class WebSocketService {
 				data: data
 			});
 		});
+
+		this.unsubscribeFromRoomUpdates(clientId);
+		this.notifyRoomObservers();
 	}
 
 	private leaveRoom(clientId: string, roomId: string) {
@@ -331,6 +358,11 @@ class WebSocketService {
 			} else {
 				// Se não houver outros jogadores, a sala é removida
 				delete this.rooms[roomId];
+
+				this.notifyClient(clientId, {
+					type: 'youLeft',
+					data: { message: 'Você saiu da sala' }
+				});
 				return;
 			}
 		}
@@ -360,6 +392,8 @@ class WebSocketService {
 				data: data
 			});
 		});
+
+		this.notifyRoomObservers();
 	}
 
 	private toggleReadyStatus(clientId: string, roomId: string, playerId: string) {
@@ -458,6 +492,8 @@ class WebSocketService {
 				data: data
 			});
 		});
+
+		this.notifyRoomObservers();
 	}
 
 	private startGame(clientId: string, roomId: string) {
@@ -519,6 +555,8 @@ class WebSocketService {
 				data: data
 			});
 		});
+
+		this.notifyRoomObservers();
 	}
 
 	private handlePlayerMove(clientId: string, roomId: string, keyPressed: string) {
@@ -673,6 +711,8 @@ class WebSocketService {
 
 					});
 				}
+
+				this.notifyRoomObservers();
 			}
 		});
 
