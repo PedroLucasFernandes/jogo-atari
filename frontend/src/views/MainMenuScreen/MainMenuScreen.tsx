@@ -12,6 +12,7 @@ import DialogTitle from '@mui/joy/DialogTitle';
 import DialogContent from '@mui/joy/DialogContent';
 import Input from '@mui/joy/Input';
 import DialogActions from '@mui/joy/DialogActions';
+import { gameAudio } from '../../utils/audioManager';
 
 interface ScreenProps {
   setScreen: Dispatch<SetStateAction<string>>;
@@ -64,6 +65,7 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   }
 
   const handleRejoin = () => {
+    gameAudio.startBackgroundMusic();
     setScreen('game');
   }
 
