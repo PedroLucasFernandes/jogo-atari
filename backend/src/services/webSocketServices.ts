@@ -30,6 +30,23 @@ class WebSocketService {
 		return this.clients[clientId]?.ws;
 	}
 
+	public clearGameSession(roomId: string): void {
+		const game = this.gamesByRoom[roomId];
+		const room = this.rooms[roomId];
+
+		if (game) {
+			console.log("game session cleared");
+			delete this.gamesByRoom[roomId];
+		}
+
+		if (room) {
+			console.log("room cleared");
+			delete this.rooms[roomId];
+
+			this.notifyRoomObservers();
+		}
+	}
+
 	private initialize() {
 		this.wss.on('connection', (ws: WebSocket, req: any) => {
 			// Extrair o token do cookie
@@ -505,7 +522,13 @@ class WebSocketService {
 
 		room.status = 'inprogress';
 
-		const game = createGame();
+		const game = createGame({
+			roomId,
+			code: room.code,
+			status: room.status,
+			host: room.host,
+			players: room.players
+		});
 		this.gamesByRoom[roomId] = game;
 
 		// Add all players from the room to the game

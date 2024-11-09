@@ -1,15 +1,15 @@
-import { IGameMessage, IGameState, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialPlanetsState, IPlayer, IPlayerRoom, PlayersRecord, planetsByPlayersPosition } from "../interfaces/game"
+import { IGameMessage, IGameState, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialPlanetsState, IPlayer, IPlayerRoom, PlayersRecord, planetsByPlayersPosition, IRoomState } from "../interfaces/game"
 import * as leaderboardServices from "../services/leaderboardServices";
+import webSocketService from '../index';
 
-
-export default function createGame() {
+export default function createGame(roomState: IRoomState) {
 
   const gameState: IGameState = {
     players: JSON.parse(JSON.stringify(initialPlayersState)),
     planets: JSON.parse(JSON.stringify(initialPlanetsState)),
     ball: JSON.parse(JSON.stringify(initialBallState)),
     canvas: JSON.parse(JSON.stringify(initialCanvasState)),
-    room: JSON.parse(JSON.stringify(initialRoomState)),
+    room: roomState,
   }
 
   // REFACTOR, ARRUMAR COM OS VALORES DAS NOVAS POSIÇÕES DOS PLAYERS!!
@@ -828,6 +828,7 @@ export default function createGame() {
       const winnerPlayerName = gameState.players[winnerPlayerId]?.username || 'Unknown Player';
 
       console.log("userId do vencedor", realUserId)
+      stop();
 
       // Notifica todos os observadores sobre o vencedor
       notifyAll({
@@ -848,8 +849,11 @@ export default function createGame() {
 
 
       try {
+        // Primeiro, cria um array de promessas
+        const promises = [];
+
         // Atualiza o leaderboard com a vitória
-        await leaderboardServices.saveOrUpdateUserLeaderboardData(realUserId, "total_score");
+        promises.push(leaderboardServices.saveOrUpdateUserLeaderboardData(realUserId, "total_score"));
 
         // Atualiza o leaderboard para todos os outros jogadores (perdedores)
         const allPlanets = gameState.planets; // Usa todos os planetas do jogo
@@ -862,10 +866,17 @@ export default function createGame() {
           const loserUserId = extractUserId(planet.ownerId);
           if (!loserUserId) continue; // Ignora caso o userId não seja válido
 
-          await leaderboardServices.saveOrUpdateUserLeaderboardData(loserUserId, "total_games_played");
+          promises.push(leaderboardServices.saveOrUpdateUserLeaderboardData(loserUserId, "total_games_played"));
         }
 
+        // Aguarda todas as promessas serem resolvidas antes de continuar
+        await Promise.all(promises);
+
         console.log(`Player ${winnerPlayerName} venceu o jogo!`);
+
+        // Limpando sala e sessão do jogo
+        webSocketService.clearGameSession(gameState.room.roomId);
+
 
       } catch (error) {
         console.error(`Erro ao atualizar leaderboard para o jogador ${winnerPlayerName}:`, error);
