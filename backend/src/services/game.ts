@@ -495,58 +495,127 @@ export default function createGame() {
     }
   }
 
+
   function moveBall() {
     let collisionDetected = false;
+
+    // Armazena a posição anterior da bola
+    const previousX = gameState.ball.x;
+    const previousY = gameState.ball.y;
 
     // Atualiza a posição da bola
     gameState.ball.x += gameState.ball.speedX;
     gameState.ball.y += gameState.ball.speedY;
 
+    // Função auxiliar para resolver colisões
+    const resolveCollision = () => {
+      // Retorna a bola para a posição anterior à colisão
+      gameState.ball.x = previousX;
+      gameState.ball.y = previousY;
+
+      // Adiciona um pequeno deslocamento na direção oposta à colisão
+      const pushBackDistance = 1;
+      if (Math.abs(gameState.ball.speedX) > Math.abs(gameState.ball.speedY)) {
+        gameState.ball.x += gameState.ball.speedX > 0 ? -pushBackDistance : pushBackDistance;
+      } else {
+        gameState.ball.y += gameState.ball.speedY > 0 ? -pushBackDistance : pushBackDistance;
+      }
+    };
+
     // Verifica colisão com as bordas do canvas
-    if (gameState.ball.x <= 0 || gameState.ball.x + gameState.ball.radius >= gameState.canvas.width) {
-      // Inverte a direção no eixo X ao colidir com as bordas esquerda ou direita
-      gameState.ball.speedX *= -1;
+    const handleWallCollision = () => {
+      let hasCollision = false;
 
-      // Adiciona uma variação leve à velocidade X para evitar trajetórias muito previsíveis
-      const randomVariation = (Math.random() - 0.5) * 0.5; // Variação entre -0.25 e 0.25 (ajuste conforme necessário)
-      gameState.ball.speedX += randomVariation;
-    }
+      if (gameState.ball.x <= 0 || gameState.ball.x + gameState.ball.radius >= gameState.canvas.width) {
+        gameState.ball.speedX *= -1;
 
-    if (gameState.ball.y <= 0 || gameState.ball.y + gameState.ball.radius >= gameState.canvas.height) {
-      // Inverte a direção no eixo Y ao colidir com as bordas superior ou inferior
-      gameState.ball.speedY *= -1;
-
-      // Adiciona uma variação leve à direção Y para evitar trajetórias muito previsíveis
-      const randomAngle = (Math.random() - 0.5) * 0.3; // Variação entre -0.15 e 0.15 (ajuste conforme necessário)
-      gameState.ball.speedY += randomAngle;
-    }
-
-
-    // Verifica colisão da bola com cada jogador
-    for (const playerId in gameState.players) {
-      const player = gameState.players[playerId];
-
-      // Ajuste conforme necessário
-      if (
-        gameState.ball.x + gameState.ball.radius > player.x &&
-        gameState.ball.x - gameState.ball.radius < player.x + player.size &&
-        gameState.ball.y + gameState.ball.radius > player.y &&
-        gameState.ball.y - gameState.ball.radius < player.y + player.size
-      ) {
-        // Rebater a bola ao detectar colisão
-        gameState.ball.speedX *= -1; // Inverte a direção no eixo X
-
-        // Adiciona uma variação aleatória à direção Y
-        const randomAngle = (Math.random() - 0.5) * 0.3; // Variação entre -0.15 e 0.15 (ajuste conforme necessário)
-        gameState.ball.speedY = gameState.ball.speedY * -1 + randomAngle; // Inverte Y e adiciona variação
-
-        // Adiciona uma variação leve à velocidade X para evitar trajetórias muito previsíveis
-        const randomVariation = (Math.random() - 0.5) * 2; // Variação entre -1 e 1 (ajuste conforme necessário)
+        // Adiciona variação controlada à velocidade
+        const maxVariation = 0.3;
+        const randomVariation = (Math.random() - 0.5) * maxVariation;
         gameState.ball.speedX += randomVariation;
 
-        break; // Sai do loop após detectar a colisão com um jogador
+        hasCollision = true;
       }
-    }
+
+      if (gameState.ball.y <= 0 || gameState.ball.y + gameState.ball.radius >= gameState.canvas.height) {
+        gameState.ball.speedY *= -1;
+
+        // Adiciona variação controlada à velocidade
+        const maxVariation = 0.3;
+        const randomVariation = (Math.random() - 0.5) * maxVariation;
+        gameState.ball.speedY += randomVariation;
+
+        hasCollision = true;
+      }
+
+      if (hasCollision) {
+        resolveCollision();
+      }
+    };
+
+    // Verifica colisão com jogadores
+    const handlePlayerCollision = () => {
+      for (const playerId in gameState.players) {
+        const player = gameState.players[playerId];
+
+        // Calcula os limites da bola e do jogador
+        const ballLeft = gameState.ball.x - gameState.ball.radius;
+        const ballRight = gameState.ball.x + gameState.ball.radius;
+        const ballTop = gameState.ball.y - gameState.ball.radius;
+        const ballBottom = gameState.ball.y + gameState.ball.radius;
+
+        const playerLeft = player.x;
+        const playerRight = player.x + player.size;
+        const playerTop = player.y;
+        const playerBottom = player.y + player.size;
+
+        if (
+          ballRight > playerLeft &&
+          ballLeft < playerRight &&
+          ballBottom > playerTop &&
+          ballTop < playerBottom
+        ) {
+          // Determina a direção da colisão
+          const overlapLeft = ballRight - playerLeft;
+          const overlapRight = playerRight - ballLeft;
+          const overlapTop = ballBottom - playerTop;
+          const overlapBottom = playerBottom - ballTop;
+
+          // Encontra a menor sobreposição para determinar a direção da colisão
+          const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
+
+          // Aplica a resposta à colisão baseada na direção
+          if (minOverlap === overlapLeft || minOverlap === overlapRight) {
+            gameState.ball.speedX *= -1;
+          } else {
+            gameState.ball.speedY *= -1;
+          }
+
+          // Adiciona variação controlada à velocidade
+          const maxVariation = 0.5;
+          const randomVariationX = (Math.random() - 0.5) * maxVariation;
+          const randomVariationY = (Math.random() - 0.5) * maxVariation;
+
+          gameState.ball.speedX += randomVariationX;
+          gameState.ball.speedY += randomVariationY;
+
+          resolveCollision();
+          break;
+        }
+      }
+    };
+
+    // Aplica limite máximo à velocidade
+    const clampSpeed = () => {
+      const MAX_SPEED = 10;
+      gameState.ball.speedX = Math.min(Math.max(gameState.ball.speedX, -MAX_SPEED), MAX_SPEED);
+      gameState.ball.speedY = Math.min(Math.max(gameState.ball.speedY, -MAX_SPEED), MAX_SPEED);
+    };
+
+    // Executa as verificações de colisão
+    handleWallCollision();
+    handlePlayerCollision();
+    clampSpeed();
 
     for (const planet of gameState.planets) {
       if (planet.active) {
@@ -570,7 +639,6 @@ export default function createGame() {
               gameState.ball.speedX *= -1;
               gameState.ball.speedY *= -1;
 
-
               collisionDetected = true;
               break;
             }
@@ -590,6 +658,102 @@ export default function createGame() {
     // Chama a função para verificar se há um vencedor
     checkForWinner();
   }
+
+  // function moveBall() {
+  //   let collisionDetected = false;
+
+  //   // Atualiza a posição da bola
+  //   gameState.ball.x += gameState.ball.speedX;
+  //   gameState.ball.y += gameState.ball.speedY;
+
+  //   // Verifica colisão com as bordas do canvas
+  //   if (gameState.ball.x <= 0 || gameState.ball.x + gameState.ball.radius >= gameState.canvas.width) {
+  //     // Inverte a direção no eixo X ao colidir com as bordas esquerda ou direita
+  //     gameState.ball.speedX *= -1;
+
+  //     // Adiciona uma variação leve à velocidade X para evitar trajetórias muito previsíveis
+  //     const randomVariation = (Math.random() - 0.5) * 0.5; // Variação entre -0.25 e 0.25 (ajuste conforme necessário)
+  //     gameState.ball.speedX += randomVariation;
+  //   }
+
+  //   if (gameState.ball.y <= 0 || gameState.ball.y + gameState.ball.radius >= gameState.canvas.height) {
+  //     // Inverte a direção no eixo Y ao colidir com as bordas superior ou inferior
+  //     gameState.ball.speedY *= -1;
+
+  //     // Adiciona uma variação leve à direção Y para evitar trajetórias muito previsíveis
+  //     const randomAngle = (Math.random() - 0.5) * 0.3; // Variação entre -0.15 e 0.15 (ajuste conforme necessário)
+  //     gameState.ball.speedY += randomAngle;
+  //   }
+
+
+  //   // Verifica colisão da bola com cada jogador
+  //   for (const playerId in gameState.players) {
+  //     const player = gameState.players[playerId];
+
+  //     // Ajuste conforme necessário
+  //     if (
+  //       gameState.ball.x + gameState.ball.radius > player.x &&
+  //       gameState.ball.x - gameState.ball.radius < player.x + player.size &&
+  //       gameState.ball.y + gameState.ball.radius > player.y &&
+  //       gameState.ball.y - gameState.ball.radius < player.y + player.size
+  //     ) {
+  //       // Rebater a bola ao detectar colisão
+  //       gameState.ball.speedX *= -1; // Inverte a direção no eixo X
+
+  //       // Adiciona uma variação aleatória à direção Y
+  //       const randomAngle = (Math.random() - 0.5) * 0.3; // Variação entre -0.15 e 0.15 (ajuste conforme necessário)
+  //       gameState.ball.speedY = gameState.ball.speedY * -1 + randomAngle; // Inverte Y e adiciona variação
+
+  //       // Adiciona uma variação leve à velocidade X para evitar trajetórias muito previsíveis
+  //       const randomVariation = (Math.random() - 0.5) * 2; // Variação entre -1 e 1 (ajuste conforme necessário)
+  //       gameState.ball.speedX += randomVariation;
+
+  //       break; // Sai do loop após detectar a colisão com um jogador
+  //     }
+  //   }
+
+  //   for (const planet of gameState.planets) {
+  //     if (planet.active) {
+  //       // notifyPlanetUpdate();
+  //       const partWidth = planet.width / 2;
+  //       const partHeight = planet.height / 3;
+
+  //       for (let i = 0; i < planet.parts.length; i++) {
+  //         if (planet.parts[i]) {
+  //           const partX = planet.x + (i % 2) * partWidth;
+  //           const partY = planet.y + Math.floor(i / 2) * partHeight;
+
+  //           if (
+  //             gameState.ball.x + gameState.ball.radius > partX &&
+  //             gameState.ball.x - gameState.ball.radius < partX + partWidth &&
+  //             gameState.ball.y + gameState.ball.radius > partY &&
+  //             gameState.ball.y - gameState.ball.radius < partY + partHeight
+  //           ) {
+
+  //             planet.parts[i] = false;
+  //             gameState.ball.speedX *= -1;
+  //             gameState.ball.speedY *= -1;
+
+
+  //             collisionDetected = true;
+  //             break;
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+
+  //   gameState.ball.speedX = Math.min(Math.max(gameState.ball.speedX, -MAX_SPEED), MAX_SPEED);
+  //   gameState.ball.speedY = Math.min(Math.max(gameState.ball.speedY, -MAX_SPEED), MAX_SPEED);
+
+  //   if (collisionDetected) {
+  //     notifyPlanetUpdate();
+  //   }
+
+  //   notifyBallUpdate();
+  //   // Chama a função para verificar se há um vencedor
+  //   checkForWinner();
+  // }
 
 
   function addPlayers(players: IPlayerRoom[]) {
