@@ -1,4 +1,3 @@
-export type AcceptedMoves = 'w' | 'a' | 's' | 'd' | 'arrowup' | 'arrowleft' | 'arrowdown' | 'arrowright';
 export type gameStatus = 'lobby' | 'waiting' | 'inprogress' | 'paused' | 'finished';
 
 export interface IPlanet {
@@ -6,9 +5,10 @@ export interface IPlanet {
   y: number;
   width: number;
   height: number;
-  active: boolean; // Para saber se a parede está ativa
+  active: boolean; // Para saber se o planeta está ativa
   parts: boolean[]; // Cada parte representará um fragmento da imagem
   imageSrc: string; // Caminho da imagem do planeta
+  ownerId: string;
 }
 
 export interface IPlayer {
@@ -21,6 +21,7 @@ export interface IPlayer {
   size: number;
   isBot: boolean;
   imageSrc: string;
+  defendingPlanetId: number;
 }
 
 export type PlayersRecord = Record<string, IPlayer>;
@@ -48,9 +49,15 @@ export interface IPlayerRoom {
 
 export interface IRoomState {
   roomId: string;
+  code: string | null;
   status: gameStatus;
   host: string;
   players: IPlayerRoom[];
+}
+
+interface Winner {
+  username: string;
+  id: string;
 }
 
 export interface IGameState {
@@ -76,6 +83,7 @@ export interface IGameMessage {
     rooms?: IRoomState[];
     planets?: IPlanet[];
     player?: IPlayer;
+    winner?: Winner;
   }
 }
 
@@ -90,18 +98,19 @@ export interface IGame {
 }
 
 export const initialPlanetsState: IPlanet[] = [
-  { x: 0, y: 0, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '' },
-  { x: 650, y: 0, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '' },
-  { x: 0, y: 450, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '' },
-  { x: 650, y: 450, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '' }
+  { x: 0, y: 0, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '', ownerId: '' },
+  { x: 650, y: 0, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '', ownerId: '' },
+  { x: 0, y: 450, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '', ownerId: '' },
+  { x: 650, y: 450, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '', ownerId: '' }
 ];
 
 export const initialPlayersState: PlayersRecord = {
-  'bot0': { username: 'Bot 0', x: 170, y: 150, initialX: 170, initialY: 150, size: 80, isBot: true, imageSrc: '' },
-  'bot1': { username: 'Bot 1', x: 550, y: 150, initialX: 550, initialY: 150, size: 80, isBot: true, imageSrc: '' },
-  'bot2': { username: 'Bot 2', x: 170, y: 370, initialX: 170, initialY: 370, size: 80, isBot: true, imageSrc: '' },
-  'bot3': { username: 'Bot 3', x: 550, y: 370, initialX: 550, initialY: 370, size: 80, isBot: false, imageSrc: '' }
+  'player0': { username: 'Player 0', x: 170, y: 150, initialX: 170, initialY: 150, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 0 },
+  'player1': { username: 'Player 1', x: 550, y: 150, initialX: 550, initialY: 150, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 1 },
+  'player2': { username: 'Player 2', x: 170, y: 370, initialX: 170, initialY: 370, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 2 },
+  'player3': { username: 'Player 3', x: 550, y: 370, initialX: 550, initialY: 370, size: 80, isBot: false, imageSrc: '', defendingPlanetId: 3 }
 };
+
 
 export const initialBallState: IBall = {
   x: 400,
@@ -118,14 +127,15 @@ export const initialCanvasState: ICanvas = {
 };
 
 export const initialPlayersRoomState: IPlayerRoom[] = [
-  { playerId: 'bot0', username: 'Bot 0', ready: false, isHost: false },
-  { playerId: 'bot1', username: 'Bot 1', ready: false, isHost: false },
-  { playerId: 'bot2', username: 'Bot 2', ready: false, isHost: false },
-  { playerId: 'bot3', username: 'Bot 3', ready: false, isHost: false }
+  { playerId: 'player0', username: 'Player 0', ready: false, isHost: false },
+  { playerId: 'player1', username: 'Player 1', ready: false, isHost: false },
+  { playerId: 'player2', username: 'Player 2', ready: false, isHost: false },
+  { playerId: 'player3', username: 'Player 3', ready: false, isHost: false }
 ]
 
 export const initialRoomState: IRoomState = {
   roomId: '',
+  code: '',
   status: 'lobby',
   host: '',
   players: initialPlayersRoomState

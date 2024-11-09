@@ -6,12 +6,15 @@ import { RankingScreen } from '../RankingScreen/RankingScreen';
 import NewGameScreen from '../NewGameScreen/NewGameScreen';
 import { WaitingRoomScreen } from '../WaitingRoomScreen/WaitingRoomScreen';
 import CreateRoomScreen from '../CreateRoomScreen/CreateRoomScreen';
+import { GameOverScreen } from '../GameOverScreen/GameOverScreen';
+import { IWinner } from '../../interfaces/game';
 
 // Testando em como renderizar o conteúdo de uma rota dinamicamente
 
 
 export const GameMonolito: React.FC = () => {
     const [screen, setScreen] = useState('main-menu'); // 'home', 'settings', ou 'profile'
+    const [winner, setWinner] = useState<IWinner | null>(null);
 
     const renderScreen = () => {
         switch (screen) {
@@ -26,7 +29,9 @@ export const GameMonolito: React.FC = () => {
             case 'ranking-room':
                 return <RankingScreen setScreen={setScreen} />;
             case 'game':
-                return <NewGameScreen setScreen={setScreen} />;
+                return <NewGameScreen setScreen={setScreen} setWinner={setWinner} />;
+            case 'game-over':
+                return <GameOverScreen setScreen={setScreen} winner={winner} />;
             default:
                 return <MainMenuScreen setScreen={setScreen} />;
         }

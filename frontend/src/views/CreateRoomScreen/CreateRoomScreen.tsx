@@ -23,8 +23,6 @@ const CreateRoomScreen: React.FC<CreateRoomScreenProps> = ({ setScreen }) => {
         if (!roomState) return;
         if (roomState.status === 'waiting') {
             setScreen('waiting-room');
-            console.log("Movido para a sala de espera");
-
             setRoomCode('');
             setLoading(false);
         }
