@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { webSocketService } from '../services/WebSocketService';
 import { IGameMessage, IGameState, IWinner, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialPlanetsState, IRoomState } from '../interfaces/game';
 import { useUser } from './UserContext';
+import { gameAudio } from '../utils/audioManager';
 
 interface WebSocketContextType {
   //isConnected: boolean; // removido, socketId já faz essa função
@@ -42,6 +43,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     if (!user) {
       if (socketId) {
         webSocketService.disconnect();
+        gameAudio.stopAll(); // Stop all audio when disconnecting
         setStatus('offline');
         setGameState(null);
         setRoomState(null);
@@ -199,6 +201,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         return;
       }
 
+      gameAudio.startBackgroundMusic();
       setLastMessage(data);
       setRoomState(roomState);
       setGameState(data.data.gameState)
@@ -240,6 +243,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     webSocketService.registerCallback('updateBall', (data) => {
       if (data.data && data.data.ball) {
+          // Check for collisions by comparing with previous state
         setGameState(prevGameState => {
           // Se o estado anterior for nulo, você pode retornar um novo estado inicial
           if (prevGameState === null) {
@@ -269,6 +273,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     webSocketService.registerCallback('updatePlanet', (data) => {
       if (data.data && data.data.planets) {
+        // Play destruction sound when a planet part is destroyed
+        if (data.data.planetDestruction) {
+          gameAudio.playDestructionSound();
+        }
         setGameState(prevGameState => {
           // Se o estado anterior for nulo, você pode retornar um novo estado inicial
           if (prevGameState === null) {
@@ -295,6 +303,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     webSocketService.registerCallback('gameOver', (data) => {
       if (data.data && data.data.winner) {
+        gameAudio.stopAll(); 
         setGameState(prevGameState => {
           // Atualiza o estado do jogo
           return {
@@ -379,6 +388,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       return;
     }
 
+    gameAudio.stopAll(); 
     const data = { roomId: roomId, playerId: socketId }
     webSocketService.send({ type: 'leaveRoom', data });
   }
@@ -444,6 +454,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       socketId, webSocketService, status, gameState, roomState, rooms, lastMessage,
       getRooms, createRoom, closeRoom, joinRoom, leaveRoom, toggleReadyStatus, removePlayer, movePlayer,
       startGame, leaveGame, setLastMessage
+      // Opção para criar um botão de liga e desliga áudio
+      // toggleAudio: gameAudio.toggleMute.bind(gameAudio), // Add audio toggle function
     }}>
       {children}
     </WebSocketContext.Provider>

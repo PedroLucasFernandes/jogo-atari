@@ -479,6 +479,7 @@ export default function createGame() {
   function notifyPlanetUpdate(isInitial: boolean = false) {
     const data = {
       planets: gameState.planets,
+      planetDestruction: true,
     };
 
     // Enviar notificação inicial se todas as partes do planeta ainda estiverem ativas
