@@ -99,10 +99,10 @@ export const initialPlanetsState: IPlanet[] = [
 ];
 
 export const initialPlayersState: PlayersRecord = {
-  'bot0': { username: 'Bot 0', x: 170, y: 150, initialX: 170, initialY: 150, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 0 },
-  'bot1': { username: 'Bot 1', x: 550, y: 150, initialX: 550, initialY: 150, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 1 },
-  'bot2': { username: 'Bot 2', x: 170, y: 370, initialX: 170, initialY: 370, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 2 },
-  'bot3': { username: 'Bot 3', x: 550, y: 370, initialX: 550, initialY: 370, size: 80, isBot: false, imageSrc: '', defendingPlanetId: 3 }
+  'player0': { username: 'Player 0', x: 170, y: 150, initialX: 170, initialY: 150, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 0 },
+  'player1': { username: 'Player 1', x: 550, y: 150, initialX: 550, initialY: 150, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 1 },
+  'player2': { username: 'Player 2', x: 170, y: 370, initialX: 170, initialY: 370, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 2 },
+  'player3': { username: 'Player 3', x: 550, y: 370, initialX: 550, initialY: 370, size: 80, isBot: false, imageSrc: '', defendingPlanetId: 3 }
 };
 
 export const initialBallState: IBall = {
@@ -120,10 +120,10 @@ export const initialCanvasState: ICanvas = {
 };
 
 export const initialPlayersRoomState: IPlayerRoom[] = [
-  { playerId: 'bot0', username: 'Bot 0', ready: false, isHost: false },
-  { playerId: 'bot1', username: 'Bot 1', ready: false, isHost: false },
-  { playerId: 'bot2', username: 'Bot 2', ready: false, isHost: false },
-  { playerId: 'bot3', username: 'Bot 3', ready: false, isHost: false }
+  { playerId: 'player0', username: 'Bot 0', ready: false, isHost: false },
+  { playerId: 'player1', username: 'Bot 1', ready: false, isHost: false },
+  { playerId: 'player2', username: 'Bot 2', ready: false, isHost: false },
+  { playerId: 'player3', username: 'Bot 3', ready: false, isHost: false }
 ]
 
 export const initialRoomState: IRoomState = {

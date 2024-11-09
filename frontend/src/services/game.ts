@@ -4,10 +4,10 @@ export default function createGame() {
 
   const gameState: IGameState = {
     players: {
-      'bot0': initialPlayersState[0],
-      'bot1': initialPlayersState[1],
-      'bot2': initialPlayersState[2],
-      'bot3': initialPlayersState[3],
+      'player0': initialPlayersState[0],
+      'player1': initialPlayersState[1],
+      'player2': initialPlayersState[2],
+      'player3': initialPlayersState[3],
 
     },
     planets: initialPlanetsState,
