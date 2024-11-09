@@ -96,6 +96,16 @@ export default function renderScreen(
             partWidth,
             partHeight
           );
+
+          // Define a opacidade para a camada de sobreposição
+        context.globalAlpha = 0.06; // Ajuste para o nível de transparência desejado
+        context.fillStyle = 'white'; // Ou uma cor ligeiramente mais clara
+
+        // Desenha a sobreposição apenas dentro do setor, deixando 1px de margem transparente
+        context.fillRect(partX + 1, partY + 1, partWidth - 2, partHeight - 2);
+
+        // Restaura a opacidade para outros elementos
+        context.globalAlpha = 1.0;
         }
       }
     }
