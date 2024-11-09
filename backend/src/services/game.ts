@@ -774,17 +774,12 @@ export default function createGame(roomState: IRoomState) {
     gameState.players = {};
     gameState.planets = [];
 
-    console.log("x", initialPlayersState);
-    console.log("x", initialPlanetsState);
-
     // Embaralha `planetsByPlayersPosition` para distribuir posições aleatórias
     const shuffledPositions = [...planetsByPlayersPosition].sort(() => Math.random() - 0.5);
 
     // Associa jogadores aleatoriamente às posições e planetas correspondentes
     players.forEach((player, index) => {
       const position = shuffledPositions[index]; // Posição aleatória para o jogador
-
-      console.log("position: " + JSON.stringify(position) + "\n");
 
       if (position) {  // Garante que a posição existe
         // Define as informações do jogador no estado do jogo
@@ -813,8 +808,6 @@ export default function createGame(roomState: IRoomState) {
         });
       }
     });
-
-    console.log(JSON.stringify(gameState));
   }
 
 

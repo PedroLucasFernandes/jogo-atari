@@ -67,7 +67,8 @@ class WebSocketService {
 					return;
 				}
 
-				const clientId = `socket_${decoded.id}_${Date.now()}`;
+				//const clientId = `socket_${decoded.id}_${Date.now()}`;
+				const clientId = `socket_${decoded.id}`;
 				this.clients[clientId] = {
 					ws,
 					user: {
@@ -112,6 +113,9 @@ class WebSocketService {
 			case 'movePlayer':
 				this.handlePlayerMove(clientId, message.data.roomId, message.data.keyPressed);
 				break;
+			case 'checkGameInProgress':
+				this.checkGameInProgress(clientId);
+				break;
 			case 'getRooms':
 				this.getRooms(clientId);
 				break;
@@ -142,6 +146,48 @@ class WebSocketService {
 			default:
 				console.error(`Invalid message type received: ${message.type}`);
 		}
+	}
+
+	private checkGameInProgress(clientId: string) {
+		const client = this.clients[clientId];
+		if (!client) {
+			return;
+		}
+
+		// Itera sobre cada sala para verificar se o jogador está em uma sala e se o jogo está em andamento
+		Object.entries(this.rooms).forEach(([roomId, roomData]) => {
+			const { players, status } = roomData;
+
+			// Verifica se o jogador está presente na sala
+			const playerInRoom = players.find(player => player.playerId === clientId);
+
+			if (playerInRoom) {
+				// Verifica se o jogo da sala está em progresso e se a sala possui um jogo ativo em gamesByRoom
+				const gameInProgress = this.gamesByRoom[roomId] && status === 'inprogress';
+
+				if (gameInProgress) {
+					// Monta os estados para notificação
+					const roomState = {
+						roomId,
+						code: roomData.code,
+						status: roomData.status,
+						host: roomData.host,
+						players: roomData.players
+					};
+
+					const gameState = this.gamesByRoom[roomId].gameState;
+
+					// Notifica o cliente sobre o estado do jogo e da sala
+					this.notifyClient(clientId, {
+						type: 'gameInProgress',
+						data: {
+							roomState,
+							gameState
+						}
+					});
+				}
+			}
+		});
 	}
 
 	private getRoomStates() {
@@ -520,6 +566,16 @@ class WebSocketService {
 			return;
 		}
 
+		//verificar se todos os jogdores estão com o status ready
+		const allPlayersReady = room.players.every(player => player.ready);
+		if (!allPlayersReady) {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Todos os jogadores devem estar prontos para iniciar a partida' }
+			});
+			return;
+		}
+
 		room.status = 'inprogress';
 
 		const game = createGame({
@@ -637,27 +693,38 @@ class WebSocketService {
 			return;
 		}
 
-		// Remover jogador da sala
+		// Remover jogador da lista de `players` da sala
 		const playerIndex = room.players.findIndex(player => player.playerId === clientId);
 		if (playerIndex !== -1) {
 			const removedPlayer = room.players.splice(playerIndex, 1)[0];
 
+			// Se o jogador que saiu era o host, transfere a posição de host para outro jogador
+			if (removedPlayer.isHost && room.players.length > 0) {
+				room.players[0].isHost = true;
+				room.host = room.players[0].playerId; // Atualiza o novo host no estado da sala
+			}
+
 			// Remover jogador do estado do jogo
 			const updatedPlayers = { ...game.gameState.players };
-			delete updatedPlayers[clientId]; // Remove o jogador pelo clientId
+			delete updatedPlayers[clientId];
+
+			// Remover planetas associados ao jogador que saiu
+			const updatedPlanets = game.gameState.planets.filter(planet => planet.ownerId !== clientId);
 
 			game.setState({
-				players: updatedPlayers // Atualiza o estado do jogo com o jogador removido
+				players: updatedPlayers,
+				planets: updatedPlanets // Atualiza o estado do jogo sem os planetas do jogador removido
 			});
 
 			this.notifyClient(clientId, {
 				type: 'youLeftGame',
 				data: {
-					roomId, message: `Você abandonou a partida`
+					roomId,
+					message: `Você abandonou a partida`
 				}
 			});
 
-			// Notificar os demais jogadores sobre a saída
+			// Notificar os demais jogadores sobre a saída e a atualização do estado
 			room.players.forEach(player => {
 				this.notifyClient(player.playerId, {
 					type: 'playerLeftGame',
@@ -685,29 +752,51 @@ class WebSocketService {
 	private handleDisconnect(clientId: string) {
 		// Itera sobre cada sala e remove o usuário desconectado
 		Object.entries(this.rooms).forEach(([roomId, roomData]) => {
-			const { players } = roomData;
+			const { players, status } = roomData;
 
 			// Verifica se o usuário está na sala
 			if (players.some(player => player.playerId === clientId)) {
 				const client = players.find(player => player.playerId === clientId);
-				// Remove o usuário da lista
-				this.rooms[roomId].players = players.filter(player => player.playerId !== clientId);
 
-				// Se a sala ficou vazia após a remoção, apaga a sala e para o jogo
-				if (this.rooms[roomId].players.length === 0) {
-					delete this.rooms[roomId];
+				// Verifica se o jogo já iniciou (status == 'inprogress')
+				if (status !== 'inprogress') {
+					// Se o jogo não estiver em andamento, remove o usuário da lista
+					this.rooms[roomId].players = players.filter(player => player.playerId !== clientId);
 
-					if (this.gamesByRoom[roomId]) {
-						this.gamesByRoom[roomId].stop();
-						delete this.gamesByRoom[roomId];
+					// Se a sala ficou vazia após a remoção, apaga a sala e para o jogo
+					if (this.rooms[roomId].players.length === 0) {
+						delete this.rooms[roomId];
+
+						if (this.gamesByRoom[roomId]) {
+							this.gamesByRoom[roomId].stop();
+							delete this.gamesByRoom[roomId];
+						}
+
+					} else {
+						// Notifica os demais usuários sobre a desconexão
+						this.rooms[roomId].players.forEach(player => {
+							this.notifyClient(player.playerId, {
+								type: 'playerLeft',
+								data: {
+									roomState: {
+										roomId: roomId,
+										code: this.rooms[roomId].code,
+										status: this.rooms[roomId].status,
+										host: this.rooms[roomId].host,
+										players: this.rooms[roomId].players
+									},
+									message: `${client?.username} saiu da sala`
+								}
+							});
+						});
 					}
 
+					this.notifyRoomObservers();
 				} else {
-					// Notifica os demais usuários sobre a desconexão
+					// Caso o jogo tenha iniciado, apenas notifique os outros jogadores
 					this.rooms[roomId].players.forEach(player => {
-
 						this.notifyClient(player.playerId, {
-							type: 'playerLeft',
+							type: 'playerDisconnected',
 							data: {
 								roomState: {
 									roomId: roomId,
@@ -716,14 +805,11 @@ class WebSocketService {
 									host: this.rooms[roomId].host,
 									players: this.rooms[roomId].players
 								},
-								message: `${client?.username} saiu da sala`
+								message: `${client?.username} perdeu a conexão`
 							}
 						});
-
 					});
 				}
-
-				this.notifyRoomObservers();
 			}
 		});
 

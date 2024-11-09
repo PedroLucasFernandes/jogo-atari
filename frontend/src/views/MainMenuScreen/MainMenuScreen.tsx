@@ -7,6 +7,11 @@ import { useWebSocket } from '../../context/WebSocketContext';
 import { useUser } from '../../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { logoutApi } from '../../api/logoutApi';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/joy/DialogTitle';
+import DialogContent from '@mui/joy/DialogContent';
+import Input from '@mui/joy/Input';
+import DialogActions from '@mui/joy/DialogActions';
 
 interface ScreenProps {
   setScreen: Dispatch<SetStateAction<string>>;
@@ -14,15 +19,27 @@ interface ScreenProps {
 
 export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   const navigate = useNavigate();
-  const { webSocketService, socketId } = useWebSocket();
+  const { webSocketService, socketId, checkGameInProgress, roomState, gameState, leaveGame } = useWebSocket();
   const [showLogout, setShowLogout] = useState(false);
   const { user, setUser } = useUser();
+  const [openModal, setOpenModal] = useState(false);
 
   useEffect(() => {
     webSocketService.registerCallback('something', (data) => {
     });
 
   }, [webSocketService]);
+
+  useEffect(() => {
+    if (!socketId) return;
+    checkGameInProgress();
+  }, [socketId]);
+
+  useEffect(() => {
+    if (!roomState || !gameState) return
+    setOpenModal(true);
+
+  }, [roomState, gameState])
 
   const handleLogout = async () => {
     const { success, error } = await logoutApi();
@@ -38,6 +55,16 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
       setUser(null);
       navigate('/');
     }
+  }
+
+  const handleAbandon = () => {
+    if (!roomState) return;
+    leaveGame(roomState.roomId);
+    setOpenModal(false);
+  }
+
+  const handleRejoin = () => {
+    setScreen('game');
   }
 
   return (
@@ -103,6 +130,17 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
           Ranking
         </Button>
       </div>
+
+      <Dialog open={openModal} onClose={() => setOpenModal(false)}>
+        <DialogTitle>Entrar na Sala</DialogTitle>
+        <DialogContent>
+          <p>Você está em uma partida em andamento, deseja continuá-la?</p>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleAbandon}>Abandonar</Button>
+          <Button onClick={handleRejoin}>Continuar</Button>
+        </DialogActions>
+      </Dialog>
 
     </Box>
   );
