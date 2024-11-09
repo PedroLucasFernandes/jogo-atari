@@ -1,4 +1,4 @@
-import { AcceptedMoves, IGameMessage, IGameState, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialPlanetsState, IPlayer, IPlayerRoom, PlayersRecord } from "../interfaces/game"
+import { IGameMessage, IGameState, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialPlanetsState, IPlayer, IPlayerRoom, PlayersRecord } from "../interfaces/game"
 import * as leaderboardServices from "../services/leaderboardServices";
 
 
@@ -46,161 +46,124 @@ export default function createGame() {
     Object.assign(gameState, newState)
   }
 
+
+
   function movePlayer(playerId: string, keyPressed: string) {
     const player = gameState.players[playerId];
     if (!player || !keyPressed) return;
 
     const playerIndex = Object.keys(gameState.players).indexOf(playerId);
     if (playerIndex === -1) return;
-    const toleranceX = speed;
-    const toleranceY = speed;
-    const acceptedMoves: Record<AcceptedMoves, (player: IPlayer, index: number) => void> = {
 
+    const speed = 10;
 
-      w(player: IPlayer, index: number) {
-        if (index === 0 || index === 1) {
-          if (player.y > 0) {
-            // Verifica se o jogador está dentro da zona de tolerância no eixo X
-            if (Math.abs(player.x - player.initialX) <= toleranceX) {
-              player.x = player.initialX; // Corrige a posição no eixo X
-              player.y = Math.max(player.y - speed, 0);
-            }
-          }
-        } else {
-          if (player.y > player.initialY) {
-            if (Math.abs(player.x - player.initialX) <= toleranceX) {
-              player.x = player.initialX;
-              player.y = Math.max(player.y - speed, player.initialY);
-            }
-          }
-        }
-      },
-      a(player: IPlayer, index: number) {
-        if (index === 0 || index === 2) {
-          if (player.x > 0) {
-            if (Math.abs(player.y - player.initialY) <= toleranceY) {
-              player.y = player.initialY;
-              player.x = Math.max(player.x - speed, 0);
-            }
-          }
-        } else {
-          if (player.x > player.initialX) {
-            if (Math.abs(player.y - player.initialY) <= toleranceY) {
-              player.y = player.initialY;
-              player.x = Math.max(player.x - speed, player.initialX);
-            }
-          }
-        }
-      },
-      s(player: IPlayer, index: number) {
-        if (index === 0 || index === 1) {
-          if (player.y < player.initialY) {
-            if (Math.abs(player.x - player.initialX) <= toleranceX) {
-              player.x = player.initialX;
-              player.y = Math.min(player.y + speed, player.initialY);
-            }
-          }
-        } else {
-          if (player.y < gameState.canvas.height) {
-            if (Math.abs(player.x - player.initialX) <= toleranceX) {
-              player.x = player.initialX;
-              player.y = Math.min(player.y + speed, gameState.canvas.height);
-            }
-          }
-        }
-      },
-      d(player: IPlayer, index: number) {
-        if (index === 1 || index === 3) {
-          if (player.x < gameState.canvas.width) {
-            if (Math.abs(player.y - player.initialY) <= toleranceY) {
-              player.y = player.initialY;
-              player.x = Math.min(player.x + speed, gameState.canvas.width);
-            }
-          }
-        } else {
-          if (player.x < player.initialX) {
-            if (Math.abs(player.y - player.initialY) <= toleranceY) {
-              player.y = player.initialY;
-              player.x = Math.min(player.x + speed, player.initialX);
-            }
-          }
-        }
-      },
-      arrowup(player: IPlayer, index: number) {
-        if (index === 0 || index === 1) {
-          if (player.y > 0) {
-            // Verifica se o jogador está dentro da zona de tolerância no eixo X
-            if (Math.abs(player.x - player.initialX) <= toleranceX) {
-              player.x = player.initialX; // Corrige a posição no eixo X
-              player.y = Math.max(player.y - speed, 0);
-            }
-          }
-        } else {
-          if (player.y > player.initialY) {
-            if (Math.abs(player.x - player.initialX) <= toleranceX) {
-              player.x = player.initialX;
-              player.y = Math.max(player.y - speed, player.initialY);
-            }
-          }
-        }
-      },
-      arrowleft(player: IPlayer, index: number) {
-        if (index === 0 || index === 2) {
-          if (player.x > 0) {
-            if (Math.abs(player.y - player.initialY) <= toleranceY) {
-              player.y = player.initialY;
-              player.x = Math.max(player.x - speed, 0);
-            }
-          }
-        } else {
-          if (player.x > player.initialX) {
-            if (Math.abs(player.y - player.initialY) <= toleranceY) {
-              player.y = player.initialY;
-              player.x = Math.max(player.x - speed, player.initialX);
-            }
-          }
-        }
-      },
-      arrowdown(player: IPlayer, index: number) {
-        if (index === 0 || index === 1) {
-          if (player.y < player.initialY) {
-            if (Math.abs(player.x - player.initialX) <= toleranceX) {
-              player.x = player.initialX;
-              player.y = Math.min(player.y + speed, player.initialY);
-            }
-          }
-        } else {
-          if (player.y < gameState.canvas.height) {
-            if (Math.abs(player.x - player.initialX) <= toleranceX) {
-              player.x = player.initialX;
-              player.y = Math.min(player.y + speed, gameState.canvas.height);
-            }
-          }
-        }
-      },
-      arrowright(player: IPlayer, index: number) {
-        if (index === 1 || index === 3) {
-          if (player.x < gameState.canvas.width) {
-            if (Math.abs(player.y - player.initialY) <= toleranceY) {
-              player.y = player.initialY;
-              player.x = Math.min(player.x + speed, gameState.canvas.width);
-            }
-          }
-        } else {
-          if (player.x < player.initialX) {
-            if (Math.abs(player.y - player.initialY) <= toleranceY) {
-              player.y = player.initialY;
-              player.x = Math.min(player.x + speed, player.initialX);
-            }
-          }
-        }
-      },
+    // Função auxiliar para verificar se o player está na posição inicial
+    const isAtInitialPosition = (player: IPlayer) => {
+      return Math.abs(player.x - player.initialX) < speed &&
+        Math.abs(player.y - player.initialY) < speed;
     };
 
-    // Executa o movimento com base na tecla pressionada
-    if (keyPressed in acceptedMoves) {
-      const moveFunction = acceptedMoves[keyPressed as AcceptedMoves];
-      moveFunction(player, playerIndex);
+    // Função auxiliar para verificar se o player está no limite vertical
+    const isAtVerticalLimit = (player: IPlayer, isTop: boolean) => {
+      return isTop ? player.y <= 0 : player.y + player.size >= gameState.canvas.height;
+    };
+
+    // Função auxiliar para verificar se o player está no limite horizontal
+    const isAtHorizontalLimit = (player: IPlayer, isRight: boolean) => {
+      return isRight ? player.x + player.size >= gameState.canvas.width : player.x <= 0;
+    };
+
+    const moveLogic = {
+      // Player Superior Esquerdo (índice 0)
+      0: {
+        arrowright: (player: IPlayer) => {
+          if (player.x < player.initialX) {
+            // Movimento horizontal para direita até posição inicial
+            player.x = Math.min(player.x + speed, player.initialX);
+          } else if (!isAtVerticalLimit(player, true)) {
+            // Subir depois de atingir posição inicial
+            player.y = Math.max(player.y - speed, 0);
+          }
+        },
+        arrowleft: (player: IPlayer) => {
+          if (player.y === player.initialY) {
+            // Movimento horizontal para esquerda
+            player.x = Math.max(player.x - speed, 0);
+          } else if (player.x === player.initialX) {
+            // Descer de volta à posição inicial
+            player.y = Math.min(player.y + speed, player.initialY);
+          }
+        }
+      },
+      // Player Superior Direito (índice 1)
+      1: {
+        arrowright: (player: IPlayer) => {
+          if (player.y === player.initialY) {
+            // Movimento horizontal para direita, considerando o tamanho do player
+            player.x = Math.min(player.x + speed, gameState.canvas.width - player.size);
+          } else if (player.x === player.initialX) {
+            // Descer de volta à posição inicial
+            player.y = Math.min(player.y + speed, player.initialY);
+          }
+        },
+        arrowleft: (player: IPlayer) => {
+          if (player.x > player.initialX) {
+            // Movimento horizontal para esquerda até posição inicial
+            player.x = Math.max(player.x - speed, player.initialX);
+          } else if (!isAtVerticalLimit(player, true)) {
+            // Subir depois de atingir posição inicial
+            player.y = Math.max(player.y - speed, 0);
+          }
+        }
+      },
+      // Player Inferior Esquerdo (índice 2)
+      2: {
+        arrowright: (player: IPlayer) => {
+          if (player.x < player.initialX) {
+            // Movimento horizontal para direita até posição inicial
+            player.x = Math.min(player.x + speed, player.initialX);
+          } else if (!isAtVerticalLimit(player, false)) {
+            // Descer depois de atingir posição inicial
+            player.y = Math.min(player.y + speed, gameState.canvas.height - player.size);
+          }
+        },
+        arrowleft: (player: IPlayer) => {
+          if (player.y === player.initialY) {
+            // Movimento horizontal para esquerda
+            player.x = Math.max(player.x - speed, 0);
+          } else if (player.x === player.initialX) {
+            // Subir de volta à posição inicial
+            player.y = Math.max(player.y - speed, player.initialY);
+          }
+        }
+      },
+      // Player Inferior Direito (índice 3)
+      3: {
+        arrowright: (player: IPlayer) => {
+          if (player.y === player.initialY) {
+            // Movimento horizontal para direita, considerando o tamanho do player
+            player.x = Math.min(player.x + speed, gameState.canvas.width - player.size);
+          } else if (player.x === player.initialX) {
+            // Subir de volta à posição inicial
+            player.y = Math.max(player.y - speed, player.initialY);
+          }
+        },
+        arrowleft: (player: IPlayer) => {
+          if (player.x > player.initialX) {
+            // Movimento horizontal para esquerda até posição inicial
+            player.x = Math.max(player.x - speed, player.initialX);
+          } else if (!isAtVerticalLimit(player, false)) {
+            // Descer depois de atingir posição inicial
+            player.y = Math.min(player.y + speed, gameState.canvas.height - player.size);
+          }
+        }
+      }
+    };
+
+    // Executa o movimento baseado no índice do jogador e tecla pressionada
+    const playerMoveLogic = moveLogic[playerIndex as keyof typeof moveLogic];
+    if (playerMoveLogic && keyPressed.toLowerCase() in playerMoveLogic) {
+      playerMoveLogic[keyPressed.toLowerCase() as keyof typeof playerMoveLogic](player);
     }
 
     const data = {
@@ -208,6 +171,295 @@ export default function createGame() {
     };
     notifyAll({ type: 'playerMoved', data });
   }
+
+  // function movePlayer(playerId: string, keyPressed: string) {
+  //   const player = gameState.players[playerId];
+  //   if (!player || !keyPressed) return;
+
+  //   const playerIndex = Object.keys(gameState.players).indexOf(playerId);
+  //   if (playerIndex === -1) return;
+
+  //   const speed = 10;
+
+  //   // Função auxiliar para verificar se o player está na posição inicial
+  //   const isAtInitialPosition = (player: IPlayer) => {
+  //     return Math.abs(player.x - player.initialX) < speed &&
+  //       Math.abs(player.y - player.initialY) < speed;
+  //   };
+
+  //   // Função auxiliar para verificar se o player está no limite vertical
+  //   const isAtVerticalLimit = (player: IPlayer, isTop: boolean) => {
+  //     return isTop ? player.y <= 0 : player.y >= gameState.canvas.height;
+  //   };
+
+  //   // Função auxiliar para verificar se o player está no limite horizontal
+  //   const isAtHorizontalLimit = (player: IPlayer, isRight: boolean) => {
+  //     return isRight ? player.x >= gameState.canvas.width : player.x <= 0;
+  //   };
+
+  //   const moveLogic = {
+  //     // Player Superior Esquerdo (índice 0)
+  //     0: {
+  //       arrowright: (player: IPlayer) => {
+  //         if (player.x < player.initialX) {
+  //           // Movimento horizontal para direita até posição inicial
+  //           player.x = Math.min(player.x + speed, player.initialX);
+  //         } else if (!isAtVerticalLimit(player, true)) {
+  //           // Subir depois de atingir posição inicial
+  //           player.y = Math.max(player.y - speed, 0);
+  //         }
+  //       },
+  //       arrowleft: (player: IPlayer) => {
+  //         if (player.y === player.initialY) {
+  //           // Movimento horizontal para esquerda
+  //           player.x = Math.max(player.x - speed, 0);
+  //         } else if (player.x === player.initialX) {
+  //           // Descer de volta à posição inicial
+  //           player.y = Math.min(player.y + speed, player.initialY);
+  //         }
+  //       }
+  //     },
+  //     // Player Superior Direito (índice 1)
+  //     1: {
+  //       arrowright: (player: IPlayer) => {
+  //         if (player.y === player.initialY) {
+  //           // Movimento horizontal para direita
+  //           player.x = Math.min(player.x + speed, gameState.canvas.width);
+  //         } else if (player.x === player.initialX) {
+  //           // Descer de volta à posição inicial
+  //           player.y = Math.min(player.y + speed, player.initialY);
+  //         }
+  //       },
+  //       arrowleft: (player: IPlayer) => {
+  //         if (player.x > player.initialX) {
+  //           // Movimento horizontal para esquerda até posição inicial
+  //           player.x = Math.max(player.x - speed, player.initialX);
+  //         } else if (!isAtVerticalLimit(player, true)) {
+  //           // Subir depois de atingir posição inicial
+  //           player.y = Math.max(player.y - speed, 0);
+  //         }
+  //       }
+  //     },
+  //     // Player Inferior Esquerdo (índice 2)
+  //     2: {
+  //       arrowright: (player: IPlayer) => {
+  //         if (player.x < player.initialX) {
+  //           // Movimento horizontal para direita até posição inicial
+  //           player.x = Math.min(player.x + speed, player.initialX);
+  //         } else if (!isAtVerticalLimit(player, false)) {
+  //           // Descer depois de atingir posição inicial
+  //           player.y = Math.min(player.y + speed, gameState.canvas.height);
+  //         }
+  //       },
+  //       arrowleft: (player: IPlayer) => {
+  //         if (player.y === player.initialY) {
+  //           // Movimento horizontal para esquerda
+  //           player.x = Math.max(player.x - speed, 0);
+  //         } else if (player.x === player.initialX) {
+  //           // Subir de volta à posição inicial
+  //           player.y = Math.max(player.y - speed, player.initialY);
+  //         }
+  //       }
+  //     },
+  //     // Player Inferior Direito (índice 3)
+  //     3: {
+  //       arrowright: (player: IPlayer) => {
+  //         if (player.y === player.initialY) {
+  //           // Movimento horizontal para direita
+  //           player.x = Math.min(player.x + speed, gameState.canvas.width);
+  //         } else if (player.x === player.initialX) {
+  //           // Subir de volta à posição inicial
+  //           player.y = Math.max(player.y - speed, player.initialY);
+  //         }
+  //       },
+  //       arrowleft: (player: IPlayer) => {
+  //         if (player.x > player.initialX) {
+  //           // Movimento horizontal para esquerda até posição inicial
+  //           player.x = Math.max(player.x - speed, player.initialX);
+  //         } else if (!isAtVerticalLimit(player, false)) {
+  //           // Descer depois de atingir posição inicial
+  //           player.y = Math.min(player.y + speed, gameState.canvas.height);
+  //         }
+  //       }
+  //     }
+  //   };
+
+  //   // Executa o movimento baseado no índice do jogador e tecla pressionada
+  //   const playerMoveLogic = moveLogic[playerIndex as keyof typeof moveLogic];
+  //   if (playerMoveLogic && keyPressed.toLowerCase() in playerMoveLogic) {
+  //     playerMoveLogic[keyPressed.toLowerCase() as keyof typeof playerMoveLogic](player);
+  //   }
+
+  //   const data = {
+  //     gameState,
+  //   };
+  //   notifyAll({ type: 'playerMoved', data });
+  // }
+
+
+
+  // function movePlayer(playerId: string, keyPressed: string) {
+  //   const player = gameState.players[playerId];
+  //   if (!player || !keyPressed) return;
+
+  //   const playerIndex = Object.keys(gameState.players).indexOf(playerId);
+  //   if (playerIndex === -1) return;
+  //   const toleranceX = speed;
+  //   const toleranceY = speed;
+  //   const acceptedMoves: Record<AcceptedMoves, (player: IPlayer, index: number) => void> = {
+
+
+  //     w(player: IPlayer, index: number) {
+  //       if (index === 0 || index === 1) {
+  //         if (player.y > 0) {
+  //           // Verifica se o jogador está dentro da zona de tolerância no eixo X
+  //           if (Math.abs(player.x - player.initialX) <= toleranceX) {
+  //             player.x = player.initialX; // Corrige a posição no eixo X
+  //             player.y = Math.max(player.y - speed, 0);
+  //           }
+  //         }
+  //       } else {
+  //         if (player.y > player.initialY) {
+  //           if (Math.abs(player.x - player.initialX) <= toleranceX) {
+  //             player.x = player.initialX;
+  //             player.y = Math.max(player.y - speed, player.initialY);
+  //           }
+  //         }
+  //       }
+  //     },
+  //     a(player: IPlayer, index: number) {
+  //       if (index === 0 || index === 2) {
+  //         if (player.x > 0) {
+  //           if (Math.abs(player.y - player.initialY) <= toleranceY) {
+  //             player.y = player.initialY;
+  //             player.x = Math.max(player.x - speed, 0);
+  //           }
+  //         }
+  //       } else {
+  //         if (player.x > player.initialX) {
+  //           if (Math.abs(player.y - player.initialY) <= toleranceY) {
+  //             player.y = player.initialY;
+  //             player.x = Math.max(player.x - speed, player.initialX);
+  //           }
+  //         }
+  //       }
+  //     },
+  //     s(player: IPlayer, index: number) {
+  //       if (index === 0 || index === 1) {
+  //         if (player.y < player.initialY) {
+  //           if (Math.abs(player.x - player.initialX) <= toleranceX) {
+  //             player.x = player.initialX;
+  //             player.y = Math.min(player.y + speed, player.initialY);
+  //           }
+  //         }
+  //       } else {
+  //         if (player.y < gameState.canvas.height) {
+  //           if (Math.abs(player.x - player.initialX) <= toleranceX) {
+  //             player.x = player.initialX;
+  //             player.y = Math.min(player.y + speed, gameState.canvas.height);
+  //           }
+  //         }
+  //       }
+  //     },
+  //     d(player: IPlayer, index: number) {
+  //       if (index === 1 || index === 3) {
+  //         if (player.x < gameState.canvas.width) {
+  //           if (Math.abs(player.y - player.initialY) <= toleranceY) {
+  //             player.y = player.initialY;
+  //             player.x = Math.min(player.x + speed, gameState.canvas.width);
+  //           }
+  //         }
+  //       } else {
+  //         if (player.x < player.initialX) {
+  //           if (Math.abs(player.y - player.initialY) <= toleranceY) {
+  //             player.y = player.initialY;
+  //             player.x = Math.min(player.x + speed, player.initialX);
+  //           }
+  //         }
+  //       }
+  //     },
+  //     arrowup(player: IPlayer, index: number) {
+  //       if (index === 0 || index === 1) {
+  //         if (player.y > 0) {
+  //           // Verifica se o jogador está dentro da zona de tolerância no eixo X
+  //           if (Math.abs(player.x - player.initialX) <= toleranceX) {
+  //             player.x = player.initialX; // Corrige a posição no eixo X
+  //             player.y = Math.max(player.y - speed, 0);
+  //           }
+  //         }
+  //       } else {
+  //         if (player.y > player.initialY) {
+  //           if (Math.abs(player.x - player.initialX) <= toleranceX) {
+  //             player.x = player.initialX;
+  //             player.y = Math.max(player.y - speed, player.initialY);
+  //           }
+  //         }
+  //       }
+  //     },
+  //     arrowleft(player: IPlayer, index: number) {
+  //       if (index === 0 || index === 2) {
+  //         if (player.x > 0) {
+  //           if (Math.abs(player.y - player.initialY) <= toleranceY) {
+  //             player.y = player.initialY;
+  //             player.x = Math.max(player.x - speed, 0);
+  //           }
+  //         }
+  //       } else {
+  //         if (player.x > player.initialX) {
+  //           if (Math.abs(player.y - player.initialY) <= toleranceY) {
+  //             player.y = player.initialY;
+  //             player.x = Math.max(player.x - speed, player.initialX);
+  //           }
+  //         }
+  //       }
+  //     },
+  //     arrowdown(player: IPlayer, index: number) {
+  //       if (index === 0 || index === 1) {
+  //         if (player.y < player.initialY) {
+  //           if (Math.abs(player.x - player.initialX) <= toleranceX) {
+  //             player.x = player.initialX;
+  //             player.y = Math.min(player.y + speed, player.initialY);
+  //           }
+  //         }
+  //       } else {
+  //         if (player.y < gameState.canvas.height) {
+  //           if (Math.abs(player.x - player.initialX) <= toleranceX) {
+  //             player.x = player.initialX;
+  //             player.y = Math.min(player.y + speed, gameState.canvas.height);
+  //           }
+  //         }
+  //       }
+  //     },
+  //     arrowright(player: IPlayer, index: number) {
+  //       if (index === 1 || index === 3) {
+  //         if (player.x < gameState.canvas.width) {
+  //           if (Math.abs(player.y - player.initialY) <= toleranceY) {
+  //             player.y = player.initialY;
+  //             player.x = Math.min(player.x + speed, gameState.canvas.width);
+  //           }
+  //         }
+  //       } else {
+  //         if (player.x < player.initialX) {
+  //           if (Math.abs(player.y - player.initialY) <= toleranceY) {
+  //             player.y = player.initialY;
+  //             player.x = Math.min(player.x + speed, player.initialX);
+  //           }
+  //         }
+  //       }
+  //     },
+  //   };
+
+  //   // Executa o movimento com base na tecla pressionada
+  //   if (keyPressed in acceptedMoves) {
+  //     const moveFunction = acceptedMoves[keyPressed as AcceptedMoves];
+  //     moveFunction(player, playerIndex);
+  //   }
+
+  //   const data = {
+  //     gameState,
+  //   };
+  //   notifyAll({ type: 'playerMoved', data });
+  // }
 
   function notifyBallUpdate() {
     const data = {
@@ -444,7 +696,7 @@ export default function createGame() {
         intervalId = null;
       }
 
-      
+
       try {
         // Atualiza o leaderboard com a vitória
         await leaderboardServices.saveOrUpdateUserLeaderboardData(realUserId, "total_score");

@@ -1,4 +1,3 @@
-export type AcceptedMoves = 'w' | 'a' | 's' | 'd' | 'arrowup' | 'arrowleft' | 'arrowdown' | 'arrowright';
 export type gameStatus = 'lobby' | 'waiting' | 'inprogress' | 'paused' | 'finished';
 
 export interface IPlanet {
