@@ -50,6 +50,7 @@ export interface IPlayerRoom {
 
 export interface IRoomState {
   roomId: string;
+  code: string | null;
   status: gameStatus;
   host: string;
   players: IPlayerRoom[];
@@ -135,6 +136,7 @@ export const initialPlayersRoomState: IPlayerRoom[] = [
 
 export const initialRoomState: IRoomState = {
   roomId: '',
+  code: '',
   status: 'lobby',
   host: '',
   players: initialPlayersRoomState

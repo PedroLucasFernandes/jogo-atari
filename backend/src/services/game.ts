@@ -4,14 +4,12 @@ import * as leaderboardServices from "../services/leaderboardServices";
 
 export default function createGame() {
 
-
-
   const gameState: IGameState = {
-    players: initialPlayersState,
-    planets: initialPlanetsState,
-    ball: initialBallState,
-    canvas: initialCanvasState,
-    room: initialRoomState
+    players: JSON.parse(JSON.stringify(initialPlayersState)),
+    planets: JSON.parse(JSON.stringify(initialPlanetsState)),
+    ball: JSON.parse(JSON.stringify(initialBallState)),
+    canvas: JSON.parse(JSON.stringify(initialCanvasState)),
+    room: JSON.parse(JSON.stringify(initialRoomState)),
   }
 
   // REFACTOR, ARRUMAR COM OS VALORES DAS NOVAS POSIÇÕES DOS PLAYERS!!

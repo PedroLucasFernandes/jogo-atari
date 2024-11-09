@@ -20,6 +20,7 @@ class WebSocketService {
 		}
 	} = {};
 	private gamesByRoom: { [key: string]: IGame } = {}; // roomId -> game instance
+	private roomObservers: Set<string> = new Set(); // Armazena os clientIds dos observadores
 
 	constructor(private wss: WebSocketServer) {
 		this.initialize();
@@ -91,6 +92,9 @@ class WebSocketService {
 
 	private handleMessage(clientId: string, message: any) {
 		switch (message.type) {
+			case 'movePlayer':
+				this.handlePlayerMove(clientId, message.data.roomId, message.data.keyPressed);
+				break;
 			case 'getRooms':
 				this.getRooms(clientId);
 				break;
@@ -103,9 +107,6 @@ class WebSocketService {
 			case 'startGame':
 				this.startGame(clientId, message.data.roomId);
 				break;
-			case 'movePlayer':
-				this.handlePlayerMove(clientId, message.data.roomId, message.data.keyPressed);
-				break;
 			case 'closeRoom':
 				this.closeRoom(clientId, message.data.roomId);
 				break;
@@ -117,6 +118,10 @@ class WebSocketService {
 				break;
 			case 'removePlayer':
 				this.removePlayer(clientId, message.data.roomId, message.data.playerId);
+				break;
+			case 'leaveGame':
+				this.leaveGame(clientId, message.data.roomId);
+				break;
 			default:
 				console.error(`Invalid message type received: ${message.type}`);
 		}
@@ -125,6 +130,7 @@ class WebSocketService {
 	private getRoomStates() {
 		const roomStates: IRoomState[] = Object.entries(this.rooms).map(([roomId, room]) => ({
 			roomId, // A chave é o id da sala
+			code: null,
 			status: room.status,
 			host: room.host,
 			players: room.players.map(player => ({
@@ -143,6 +149,29 @@ class WebSocketService {
 			type: 'roomsReceived',
 			data: { rooms: this.getRoomStates() }
 		});
+		this.subscribeToRoomUpdates(clientId);
+	}
+
+	// Adiciona um cliente ao observer
+	public subscribeToRoomUpdates(clientId: string) {
+		this.roomObservers.add(clientId);
+		//this.getRooms(clientId); // Envia o estado inicial das salas para o cliente
+	}
+
+	// Remove um cliente do observer
+	public unsubscribeFromRoomUpdates(clientId: string) {
+		this.roomObservers.delete(clientId);
+	}
+
+	// Notifica todos os observadores sobre a atualização das salas
+	private notifyRoomObservers() {
+		const roomStates = this.getRoomStates();
+		this.roomObservers.forEach(observerId => {
+			this.notifyClient(observerId, {
+				type: 'roomsReceived', //Adicionar outra mensagem diferente se for preciso
+				data: { rooms: roomStates }
+			});
+		});
 	}
 
 	private createRoom(clientId: string, username: string, code: string) {
@@ -155,26 +184,32 @@ class WebSocketService {
 			};
 
 		} else {
+			console.log(`Erro: a sala ${roomId} já existe. Tente novamente.`);
+			//return this.createRoom(clientId, code);
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Falha ao criar sala, tente novamente' }
+			});
 			return
 		}
 
 		const data = {
 			roomState: {
 				roomId: roomId,
+				code: code,
 				status: 'waiting',
 				host: clientId,
 				players: [{ playerId: clientId, username: username, ready: false, isHost: true }],
-			}
+			},
+			message: `Sala #${roomId} criada`
 		}
 
 		this.notifyClient(clientId, {
 			type: 'roomCreated',
 			data: data
 		});
-		/* this.notifyClient(clientId, {
-			type: 'roomCreated',
-			data: { roomId, gameState: { players: [{ playerId: clientId, username: username, ready: false }] } }
-		}); */
+
+		this.notifyRoomObservers();
 	}
 
 	private closeRoom(clientId: string, roomId: string) {
@@ -184,7 +219,7 @@ class WebSocketService {
 		if (playerIndex === -1) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Player not found' }
+				data: { message: 'Falha ao encerrar sala. Unidentified Host' }
 			});
 			return;
 		}
@@ -192,17 +227,22 @@ class WebSocketService {
 		if (!room) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Room not found' }
+				data: { message: 'Falha ao encerrar sala. Unidentified Room' }
 			});
 			return;
 		}
 
 		if (room.host === clientId) {
-			this.notifyClient(clientId, {
-				type: 'roomClosed',
-				data: { roomId }
+			room.players.forEach(player => {
+				this.notifyClient(player.playerId, {
+					type: 'roomClosed',
+					data: { roomId, message: `Sala #${roomId} encerrada pelo host` }
+				});
 			});
 			delete this.rooms[roomId];
+			console.log(`Sala ${roomId} fechada.`);
+
+			this.notifyRoomObservers();
 			return;
 		}
 	}
@@ -214,7 +254,7 @@ class WebSocketService {
 		if (!room) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Room not found' }
+				data: { message: 'Falha ao entrar na sala. Unidentified Room' }
 			});
 			return;
 		}
@@ -222,7 +262,7 @@ class WebSocketService {
 		if (room.code !== code) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Invalid code' }
+				data: { message: 'Código inválido' }
 			});
 			return;
 		}
@@ -230,7 +270,23 @@ class WebSocketService {
 		if (room.players.length >= 4) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Room is full' }
+				data: { message: 'Esta sala já está cheia' }
+			});
+			return;
+		}
+
+		if (room.status === 'inprogress') {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Esta partida já está em andamento' }
+			});
+			return;
+		}
+
+		if (room.status === 'finished') {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Esta partida já terminou' }
 			});
 			return;
 		}
@@ -240,10 +296,12 @@ class WebSocketService {
 		const data = {
 			roomState: {
 				roomId: roomId,
+				code: room.code,
 				status: room.status,
 				host: room.host,
 				players: this.rooms[roomId].players
-			}
+			},
+			message: `${username} entrou na sala`
 		}
 
 		room.players.forEach(player => {
@@ -252,55 +310,78 @@ class WebSocketService {
 				data: data
 			});
 		});
+
+		this.unsubscribeFromRoomUpdates(clientId);
+		this.notifyRoomObservers();
 	}
 
 	private leaveRoom(clientId: string, roomId: string) {
 		const room = this.rooms[roomId];
-		const playerIndex = room.players.findIndex(p => p.playerId === clientId);
-
-		if (playerIndex === -1) {
-			this.notifyClient(clientId, {
-				type: 'error',
-				data: { message: 'Player not found' }
-			});
-			return;
-		}
-
 		if (!room) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Room not found' }
+				data: { message: 'Falha ao sair da sala. Unidentified Room' }
 			});
 			return;
 		}
 
-		if (room.host === clientId) {
+		const playerIndex = room.players.findIndex(p => p.playerId === clientId);
+		if (playerIndex === -1) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Cannot leave the room as the host' }
-				//TODO: Implementar outra alternativa depois, como repassar o host ou excluir a sala
+				data: { message: 'Falha ao sair da sala. Unidentified Player' }
 			});
 			return;
 		}
 
+
+		if (room.host === clientId) {
+			// Se houver outros jogadores na sala, transfere o host para o próximo jogador
+			if (room.players.length > 1) {
+				const newHost = room.players.find(player => player.playerId !== clientId);
+				if (newHost) {
+					room.host = newHost.playerId;
+					newHost.isHost = true;
+				}
+			} else {
+				// Se não houver outros jogadores, a sala é removida
+				delete this.rooms[roomId];
+
+				this.notifyClient(clientId, {
+					type: 'youLeft',
+					data: { message: 'Você saiu da sala' }
+				});
+				return;
+			}
+		}
+
+		const client = room.players[playerIndex];
 		room.players.splice(playerIndex, 1);
+
+		this.notifyClient(clientId, {
+			type: 'youLeft',
+			data: { message: 'Você saiu da sala' }
+		});
 
 		const data = {
 			roomState: {
 				roomId: roomId,
+				code: room.code,
 				status: room.status,
 				host: room.host,
 				players: this.rooms[roomId].players
-			}
+			},
+			message: `${client.username} saiu da sala`
 		}
 
-		// Notify all players in the room about the new player
 		room.players.forEach(player => {
 			this.notifyClient(player.playerId, {
 				type: 'playerLeft',
 				data: data
 			});
 		});
+
+		this.notifyRoomObservers();
 	}
 
 	private toggleReadyStatus(clientId: string, roomId: string, playerId: string) {
@@ -310,7 +391,7 @@ class WebSocketService {
 		if (!room) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Room not found' }
+				data: { message: 'Falha ao se preparar. Unidentified Room' }
 			});
 			return;
 		}
@@ -318,7 +399,7 @@ class WebSocketService {
 		if (!player) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Player not found' }
+				data: { message: 'Falha ao se preparar. Unidentified Player' }
 			});
 			return;
 		}
@@ -328,6 +409,7 @@ class WebSocketService {
 		const data = {
 			roomState: {
 				roomId: roomId,
+				code: room.code,
 				status: room.status,
 				host: room.host,
 				players: this.rooms[roomId].players
@@ -350,7 +432,7 @@ class WebSocketService {
 		if (room.host !== clientId) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'You are not the host of the room' }
+				data: { message: 'Você não é o host desta sala' }
 			});
 			return;
 		}
@@ -358,7 +440,7 @@ class WebSocketService {
 		if (!room) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Room not found' }
+				data: { message: 'Falha ao remover jogador. Unidentified Room' }
 			});
 			return;
 		}
@@ -366,20 +448,27 @@ class WebSocketService {
 		if (!player) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Player not found' }
+				data: { message: 'Falha ao remover jogador. Unidentified Player' }
 			});
 			return;
 		}
 
 		room.players = room.players.filter(p => p.playerId !== playerId);
 
+		this.notifyClient(playerId, {
+			type: 'youAreRemoved',
+			data: { message: 'Você foi removido da sala' }
+		});
+
 		const data = {
 			roomState: {
 				roomId: roomId,
+				code: room.code,
 				status: room.status,
 				host: room.host,
 				players: this.rooms[roomId].players
-			}
+			},
+			message: `${player.username} foi removido da sala`
 		}
 
 		// Notify all players in the room about the new player
@@ -389,6 +478,8 @@ class WebSocketService {
 				data: data
 			});
 		});
+
+		this.notifyRoomObservers();
 	}
 
 	private startGame(clientId: string, roomId: string) {
@@ -397,7 +488,7 @@ class WebSocketService {
 		if (!room) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Room not found' }
+				data: { message: 'Falha ao inciar partida. Unidentified Room' }
 			});
 			return;
 		}
@@ -405,7 +496,7 @@ class WebSocketService {
 		if (room.host !== clientId) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'You are not the host of the room' }
+				data: { message: 'Você não é host desta sala' }
 			});
 			return;
 		}
@@ -434,6 +525,7 @@ class WebSocketService {
 		const data = {
 			roomState: {
 				roomId: roomId,
+				code: room.code,
 				status: room.status,
 				host: room.host,
 				players: this.rooms[roomId].players
@@ -448,6 +540,8 @@ class WebSocketService {
 				data: data
 			});
 		});
+
+		this.notifyRoomObservers();
 	}
 
 	private handlePlayerMove(clientId: string, roomId: string, keyPressed: string) {
@@ -458,7 +552,7 @@ class WebSocketService {
 		if (!room) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Room not found' }
+				data: { message: 'Falha no jogo. Unidentified Room' }
 			});
 			return;
 		}
@@ -466,7 +560,7 @@ class WebSocketService {
 		if (!gameRoom) {
 			this.notifyClient(clientId, {
 				type: 'error',
-				data: { message: 'Game not found' }
+				data: { message: 'Falha no jogo. Match not found' }
 			});
 			return;
 		}
@@ -496,6 +590,72 @@ class WebSocketService {
 		} */
 	}
 
+	private leaveGame(clientId: string, roomId: string) {
+		console.log("leaving game", roomId);
+		const room = this.rooms[roomId];
+
+		if (!room) {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Falha ao deixar sala do jogo. Unidentified Room' }
+			});
+			return;
+		}
+
+		const game = this.gamesByRoom[roomId];
+		if (!game) {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Falha ao sair da partida. Match not found' }
+			});
+			return;
+		}
+
+		// Remover jogador da sala
+		const playerIndex = room.players.findIndex(player => player.playerId === clientId);
+		if (playerIndex !== -1) {
+			const removedPlayer = room.players.splice(playerIndex, 1)[0];
+
+			// Remover jogador do estado do jogo
+			const updatedPlayers = { ...game.gameState.players };
+			delete updatedPlayers[clientId]; // Remove o jogador pelo clientId
+
+			game.setState({
+				players: updatedPlayers // Atualiza o estado do jogo com o jogador removido
+			});
+
+			this.notifyClient(clientId, {
+				type: 'youLeftGame',
+				data: {
+					roomId, message: `Você abandonou a partida`
+				}
+			});
+
+			// Notificar os demais jogadores sobre a saída
+			room.players.forEach(player => {
+				this.notifyClient(player.playerId, {
+					type: 'playerLeftGame',
+					data: {
+						roomState: {
+							roomId: roomId,
+							code: room.code,
+							status: room.status,
+							host: room.host,
+							players: room.players
+						},
+						gameState: game.gameState,
+						message: `${removedPlayer.username} abandonou a partida`
+					}
+				});
+			});
+		} else {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Falha ao sair do jogo. Unidentified Player' }
+			});
+		}
+	}
+
 	private handleDisconnect(clientId: string) {
 		// Itera sobre cada sala e remove o usuário desconectado
 		Object.entries(this.rooms).forEach(([roomId, roomData]) => {
@@ -503,25 +663,41 @@ class WebSocketService {
 
 			// Verifica se o usuário está na sala
 			if (players.some(player => player.playerId === clientId)) {
+				const client = players.find(player => player.playerId === clientId);
 				// Remove o usuário da lista
 				this.rooms[roomId].players = players.filter(player => player.playerId !== clientId);
 
 				// Se a sala ficou vazia após a remoção, apaga a sala e para o jogo
 				if (this.rooms[roomId].players.length === 0) {
 					delete this.rooms[roomId];
+
 					if (this.gamesByRoom[roomId]) {
 						this.gamesByRoom[roomId].stop();
 						delete this.gamesByRoom[roomId];
 					}
+
 				} else {
 					// Notifica os demais usuários sobre a desconexão
 					this.rooms[roomId].players.forEach(player => {
+
 						this.notifyClient(player.playerId, {
 							type: 'playerLeft',
-							data: { roomId, players: this.rooms[roomId].players }
+							data: {
+								roomState: {
+									roomId: roomId,
+									code: this.rooms[roomId].code,
+									status: this.rooms[roomId].status,
+									host: this.rooms[roomId].host,
+									players: this.rooms[roomId].players
+								},
+								message: `${client?.username} saiu da sala`
+							}
 						});
+
 					});
 				}
+
+				this.notifyRoomObservers();
 			}
 		});
 
