@@ -78,7 +78,7 @@ export default function createGame(roomState: IRoomState) {
     const moveLogic = {
       // Player Superior Esquerdo (índice 0)
       0: {
-        arrowright: (player: IPlayer) => {
+        right: (player: IPlayer) => {
           if (player.x < player.initialX) {
             // Movimento horizontal para direita até posição inicial
             player.x = Math.min(player.x + speed, player.initialX);
@@ -87,7 +87,7 @@ export default function createGame(roomState: IRoomState) {
             player.y = Math.max(player.y - speed, 0);
           }
         },
-        arrowleft: (player: IPlayer) => {
+        left: (player: IPlayer) => {
           if (player.y === player.initialY) {
             // Movimento horizontal para esquerda
             player.x = Math.max(player.x - speed, 0);
@@ -99,7 +99,7 @@ export default function createGame(roomState: IRoomState) {
       },
       // Player Superior Direito (índice 1)
       1: {
-        arrowright: (player: IPlayer) => {
+        right: (player: IPlayer) => {
           if (player.y === player.initialY) {
             // Movimento horizontal para direita, considerando o tamanho do player
             player.x = Math.min(player.x + speed, gameState.canvas.width - player.size);
@@ -108,7 +108,7 @@ export default function createGame(roomState: IRoomState) {
             player.y = Math.min(player.y + speed, player.initialY);
           }
         },
-        arrowleft: (player: IPlayer) => {
+        left: (player: IPlayer) => {
           if (player.x > player.initialX) {
             // Movimento horizontal para esquerda até posição inicial
             player.x = Math.max(player.x - speed, player.initialX);
@@ -120,7 +120,7 @@ export default function createGame(roomState: IRoomState) {
       },
       // Player Inferior Esquerdo (índice 2)
       2: {
-        arrowright: (player: IPlayer) => {
+        right: (player: IPlayer) => {
           if (player.x < player.initialX) {
             // Movimento horizontal para direita até posição inicial
             player.x = Math.min(player.x + speed, player.initialX);
@@ -129,7 +129,7 @@ export default function createGame(roomState: IRoomState) {
             player.y = Math.min(player.y + speed, gameState.canvas.height - player.size);
           }
         },
-        arrowleft: (player: IPlayer) => {
+        left: (player: IPlayer) => {
           if (player.y === player.initialY) {
             // Movimento horizontal para esquerda
             player.x = Math.max(player.x - speed, 0);
@@ -141,7 +141,7 @@ export default function createGame(roomState: IRoomState) {
       },
       // Player Inferior Direito (índice 3)
       3: {
-        arrowright: (player: IPlayer) => {
+        right: (player: IPlayer) => {
           if (player.y === player.initialY) {
             // Movimento horizontal para direita, considerando o tamanho do player
             player.x = Math.min(player.x + speed, gameState.canvas.width - player.size);
@@ -150,7 +150,7 @@ export default function createGame(roomState: IRoomState) {
             player.y = Math.max(player.y - speed, player.initialY);
           }
         },
-        arrowleft: (player: IPlayer) => {
+        left: (player: IPlayer) => {
           if (player.x > player.initialX) {
             // Movimento horizontal para esquerda até posição inicial
             player.x = Math.max(player.x - speed, player.initialX);
@@ -162,10 +162,20 @@ export default function createGame(roomState: IRoomState) {
       }
     };
 
+    // Mapeamento de diferente teclas para um padrão fixo
+    const keyMap: { [key: string]: string } = {
+      arrowleft: 'left',
+      arrowright: 'right',
+      a: 'left',
+      d: 'right'
+    };
+
     // Executa o movimento baseado no índice do jogador e tecla pressionada
     const playerMoveLogic = moveLogic[playerIndex as keyof typeof moveLogic];
-    if (playerMoveLogic && keyPressed.toLowerCase() in playerMoveLogic) {
-      playerMoveLogic[keyPressed.toLowerCase() as keyof typeof playerMoveLogic](player);
+    const direction = keyMap[keyPressed.toLowerCase()];
+
+    if (playerMoveLogic && direction in playerMoveLogic) {
+      playerMoveLogic[direction as keyof typeof playerMoveLogic](player);
     }
 
     const data = {
