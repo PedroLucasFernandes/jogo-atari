@@ -72,9 +72,11 @@ export default function renderScreen(
 
   // O resto do seu código para desenhar planetas e players permanece o mesmo
   const planets = gameState.planets;
+  const players = gameState.players;
   planets.forEach((planet, index) => {
     if (planet.active && planetImages.length > index) {
-      const image = planetImages[index];
+      //const image = planetImages[index];
+      const image = planetImages[players[planet.ownerId].defendingPlanetId];
       const partWidth = planet.width / 2;
       const partHeight = planet.height / 3;
   
@@ -100,7 +102,8 @@ export default function renderScreen(
   });
 
   Object.entries(gameState.players).forEach(([playerId, player], index) => {
-    const playerImage = playersImages[index % playersImages.length];
+    //const playerImage = playersImages[index % playersImages.length];
+    const playerImage = playersImages[player.defendingPlanetId];
     const centerX = player.x;
     const centerY = player.y;
 

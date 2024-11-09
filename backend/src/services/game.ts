@@ -1,4 +1,4 @@
-import { IGameMessage, IGameState, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialPlanetsState, IPlayer, IPlayerRoom, PlayersRecord } from "../interfaces/game"
+import { IGameMessage, IGameState, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialPlanetsState, IPlayer, IPlayerRoom, PlayersRecord, planetsByPlayersPosition } from "../interfaces/game"
 import * as leaderboardServices from "../services/leaderboardServices";
 
 
@@ -52,8 +52,10 @@ export default function createGame() {
     const player = gameState.players[playerId];
     if (!player || !keyPressed) return;
 
-    const playerIndex = Object.keys(gameState.players).indexOf(playerId);
-    if (playerIndex === -1) return;
+    //const playerIndex = Object.keys(gameState.players).indexOf(playerId);
+    //if (playerIndex === -1) return;
+    const playerIndex = player.defendingPlanetId;
+    //Eu ia adicionar uma propriedade de posição no player mas o defendingPlanetId já serve para isso
 
     const speed = 10;
 
@@ -758,68 +760,51 @@ export default function createGame() {
 
 
   function addPlayers(players: IPlayerRoom[]) {
-    const positions = [
-      { x: 170, y: 150 },
-      { x: 550, y: 150 },
-      { x: 150, y: 370 },
-      { x: 550, y: 370 },
-    ];
-
-    // Limpa todos os jogadores atuais de gameState.players
+    // Limpa os jogadores e planetas no gameState
     gameState.players = {};
+    gameState.planets = [];
 
-    // Embaralha as posições para alocar jogadores aleatoriamente
-    const shuffledPlayers = [...players];
-    shuffledPlayers.sort(() => Math.random() - 0.5);
+    console.log("x", initialPlayersState);
+    console.log("x", initialPlanetsState);
 
-    // Preenche as posições com os jogadores reais (primeiras posições da lista)
-    shuffledPlayers.forEach((player, index) => {
-      const { x, y } = positions[index]; // Usa as posições fixas
+    // Embaralha `planetsByPlayersPosition` para distribuir posições aleatórias
+    const shuffledPositions = [...planetsByPlayersPosition].sort(() => Math.random() - 0.5);
 
-      gameState.players[player.playerId] = {
-        username: player.username,
-        x,
-        y,
-        initialX: x,
-        initialY: y,
-        size: 80,
-        isBot: false,
-        imageSrc: "",
-        defendingPlanetId: index,
-      };
-      const planet = initialPlanetsState[index];
-      planet.ownerId = player.playerId;
+    // Associa jogadores aleatoriamente às posições e planetas correspondentes
+    players.forEach((player, index) => {
+      const position = shuffledPositions[index]; // Posição aleatória para o jogador
 
+      console.log("position: " + JSON.stringify(position) + "\n");
+
+      if (position) {  // Garante que a posição existe
+        // Define as informações do jogador no estado do jogo
+        gameState.players[player.playerId] = {
+          username: player.username,
+          x: position.player.x,
+          y: position.player.y,
+          initialX: position.player.x,
+          initialY: position.player.y,
+          size: 80,
+          isBot: false,
+          imageSrc: '',
+          defendingPlanetId: position.defendingPlanetId!, // Usa a non-null assertion
+        };
+
+        // Adiciona o planeta correspondente ao jogador no estado do jogo
+        gameState.planets.push({
+          x: initialPlanetsState[position.defendingPlanetId!].x,
+          y: initialPlanetsState[position.defendingPlanetId!].y,
+          width: initialPlanetsState[position.defendingPlanetId!].width,
+          height: initialPlanetsState[position.defendingPlanetId!].height,
+          active: initialPlanetsState[position.defendingPlanetId!].active,
+          parts: [...initialPlanetsState[position.defendingPlanetId!].parts], // cópia do array `parts`
+          imageSrc: initialPlanetsState[position.defendingPlanetId!].imageSrc,
+          ownerId: player.playerId,
+        });
+      }
     });
 
-
-
-    // Quantidade total de jogadores (real + bots)
-    const totalPlayers = 4;
-
-    // Adiciona bots nas posições restantes
-    const botEntries = Object.entries(initialPlayersState);
-    const remainingBots = totalPlayers - players.length;
-
-    for (let i = 0; i < remainingBots; i++) {
-      const botId = botEntries[i][0];
-      const botData = botEntries[i][1];
-      const positionIndex = players.length + i;
-
-      const { x, y } = positions[positionIndex]; // Usa as posições fixas para bots também
-
-      gameState.players[botId] = {
-        ...botData,
-        x,
-        y,
-        initialX: x,
-        initialY: y,
-        defendingPlanetId: positionIndex,
-      };
-      // Associa o bot ao planeta
-      const planet = initialPlanetsState[positionIndex];
-      planet.ownerId = botId;
-    }
+    console.log(JSON.stringify(gameState));
   }
 
 

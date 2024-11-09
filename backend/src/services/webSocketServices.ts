@@ -547,6 +547,7 @@ class WebSocketService {
 	}
 
 	private handlePlayerMove(clientId: string, roomId: string, keyPressed: string) {
+		console.log(this.gamesByRoom[roomId].gameState);
 
 		const room = this.rooms[roomId];
 		const gameRoom = this.gamesByRoom[roomId]
