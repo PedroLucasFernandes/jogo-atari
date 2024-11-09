@@ -52,7 +52,6 @@ export async function loginApi({ email, password }: { email: string, password: s
 
   try {
     const response: ApiResponse = await request(requestParams);
-    console.log('Resposta da API:', response); 
 
     if (response.error) {
       const errorMessage = Array.isArray(response.error)

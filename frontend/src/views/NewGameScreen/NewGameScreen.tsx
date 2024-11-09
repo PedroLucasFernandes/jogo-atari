@@ -1,16 +1,26 @@
 import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { useWebSocket } from '../../context/WebSocketContext';
 import renderScreen from './renderScreen';
+import { IWinner } from '../../interfaces/game';
 
 interface ScreenProps {
 	setScreen: Dispatch<SetStateAction<string>>;
 	roomCode?: string;
+	setWinner: (winner: IWinner) => void;
 }
 
-const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, roomCode }) => {
+const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }) => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const { socketId, roomState, gameState, movePlayer } = useWebSocket();
 	const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
+
+
+	useEffect(() => {
+		if (gameState?.winner) {
+			setWinner(gameState.winner);
+			setScreen('game-over');
+		}
+	}, [gameState?.winner]);
 
 	useEffect(() => {
 		const bgImage = '/assets/bg-space.svg';
@@ -38,7 +48,15 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, roomCode }) => {
 		return () => {
 			cancelAnimationFrame(animationFrameId);
 		};
-	}, [roomState, gameState, socketId, backgroundImage]);
+	}, [roomState, gameState, socketId, backgroundImage, gameState?.winner]);
+
+	// Exibe tela de vencedor se houver um ganhador
+	// useEffect(() => {
+	// 	if (gameState?.winner) {
+	// 		setScreen('game-over');
+	// 	return;
+	// 	}
+	// }, [gameState?.winner]);
 
 	// Handle keyboard input
 	useEffect(() => {

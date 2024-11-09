@@ -8,7 +8,6 @@ class WebSocketService {
       this.socket = new WebSocket(`ws://localhost:3001`);
 
       this.socket.onopen = () => {
-        console.log('Conectado ao WebSocket');
       };
 
       this.socket.onmessage = (event) => {

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { webSocketService } from '../services/WebSocketService';
-import { IGameMessage, IGameState, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialPlanetsState, IRoomState } from '../interfaces/game';
+import { IGameMessage, IGameState, IWinner, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialPlanetsState, IRoomState } from '../interfaces/game';
 import { useUser } from './UserContext';
 
 interface WebSocketContextType {
@@ -36,9 +36,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const { user } = useUser();
 
-
-
-
   useEffect(() => {
     const connectWebSocket = () => {
       webSocketService.connect();
@@ -46,60 +43,47 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     connectWebSocket();
 
     webSocketService.registerCallback('uuid', (data) => {
-      console.log(`UUID recebido: ${data.socketId}`);
       setSocketId(data.socketId);
       setStatus('online');
     });
 
     webSocketService.registerCallback('roomsReceived', (data) => {
-      console.log(`Retorno - lista de salas recebidas: ${data}`);
 
       const rooms = data.data.rooms;
 
       if (!rooms) {
-        console.log("Erro ao receber salas");
         return;
       }
 
       setRooms(rooms)
-      console.log("Retorno - salas recebidas: rooms setado");
     });
 
     webSocketService.registerCallback('roomCreated', (data) => {
-      console.log(`Retorno - sala criada: ${data}`);
-
       const roomState = data.data.roomState;
 
       if (!roomState) {
-        console.log("Erro ao indentificar estado da sala");
         return;
       }
 
       if (roomState.players.length === 0) {
-        console.log("Erro ao indentificar jogador na sala");
         return;
       }
 
       setRoomState(data.data.roomState)
-      console.log("Retorno - sala criada: roomState setado");
     });
 
     webSocketService.registerCallback('roomClosed', (data) => {
-      console.log(`Retorno - roomClosed: ${data}`);
       const roomId = data.data.roomId;
 
       if (!roomId) {
-        console.log("Erro ao identificar salas");
         return;
       }
 
       if (!roomState) {
-        console.log("Erro, estado da sala não existe");
         return;
       }
 
       if (roomState.roomId !== roomId) {
-        console.log("Erro, o id da sala removida não se refere a sala no estado");
         return;
       }
 
@@ -108,31 +92,25 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     });
 
     webSocketService.registerCallback('playerJoined', (data) => {
-      console.log(`Retorno - entrou na sala: ${data}`);
 
       const roomState = data.data.roomState;
 
       if (!roomState) {
-        console.log("Erro ao indentificar estado da sala");
         return;
       }
 
       if (roomState.players.length === 0) {
-        console.log("Erro ao indentificar jogadores na sala");
         return;
       }
 
       setLastMessage(data.data);
       setRoomState(roomState)
-      console.log("Retorno - entrou na sala: roomState setado");
     });
 
     webSocketService.registerCallback('playerLeft', (data) => {
-      console.log(`Retorno - playerLeft: ${data}`);
       const roomState = data.data.roomState;
 
       if (!roomState) {
-        console.log("Erro ao indentificar estado da sala");
         return;
       }
 
@@ -141,12 +119,9 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     });
 
     webSocketService.registerCallback('playerStatusChanged', (data) => {
-      console.log(`Retorno - playerStatusChanged: ${data}`);
-
       const roomState = data.data.roomState;
 
       if (!roomState) {
-        console.log("Erro ao indentificar estado da sala");
         return;
       }
 
@@ -155,11 +130,9 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     });
 
     webSocketService.registerCallback('playerRemoved', (data) => {
-      console.log(`Retorno - playerRemoved: ${data}`);
       const roomState = data.data.roomState;
 
       if (!roomState) {
-        console.log("Erro ao indentificar estado da sala");
         return;
       }
 
@@ -168,18 +141,14 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     })
 
     webSocketService.registerCallback('gameStarted', (data) => {
-      console.log(`Jogo iniciado: ${data}`);
-
       const roomState = data.data.roomState;
       const gameState = data.data.gameState;
 
       if (!roomState) {
-        console.log("Erro ao indentificar estado da sala");
         return;
       }
 
       if (!gameState) {
-        console.log("Erro ao identificar estado do jogo");
         return;
       }
 
@@ -189,7 +158,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     });
 
     webSocketService.registerCallback('playerMoved', (data) => {
-      console.log(`Jogador se moveu: ${JSON.stringify(data)}`);
       setGameState(data.data.gameState)
     });
 
@@ -242,16 +210,33 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           };
         });
       } else {
-        console.error('Erro ao atualizar o estado das paredes:', data);
+        console.error('Erro ao atualizar o estado dos planetas:', data);
+      }
+    });
+
+    webSocketService.registerCallback('gameOver', (data) => {
+      if (data.data && data.data.winner) {
+        setGameState(prevGameState => {
+             // Atualiza o estado do jogo
+          return {
+            ...prevGameState as IGameState,
+            winner: {
+              username: data.data.winner.username,
+              id: data.data.winner.id
+            } as IWinner,
+          };
+        });
+        setRoomState(null);  // Limpar o estado da sala após a vitória
+        setLastMessage(data.data);
+      } else {
+        console.error('Erro ao atualizar o estado dos planetas:', data);
       }
     });
   }, []);
-
-
+  
   const getRooms = () => {
     if (!socketId) {
       //Todo: Alerta
-      console.log('Can\'t request rooms without a socketId');
       return;
     }
 
@@ -261,7 +246,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const createRoom = (code: string) => {
     if (!socketId || !user) {
       //Todo: Alerta
-      console.log('Can\'t create room without a socketId or user context');
       return;
     }
 
@@ -272,7 +256,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const closeRoom = (roomId: string) => {
     if (!socketId) {
       //Todo: Alerta
-      console.log('Can\'t close a room without a socketId');
       return;
     }
 
@@ -283,13 +266,11 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const joinRoom = (roomId: string, code: string) => {
     if (!socketId || !user) {
       //Todo: Alerta
-      console.log('Can\'t join in a room without a socketId or user context');
       return;
     }
 
     if (!roomId || !code) {
       //Todo: Alerta
-      console.log('Id da sala ou código não informados ou nulos');
       return;
     }
 
@@ -300,7 +281,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const leaveRoom = (roomId: string) => {
     if (!socketId) {
       //Todo: Alerta
-      console.log('Can\'t leave room without a socketId');
       return;
     }
 
@@ -311,7 +291,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const toggleReadyStatus = (roomId: string) => {
     if (!socketId) {
       //Todo: Alerta
-      console.log('Can\'t toggle ready status without a socketId');
       return;
     }
 
@@ -321,8 +300,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const removePlayer = (roomId: string, playerId: string) => {
     if (!socketId) {
-      //Todo: Alerta
-      console.log('Can\'t remove player without a socketId');
       return;
     }
 
@@ -333,7 +310,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const startGame = (roomId: string) => { // Primeiro teste websocket
     if (!socketId) {
       //Todo: Alerta
-      console.log('Can\'t start game without a socketId');
       return;
     }
 
@@ -344,7 +320,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const movePlayer = (roomId: string, keyPressed: string) => {
     if (!socketId) {
       //Todo: Alerta
-      console.log('Can\'t move player without a socketId');
       return;
     }
 

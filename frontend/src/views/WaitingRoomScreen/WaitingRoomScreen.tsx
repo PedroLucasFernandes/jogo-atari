@@ -16,7 +16,6 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
     // Configura o timeout para 5 segundos
     const timeoutId = setTimeout(() => {
       if (!roomState) {
-        console.log("Não foi possível carregar a sala ou o usuário não pertence a ela");
         setScreen('create-room'); // Redireciona ou notifica
       }
       setLoading(false); // Desativa o loading após a verificação
@@ -39,7 +38,6 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
     if (!roomState) return;
     if (roomState.status === 'inprogress') {
       setScreen('game');
-      console.log("RoomState status inprogress")
 
       setLoading(false);
       setIsHost(false); //Remover se apresentar algum problema.

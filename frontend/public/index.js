@@ -50,7 +50,6 @@ function handleKeydown(event) {
     if (state.players.player1.horizontal) {
       if (state.players.player1.x === 0) return
       state.players.player1.x -= 10;
-      console.log(state.players.player1.x, state.players.player1.y);
       return;
     }
   
@@ -66,7 +65,6 @@ function handleKeydown(event) {
     if (!state.players.player1.horizontal) {
       if (state.players.player1.y === 0) return
       state.players.player1.y -= 10;
-      console.log(state.players.player1.x, state.players.player1.y);
       return;
     }
 
@@ -78,7 +76,6 @@ function handleKeydown(event) {
     }
 
   }
-  console.log(state.players.player1.x, state.players.player1.y);
 }
 
 

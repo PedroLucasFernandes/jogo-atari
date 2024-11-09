@@ -23,7 +23,6 @@ const LoginGoogleButton: React.FC = () => {
                 const data = await res.json();
 
                 if (data) {
-                    console.log("Logado com sucesso:", data);
                     setUser(data as User);
                     navigate('/monolito');
               

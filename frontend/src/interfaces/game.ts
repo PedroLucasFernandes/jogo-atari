@@ -9,6 +9,7 @@ export interface IPlanet {
   active: boolean;
   parts: boolean[];
   imageSrc: string; // Caminho da imagem do planeta
+  ownerId: string;
 }
 
 export interface IPlayer {
@@ -20,6 +21,8 @@ export interface IPlayer {
   initialY: number;
   size: number;
   isBot: boolean;
+  imageSrc: string;
+  defendingPlanetId: number;
 }
 
 export type PlayersRecord = Record<string, IPlayer>;
@@ -52,12 +55,18 @@ export interface IRoomState {
   players: IPlayerRoom[];
 }
 
+export interface IWinner {
+  username: string;
+  id: string;
+}
+
 export interface IGameState {
   players: PlayersRecord;
   planets: IPlanet[];
   ball: IBall;
   canvas: ICanvas;
   room: IRoomState;
+  winner?: IWinner
 }
 
 export interface IGameMessage {
@@ -73,6 +82,7 @@ export interface IGameMessage {
     message?: string;
     roomState?: IRoomState;
     rooms?: IRoomState[];
+    winner?: IWinner;
   }
 }
 
@@ -82,18 +92,18 @@ export interface IGame {
 }
 
 export const initialPlanetsState: IPlanet[] = [
-  { x: 0, y: 0, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '' },
-  { x: 650, y: 0, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '' },
-  { x: 0, y: 450, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '' },
-  { x: 650, y: 450, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '' }
+  { x: 0, y: 0, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '', ownerId: '' },
+  { x: 650, y: 0, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '', ownerId: '' },
+  { x: 0, y: 450, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '', ownerId: '' },
+  { x: 650, y: 450, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '', ownerId: '' }
 ];
 
 export const initialPlayersState: PlayersRecord = {
-  'bot0': { username: 'Bot 0', x: 170, y: 150, initialX: 170, initialY: 150, size: 80, isBot: true }, 
-  'bot1': { username: 'Bot 1', x: 550, y: 150, initialX: 550, initialY: 150, size: 80, isBot: true }, 
-  'bot2': { username: 'Bot 2', x: 170, y: 370, initialX: 170, initialY: 370, size: 80, isBot: true }, 
-  'bot3': { username: 'Bot 3', x: 550, y: 370, initialX: 550, initialY: 370, size: 80, isBot: false } 
-};;
+  'bot0': { username: 'Bot 0', x: 170, y: 150, initialX: 170, initialY: 150, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 0 },
+  'bot1': { username: 'Bot 1', x: 550, y: 150, initialX: 550, initialY: 150, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 1 },
+  'bot2': { username: 'Bot 2', x: 170, y: 370, initialX: 170, initialY: 370, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 2 },
+  'bot3': { username: 'Bot 3', x: 550, y: 370, initialX: 550, initialY: 370, size: 80, isBot: false, imageSrc: '', defendingPlanetId: 3 }
+};
 
 export const initialBallState: IBall = {
   x: 400,

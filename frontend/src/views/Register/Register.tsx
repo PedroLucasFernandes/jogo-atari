@@ -36,7 +36,6 @@ export const Register: React.FC = () => {
       }
 
       if (data) {
-        console.log("Registrado com sucesso:", data);
         navigate('/');
       }
     } catch (err) {

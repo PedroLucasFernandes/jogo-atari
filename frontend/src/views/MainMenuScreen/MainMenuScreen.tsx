@@ -20,7 +20,6 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
 
   useEffect(() => {
     webSocketService.registerCallback('something', (data) => {
-      console.log(`Something: ${data}`);
     });
 
   }, [webSocketService]);
@@ -35,7 +34,6 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
     }
 
     if (success) {
-      console.log("Deslogado com sucesso");
       navigate('/');
     }
   }

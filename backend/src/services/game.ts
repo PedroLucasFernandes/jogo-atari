@@ -445,6 +445,8 @@ export default function createGame() {
         clearInterval(intervalId);
         intervalId = null;
       }
+
+      
       try {
         // Atualiza o leaderboard com a vitória
         await leaderboardServices.saveOrUpdateUserLeaderboardData(realUserId, "total_score");
