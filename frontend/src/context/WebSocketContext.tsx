@@ -290,8 +290,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         console.error('Erro ao atualizar o estado dos planetas:', data);
       }
     });
-    // Checar essa linha (é dos planetas)
-  }, [user]);
+
 
     webSocketService.registerCallback('gameOver', (data) => {
       if (data.data && data.data.winner) {
@@ -312,6 +311,9 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setLastMessage({ type: 'error', data: { message: 'Erro ao processar jogo. Unexpected server response' } });
       }
     });
+  }, [user]);
+
+
 
   
   const getRooms = () => {
