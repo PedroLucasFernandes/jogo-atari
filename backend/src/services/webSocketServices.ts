@@ -351,6 +351,8 @@ class WebSocketService {
 					type: 'youLeft',
 					data: { message: 'Você saiu da sala' }
 				});
+
+				this.notifyRoomObservers();
 				return;
 			}
 		}

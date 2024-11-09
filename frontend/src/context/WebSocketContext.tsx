@@ -18,6 +18,7 @@ interface WebSocketContextType {
   movePlayer: (roomId: string, keyPressed: string) => void;
   startGame: (roomId: string) => void;
   leaveGame: (roomId: string) => void;
+  setLastMessage: (message: IGameMessage | null) => void;
   gameState: IGameState | null;
   roomState: IRoomState | null;
   rooms: IRoomState[] | null;
@@ -295,7 +296,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     webSocketService.registerCallback('gameOver', (data) => {
       if (data.data && data.data.winner) {
         setGameState(prevGameState => {
-             // Atualiza o estado do jogo
+          // Atualiza o estado do jogo
           return {
             ...prevGameState as IGameState,
             winner: {
@@ -315,7 +316,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
 
 
-  
+
   const getRooms = () => {
     if (!socketId) {
       setLastMessage({ type: 'error', data: { message: 'Falha ao conectar com o servidor' } });
@@ -441,7 +442,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   return (
     <WebSocketContext.Provider value={{
       socketId, webSocketService, status, gameState, roomState, rooms, lastMessage,
-      getRooms, createRoom, closeRoom, joinRoom, leaveRoom, toggleReadyStatus, removePlayer, movePlayer, startGame, leaveGame
+      getRooms, createRoom, closeRoom, joinRoom, leaveRoom, toggleReadyStatus, removePlayer, movePlayer,
+      startGame, leaveGame, setLastMessage
     }}>
       {children}
     </WebSocketContext.Provider>

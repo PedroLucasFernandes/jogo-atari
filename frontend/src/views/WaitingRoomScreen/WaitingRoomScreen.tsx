@@ -8,12 +8,13 @@ interface ScreenProps {
 }
 
 export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
-  const { startGame, socketId, roomState, toggleReadyStatus, removePlayer, closeRoom, leaveRoom, lastMessage } = useWebSocket();
+  const { startGame, socketId, roomState, toggleReadyStatus, removePlayer, closeRoom, leaveRoom, lastMessage, setLastMessage } = useWebSocket();
   const [loading, setLoading] = useState(true);  // Mantemos o loading como true inicialmente
   const [isHost, setIsHost] = useState(false);
 
   useEffect(() => {
     if (lastMessage && (lastMessage.type === 'youLeft' || lastMessage.type === 'roomClosed' || lastMessage.type === 'youAreRemoved')) {
+      setLastMessage(null);
       setScreen('join-room');
       return;
     }
