@@ -1,5 +1,5 @@
 import { AcceptedMoves, IGameMessage, IGameState, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialPlanetsState, IPlayer, IPlayerRoom, PlayersRecord } from "../interfaces/game"
-
+import * as leaderboardServices from "../services/leaderboardServices";
 
 
 export default function createGame() {
@@ -407,7 +407,13 @@ export default function createGame() {
     }
   }
 
-  function checkForWinner() {
+
+  function extractUserId(socketId: string): string {
+    // Divide a string pelos underscores e pega o segundo elemento (índice 1)
+    return socketId.split('_')[1];
+  }
+
+  async function checkForWinner() {
     const activePlanets = gameState.planets.filter(planet => planet.active);
 
     // Verifica se há apenas um planeta ativo com partes restantes
@@ -418,20 +424,50 @@ export default function createGame() {
     if (remainingPlayers.length === 1) {
       const winningPlanet = remainingPlayers[0];
       const winnerPlayerId = winningPlanet.ownerId;
-
-      // Obtém o nome do jogador com base no ID
+      const realUserId = extractUserId(winningPlanet.ownerId);
       const winnerPlayerName = gameState.players[winnerPlayerId]?.username || 'Unknown Player';
 
+      console.log("userId do vencedor", realUserId)
+
       // Notifica todos os observadores sobre o vencedor
-      notifyAll({ type: 'gameOver', data: { winner: winnerPlayerName } });
+      notifyAll({
+        type: 'gameOver',
+        data: {
+          winner: {
+            username: winnerPlayerName,
+            id: realUserId
+          }
+        }
+      });
 
       // Para o jogo após encontrar um vencedor
       if (intervalId) {
         clearInterval(intervalId);
         intervalId = null;
       }
+      try {
+        // Atualiza o leaderboard com a vitória
+        await leaderboardServices.saveOrUpdateUserLeaderboardData(realUserId, "total_score");
 
-      console.log(`Player ${winnerPlayerName} venceu o jogo!`);
+        // Atualiza o leaderboard para todos os outros jogadores (perdedores)
+        const allPlanets = gameState.planets; // Usa todos os planetas do jogo
+
+        for (const planet of allPlanets) {
+          // Ignora o planeta do vencedor ou planetas sem um ownerId válido
+          if (planet.ownerId === winnerPlayerId || !planet.ownerId) continue;
+
+          // Verifica se o ownerId é válido antes de atualizar o leaderboard
+          const loserUserId = extractUserId(planet.ownerId);
+          if (!loserUserId) continue; // Ignora caso o userId não seja válido
+
+          await leaderboardServices.saveOrUpdateUserLeaderboardData(loserUserId, "total_games_played");
+        }
+
+        console.log(`Player ${winnerPlayerName} venceu o jogo!`);
+
+      } catch (error) {
+        console.error(`Erro ao atualizar leaderboard para o jogador ${winnerPlayerName}:`, error);
+      }
     }
   }
 

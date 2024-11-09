@@ -89,7 +89,6 @@ class WebSocketService {
 		});
 	}
 
-
 	private handleMessage(clientId: string, message: any) {
 		switch (message.type) {
 			case 'getRooms':
