@@ -117,13 +117,21 @@ export default function renderScreen(
     const centerX = player.x;
     const centerY = player.y;
 
-    if (playerId === currentPlayerId) {
-      context.strokeStyle = '#00ff00';
-      context.lineWidth = 2;
-      context.strokeRect(centerX, centerY, player.size, player.size);
-    }
+    // Cotorno verde em volta do player do usuário
+    // if (playerId === currentPlayerId) {
+    //  context.strokeStyle = '#00ff00';
+    //  context.lineWidth = 2;
+    //  context.strokeRect(centerX, centerY, player.size, player.size);
+    //}
 
     context.drawImage(playerImage, centerX, centerY, player.size, player.size);
+
+      // Adiciona o nome do jogador abaixo da imagem
+      context.font = '16px "Pixelify Sans", sans-serif'; // Tamanho da fonte do nome
+      context.fillStyle = 'white'; // Cor do nome
+      context.textAlign = 'center'; // Alinha o texto ao centro
+      context.textBaseline = 'top'; // Alinha o texto acima da linha de base (aqui fica logo abaixo da imagem)
+      context.fillText(player.username, centerX + player.size / 2, centerY + player.size); // Desenha o nome abaixo da imagem
   });
 }
 

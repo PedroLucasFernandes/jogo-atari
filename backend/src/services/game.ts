@@ -18,12 +18,12 @@ export default function createGame(roomState: IRoomState) {
   const INITIAL_SPEED = 5;
   const ACCELERATION_FACTOR = 2.5; // Fator de aceleração ao colidir com um planeta
   const DECAY_RATE = 0.995; // Taxa de redução da velocidade após a aceleração
-  const initialPositions = [
+  /* const initialPositions = [
     { x: 170, y: 150 },
     { x: 550, y: 150 },
     { x: 170, y: 370 },
     { x: 550, y: 370 },
-  ];
+  ]; */
 
   const observers: Array<(message: IGameMessage) => void> = [];
 

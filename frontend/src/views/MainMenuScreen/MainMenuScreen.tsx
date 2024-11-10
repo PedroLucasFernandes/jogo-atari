@@ -59,7 +59,10 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   }
 
   const handleAbandon = () => {
-    if (!roomState) return;
+    if (!roomState) {
+      setOpenModal(false);
+      return;
+    }
     leaveGame(roomState.roomId);
     setOpenModal(false);
   }
