@@ -19,7 +19,7 @@ export default function renderScreen(
 ) {
   const context = canvasScreen.getContext('2d');
   if (!context) throw new Error("Could not get 2D context from canvas.");
-
+  console.log("speed: ", gameState.ball.speedX, gameState.ball.speedY);
   // Clear and draw background
   context.clearRect(0, 0, gameState.canvas.width, gameState.canvas.height);
   context.drawImage(backgroundImage, 0, 0, gameState.canvas.width, gameState.canvas.height);

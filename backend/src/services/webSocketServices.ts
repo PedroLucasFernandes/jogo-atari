@@ -238,6 +238,7 @@ class WebSocketService {
 	}
 
 	private createRoom(clientId: string, username: string, code: string) {
+		console.log("createRoom", clientId, username, code);
 		const roomId = uuidv4().slice(0, 6).toLocaleUpperCase(); // Gera uma chave única com 6 caracteres
 		if (!this.rooms[roomId]) {
 			this.rooms[roomId] = {

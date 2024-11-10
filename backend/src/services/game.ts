@@ -14,7 +14,10 @@ export default function createGame(roomState: IRoomState) {
 
   // REFACTOR, ARRUMAR COM OS VALORES DAS NOVAS POSIÇÕES DOS PLAYERS!!
   const speed = 10;
-  const MAX_SPEED = 10; // Limite de velocidade
+  const MAX_SPEED = 20; // Limite de velocidade
+  const INITIAL_SPEED = 5;
+  const ACCELERATION_FACTOR = 2.5; // Fator de aceleração ao colidir com um planeta
+  const DECAY_RATE = 0.995; // Taxa de redução da velocidade após a aceleração
   const initialPositions = [
     { x: 170, y: 150 },
     { x: 550, y: 150 },
@@ -620,7 +623,7 @@ export default function createGame(roomState: IRoomState) {
 
     // Aplica limite máximo à velocidade
     const clampSpeed = () => {
-      const MAX_SPEED = 10;
+      //const MAX_SPEED = 20;
       gameState.ball.speedX = Math.min(Math.max(gameState.ball.speedX, -MAX_SPEED), MAX_SPEED);
       gameState.ball.speedY = Math.min(Math.max(gameState.ball.speedY, -MAX_SPEED), MAX_SPEED);
     };
@@ -628,7 +631,7 @@ export default function createGame(roomState: IRoomState) {
     // Executa as verificações de colisão
     handleWallCollision();
     handlePlayerCollision();
-    clampSpeed();
+
 
     for (const planet of gameState.planets) {
       if (planet.active) {
@@ -649,8 +652,10 @@ export default function createGame(roomState: IRoomState) {
             ) {
 
               planet.parts[i] = false;
-              gameState.ball.speedX *= -1;
-              gameState.ball.speedY *= -1;
+              // gameState.ball.speedX *= -1;
+              // gameState.ball.speedY *= -1;
+              gameState.ball.speedX *= -ACCELERATION_FACTOR;
+              gameState.ball.speedY *= -ACCELERATION_FACTOR;
 
               collisionDetected = true;
               break;
@@ -660,11 +665,33 @@ export default function createGame(roomState: IRoomState) {
       }
     }
 
-    gameState.ball.speedX = Math.min(Math.max(gameState.ball.speedX, -MAX_SPEED), MAX_SPEED);
-    gameState.ball.speedY = Math.min(Math.max(gameState.ball.speedY, -MAX_SPEED), MAX_SPEED);
+    clampSpeed();
+
 
     if (collisionDetected) {
       notifyPlanetUpdate();
+    }
+
+    /* if (Math.abs(gameState.ball.speedX) > Math.abs(INITIAL_SPEED)) {
+      gameState.ball.speedX *= DECAY_RATE;
+    }
+    if (Math.abs(gameState.ball.speedY) > Math.abs(INITIAL_SPEED)) {
+      gameState.ball.speedY *= DECAY_RATE;
+    } */
+
+    // Desaceleração controlada até a velocidade inicial
+    if (Math.abs(gameState.ball.speedX) > Math.abs(INITIAL_SPEED)) {
+      gameState.ball.speedX *= DECAY_RATE;
+      if (Math.abs(gameState.ball.speedX) < Math.abs(INITIAL_SPEED)) {
+        gameState.ball.speedX = INITIAL_SPEED * Math.sign(gameState.ball.speedX);
+      }
+    }
+
+    if (Math.abs(gameState.ball.speedY) > Math.abs(INITIAL_SPEED)) {
+      gameState.ball.speedY *= DECAY_RATE;
+      if (Math.abs(gameState.ball.speedY) < Math.abs(INITIAL_SPEED)) {
+        gameState.ball.speedY = INITIAL_SPEED * Math.sign(gameState.ball.speedY);
+      }
     }
 
     notifyBallUpdate();
