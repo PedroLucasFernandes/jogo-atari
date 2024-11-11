@@ -2,6 +2,7 @@ import React, { Dispatch, SetStateAction, useCallback, useEffect, useRef, useSta
 import { useWebSocket } from '../../context/WebSocketContext';
 import renderScreen from './renderScreen';
 import { IWinner } from '../../interfaces/game';
+import { gameAudio } from '../../utils/audioManager';
 
 interface ScreenProps {
 	setScreen: Dispatch<SetStateAction<string>>;
@@ -19,6 +20,7 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 	useEffect(() => {
 		if (gameState?.winner) {
 			setWinner(gameState.winner);
+			gameAudio.stopAll(); //Para caso o jogador reconecte após o jogo encerrar
 			setScreen('game-over');
 		}
 	}, [gameState?.winner]);

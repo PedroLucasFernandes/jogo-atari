@@ -65,6 +65,13 @@ export const JoinRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
             return (
               <Box key={room.roomId} sx={{ mb: 2, p: 2, border: '1px solid #ccc', borderRadius: '4px' }}>
                 <p><strong>ID da sala:</strong> {room.roomId}</p>
+                <p><strong>Status:</strong>
+                  {room.status === 'waiting'
+                    ? 'Aguardando jogadores'
+                    : room.status === 'inprogress'
+                      ? 'Em andamento'
+                      : 'Não identificado'}
+                </p>
                 <p><strong>Host:</strong> {hostUsername}</p>
                 <p><strong>Jogadores:</strong> {room.players.length}/4</p>
                 <Button
@@ -74,7 +81,7 @@ export const JoinRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
                     setSelectedRoomId(room.roomId);
                     setOpenModal(true); // Abre o modal
                   }}
-                  disabled={room.players.length === 4}
+                  disabled={room.players.length === 4 || room.status === 'inprogress'}
                 >
                   Entrar na sala
                 </Button>

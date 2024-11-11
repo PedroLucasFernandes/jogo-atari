@@ -32,4 +32,7 @@ const server = app.listen(PORT, () => {
 
 const wss = new WebSocketServer({ server });
 const webSocketService = new WebSocketService(wss);
-export default { getClient: webSocketService.getClient.bind(webSocketService) };
+export default {
+	getClient: webSocketService.getClient.bind(webSocketService),
+	clearGameSession: webSocketService.clearGameSession.bind(webSocketService)
+};

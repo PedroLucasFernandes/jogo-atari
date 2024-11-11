@@ -111,6 +111,12 @@ export const initialPlayersState: PlayersRecord = {
   'player3': { username: 'Player 3', x: 550, y: 370, initialX: 550, initialY: 370, size: 80, isBot: false, imageSrc: '', defendingPlanetId: 3 }
 };
 
+export const planetsByPlayersPosition = [
+  { player: { x: 170, y: 150 }, planet: { x: 0, y: 0 }, defendingPlanetId: 0 },
+  { player: { x: 550, y: 150 }, planet: { x: 650, y: 0 }, defendingPlanetId: 1 },
+  { player: { x: 170, y: 370 }, planet: { x: 0, y: 450 }, defendingPlanetId: 2 },
+  { player: { x: 550, y: 370 }, planet: { x: 650, y: 450 }, defendingPlanetId: 3 }
+];
 
 export const initialBallState: IBall = {
   x: 400,
