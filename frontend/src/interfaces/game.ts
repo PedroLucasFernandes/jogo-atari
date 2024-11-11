@@ -127,11 +127,12 @@ export const initialCanvasState: ICanvas = {
 };
 
 export const initialPlayersRoomState: IPlayerRoom[] = [
-  { playerId: 'player0', username: 'Bot 0', ready: false, isHost: false },
+  { playerId: 'player0', username: 'Bot 0', ready: false, isHost: false},
   { playerId: 'player1', username: 'Bot 1', ready: false, isHost: false },
   { playerId: 'player2', username: 'Bot 2', ready: false, isHost: false },
-  { playerId: 'player3', username: 'Bot 3', ready: false, isHost: false }
-]
+  { playerId: 'player3', username: 'Bot 3', ready: false, isHost: false}
+];
+
 
 export const initialRoomState: IRoomState = {
   roomId: '',
