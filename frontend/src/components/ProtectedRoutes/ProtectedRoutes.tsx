@@ -6,7 +6,7 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
 
     if (loading) return <div>Loading...</div>;
 
-    return user ? children : <Navigate to="/login" />;
+    return user ? children : <Navigate to="/" />;
 };
 
 export default ProtectedRoute;
