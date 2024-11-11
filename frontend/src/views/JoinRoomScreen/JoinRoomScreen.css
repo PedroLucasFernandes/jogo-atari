@@ -1,9 +1,125 @@
 #join-room {
-  width: 100%;
+  width: 100vw;
+  height: 100vh;
   display: flex;
-  flex: 1 1;
-
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  background-image: url('../../assets/background-login.png');
+  background-size: cover;
+  background-position: center;
+  font-family: "Chewy", system-ui;
+}
+
+.div-join {
+  background-color: white;
+  width: 60vw;
+  height: 85vh;
+  border-radius: 3vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2vh;
+  color: #11205f;
+  text-align: center;
+}
+
+.title-join {
+  font-size: 2vw;
+  margin: 0;
+}
+
+.p-join {
+  font-size: 1.2vw;
+}
+
+.room-list {
+  width: 100%;
+  margin-top: 1vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.room-item {
+  background-color: #f1d9ff;
+  border-radius: 1vw;
+  margin: 1vh 0;
+  padding: 1vh;
+  width: 70%;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 2.5vh;
+}
+
+
+.custom-dialog {
+  background-color: rgba(0, 0, 0, 0.5); 
+}
+
+.custom-dialog .MuiPaper-root {
+  background-color: #f9f9f9; 
+  border-radius: 8px;       
+  padding: 2vw;           
+  width: 20vw;
+  height: 17vh;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); 
+}
+.custom-dialog-content input {
+  font-size: 2vh;
+}
+
+.custom-dialog-title {
+  font-size: 2.5vh;
+  font-weight: bold;
+  text-align: center;
+  color: #333; 
+  margin: 2vh;
+}
+
+.custom-dialog-content {
+  margin-top: 10px;
+  padding: 10px;
+}
+
+
+.title-strong{
+  color: #FF0062;
+}
+
+.room-item p {
+  margin: 0.5vh 0;
+}
+
+.button-search-room {
+  padding: 1vh;
+  width: 30%;
+  max-width: 20vw;
+  border-radius: 1vw;
+  font-size: 2vh;
+  font-family: "Chewy", system-ui;
+  background-color: #750de5;
+  color: white;
+  cursor: pointer;
+}
+
+.button-search-room-2 {
+  padding: 1vh;
+  width: 20%;
+  max-width: 20vw;
+  border-radius: 1vw;
+  font-size: 2vh;
+  font-family: "Chewy", system-ui;
+  background-color: #FF0062;
+  color: white;
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: #b0b0b0;
+  color: #6e6e6e;
+  cursor: not-allowed;
 }
