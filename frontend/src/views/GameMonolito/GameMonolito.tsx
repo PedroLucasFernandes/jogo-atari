@@ -38,7 +38,7 @@ export const GameMonolito: React.FC = () => {
     };
 
     return (
-        <div id="monolito">
+        <div id="monolito" className='slide-diagonal-bounce'>
             {renderScreen()}
         </div>
     );

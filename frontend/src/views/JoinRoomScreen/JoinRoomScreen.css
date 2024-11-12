@@ -42,18 +42,26 @@
   align-items: center;
 }
 
+.scrollable-room-list {
+  width: 70%;
+  max-height: 50vh; /* Limite de altura da lista de salas */
+  overflow-y: auto; /* Rolagem vertical */
+  margin-top: 1vh;
+}
+
 .room-item {
   background-color: #f1d9ff;
   border-radius: 1vw;
   margin: 1vh 0;
   padding: 1vh;
-  width: 70%;
+  width: 90%;
   text-align: left;
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: 2.5vh;
 }
+
 
 
 .custom-dialog {
@@ -104,6 +112,12 @@
   background-color: #750de5;
   color: white;
   cursor: pointer;
+  margin: 1rem;
+}
+
+.room-item-2{
+  display: flex;
+  flex-direction: column;
 }
 
 .button-search-room-2 {

@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './GameOverScreen.css';
 import Box from "@mui/joy/Box";
 import Button from "@mui/joy/Button";
 import { IWinner } from '../../interfaces/game';
+import { useWebSocket } from '../../context/WebSocketContext';
 
 interface GameOverScreenProps {
   setScreen: (screen: string) => void;
@@ -10,6 +11,16 @@ interface GameOverScreenProps {
 }
 
 export const GameOverScreen: React.FC<GameOverScreenProps> = ({ setScreen, winner }) => {
+  const { gameState } = useWebSocket();
+  const [winnerPosition, setWinnerPosition] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (gameState && winner) {
+      console.log("winner", winner);
+      setWinnerPosition(gameState?.players[`socket_${winner.id}`].defendingPlanetId);
+    }
+  }, [gameState, winner]);
+
   return (
     <Box id="game-over-screen" sx={{
       display: 'flex',
@@ -24,6 +35,9 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({ setScreen, winne
 
       <div id='modal'>
         <h1 className="game-over-title">O vencedor é {winner?.username}!</h1>
+        {winnerPosition ? (
+          <img src={`/assets/player${winnerPosition + 1}.svg`} alt="" style={{ maxWidth: '100px', height: 'auto' }} />
+        ) : null}
         <h2 className="game-over-subtitle">Parabéns por salvar o seu planeta!!</h2>
         <Button
           className='button-menu'

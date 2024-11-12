@@ -20,6 +20,7 @@ interface WebSocketContextType {
   startGame: (roomId: string) => void;
   leaveGame: (roomId: string) => void;
   setLastMessage: (message: IGameMessage | null) => void;
+  checkGameInProgress: () => void;
   gameState: IGameState | null;
   roomState: IRoomState | null;
   rooms: IRoomState[] | null;
@@ -65,6 +66,29 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     webSocketService.registerCallback('uuid', (data) => {
       setSocketId(data.socketId);
       setStatus('online');
+    });
+
+    webSocketService.registerCallback('gameInProgress', (data) => {
+      console.log("tem jogo em progresso");
+      const roomState = data.data.roomState;
+
+      if (!roomState) {
+        console.log("Erro ao indentificar estado da sala");
+        setLastMessage({ type: 'error', data: { message: 'Erro ao carregar dados da sala em andamento. Unexpected server response' } });
+        return;
+      }
+
+      const gameState = data.data.gameState;
+
+      if (!gameState) {
+        console.log("Erro ao identificar estado do jogo");
+        setLastMessage({ type: 'error', data: { message: 'Erro ao carregar dados do jogo em andamento. Unexpected server response' } });
+        return;
+      }
+
+      setLastMessage(data)
+      setRoomState(roomState);
+      setGameState(gameState);
     });
 
     webSocketService.registerCallback('roomsReceived', (data) => {
@@ -216,6 +240,9 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       const roomState = data.data.roomState;
       const gameState = data.data.gameState;
 
+      console.log("Room state: " + JSON.stringify(roomState));
+      console.log(`Game state: "${JSON.stringify(gameState)}`);
+
       if (!roomState) {
         console.log("Erro ao indentificar estado da sala");
         setLastMessage({ type: 'error', data: { message: 'Erro ao atualizar jogadores. Unexpected server response' } });
@@ -243,7 +270,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     webSocketService.registerCallback('updateBall', (data) => {
       if (data.data && data.data.ball) {
-          // Check for collisions by comparing with previous state
+        // Check for collisions by comparing with previous state
         setGameState(prevGameState => {
           // Se o estado anterior for nulo, você pode retornar um novo estado inicial
           if (prevGameState === null) {
@@ -303,7 +330,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     webSocketService.registerCallback('gameOver', (data) => {
       if (data.data && data.data.winner) {
-        gameAudio.stopAll(); 
+        gameAudio.stopAll();
         setGameState(prevGameState => {
           // Atualiza o estado do jogo
           return {
@@ -325,6 +352,17 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
 
 
+  const checkGameInProgress = () => {
+    console.log("checkGameInProgress");
+    if (!socketId) {
+      setLastMessage({ type: 'error', data: { message: 'Falha ao conectar com o servidor' } });
+      console.log('Can\'t check game sessions without a socketId');
+      return;
+    }
+
+    const data = { playerId: socketId }
+    webSocketService.send({ type: 'checkGameInProgress', data });
+  }
 
   const getRooms = () => {
     if (!socketId) {
@@ -388,7 +426,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       return;
     }
 
-    gameAudio.stopAll(); 
+    gameAudio.stopAll();
     const data = { roomId: roomId, playerId: socketId }
     webSocketService.send({ type: 'leaveRoom', data });
   }
@@ -448,12 +486,11 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     webSocketService.send({ type: 'leaveGame', data });
   }
 
-
   return (
     <WebSocketContext.Provider value={{
       socketId, webSocketService, status, gameState, roomState, rooms, lastMessage,
       getRooms, createRoom, closeRoom, joinRoom, leaveRoom, toggleReadyStatus, removePlayer, movePlayer,
-      startGame, leaveGame, setLastMessage
+      startGame, leaveGame, setLastMessage, checkGameInProgress
       // Opção para criar um botão de liga e desliga áudio
       // toggleAudio: gameAudio.toggleMute.bind(gameAudio), // Add audio toggle function
     }}>

@@ -19,7 +19,7 @@ export default function renderScreen(
 ) {
   const context = canvasScreen.getContext('2d');
   if (!context) throw new Error("Could not get 2D context from canvas.");
-
+  console.log("speed: ", gameState.ball.speedX, gameState.ball.speedY);
   // Clear and draw background
   context.clearRect(0, 0, gameState.canvas.width, gameState.canvas.height);
   context.drawImage(backgroundImage, 0, 0, gameState.canvas.width, gameState.canvas.height);
@@ -72,9 +72,11 @@ export default function renderScreen(
 
   // O resto do seu código para desenhar planetas e players permanece o mesmo
   const planets = gameState.planets;
+  const players = gameState.players;
   planets.forEach((planet, index) => {
     if (planet.active && planetImages.length > index) {
-      const image = planetImages[index];
+      //const image = planetImages[index];
+      const image = planetImages[players[planet.ownerId].defendingPlanetId];
       const partWidth = planet.width / 2;
       const partHeight = planet.height / 3;
   
@@ -94,23 +96,42 @@ export default function renderScreen(
             partWidth,
             partHeight
           );
+
+          // Define a opacidade para a camada de sobreposição
+        context.globalAlpha = 0.06; // Ajuste para o nível de transparência desejado
+        context.fillStyle = 'white'; // Ou uma cor ligeiramente mais clara
+
+        // Desenha a sobreposição apenas dentro do setor, deixando 1px de margem transparente
+        context.fillRect(partX + 1, partY + 1, partWidth - 2, partHeight - 2);
+
+        // Restaura a opacidade para outros elementos
+        context.globalAlpha = 1.0;
         }
       }
     }
   });
 
   Object.entries(gameState.players).forEach(([playerId, player], index) => {
-    const playerImage = playersImages[index % playersImages.length];
+    //const playerImage = playersImages[index % playersImages.length];
+    const playerImage = playersImages[player.defendingPlanetId];
     const centerX = player.x;
     const centerY = player.y;
 
-    if (playerId === currentPlayerId) {
-      context.strokeStyle = '#00ff00';
-      context.lineWidth = 2;
-      context.strokeRect(centerX, centerY, player.size, player.size);
-    }
+    // Cotorno verde em volta do player do usuário
+    // if (playerId === currentPlayerId) {
+    //  context.strokeStyle = '#00ff00';
+    //  context.lineWidth = 2;
+    //  context.strokeRect(centerX, centerY, player.size, player.size);
+    //}
 
     context.drawImage(playerImage, centerX, centerY, player.size, player.size);
+
+      // Adiciona o nome do jogador abaixo da imagem
+      context.font = '16px "Pixelify Sans", sans-serif'; // Tamanho da fonte do nome
+      context.fillStyle = 'white'; // Cor do nome
+      context.textAlign = 'center'; // Alinha o texto ao centro
+      context.textBaseline = 'top'; // Alinha o texto acima da linha de base (aqui fica logo abaixo da imagem)
+      context.fillText(player.username, centerX + player.size / 2, centerY + player.size); // Desenha o nome abaixo da imagem
   });
 }
 
