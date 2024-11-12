@@ -1,56 +1,94 @@
-import './RankingScreen.css'
+import './RankingScreen.css';
 import Box from "@mui/joy/Box";
 import Button from "@mui/joy/Button";
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { useUser } from '../../context/UserContext';
 
 interface ScreenProps {
   setScreen: Dispatch<SetStateAction<string>>;
 }
 
+interface Jogador {
+  user_id: string;
+  username: string;
+  total_score: number;
+  total_games_played: number;
+  position: string;
+}
+
 export const RankingScreen: React.FC<ScreenProps> = ({ setScreen }) => {
+  const [jogadores, setJogadores] = useState<Jogador[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { user, setUser } = useUser();
 
-  const jogadores = [
-    { nome: "Jogador 1", pontos: 120 },
-    { nome: "Jogador 2", pontos: 150 },
-    { nome: "Jogador 3", pontos: 90 },
-    { nome: "Jogador 4", pontos: 200 },
-    { nome: "Jogador 5", pontos: 170 },
-    { nome: "Jogador 6", pontos: 80 },
-    { nome: "Jogador 7", pontos: 210 },
-    { nome: "Jogador 8", pontos: 110 },
-    { nome: "Jogador 9", pontos: 95 },
-    { nome: "Jogador 10", pontos: 160 },
-  ];
+  const currentUserId = user?.id;
 
-  const topJogadores = [...jogadores]
-    .sort((a, b) => b.pontos - a.pontos)
-    .slice(0, 5);
+  useEffect(() => {
+    const fetchRanking = async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_API_ADDRESS}/leaderboard?sortBy=total_score`);
+        if (!response.ok) {
+          throw new Error('Erro ao carregar dados do ranking');
+        }
+        const data = await response.json();
+
+        if (Array.isArray(data.data)) {
+          setJogadores(data.data);
+        } else {
+          throw new Error('Formato de resposta inválido');
+        }
+
+        setIsLoading(false);
+      } catch (error: any) {
+        setError(error.message || 'Erro desconhecido');
+        setIsLoading(false);
+      }
+    };
+
+    fetchRanking();
+  }, []);
+
+  const topJogadores = jogadores.length > 0
+    ? [...jogadores].sort((a, b) => b.total_score - a.total_score).slice(0, 5)
+    : [];
+
+  const jogadorAtual = jogadores.find(jogador => jogador.user_id === currentUserId);
+  const posicaoAtual = jogadorAtual ? jogadores.indexOf(jogadorAtual) + 1 : null;
+  const pontosAtual = jogadorAtual ? jogadorAtual.total_score : null;
 
   return (
-
     <Box id="ranking-room">
-      <h1>Ranking de jogadores</h1>
+      <h1>Melhores jogadores</h1>
 
-      <Box id="header">
-        <h2>JOGADORES</h2>
-        <h2>PONTOS</h2>
-      </Box>
+      {isLoading && <p>Carregando...</p>}
+      {error && <p>{error}</p>}
 
-      <Box id="ranking-box">
-        {topJogadores.map((jogador, index) => (
-          <Box key={index} className="ranking-item">
-            <h2>{index + 1}º {jogador.nome}</h2>
-            <h2>{jogador.pontos}</h2>
+      {!isLoading && !error && (
+        <>
+          <Box id="header">
+            <h2>JOGADORES</h2>
+            <h2>PONTOS</h2>
           </Box>
-        ))}
-        <Box className="your-item">
-              <h2>10º Você</h2>
-              <h2>40</h2>
-        </Box>
-      </Box>
+
+          <Box id="ranking-box">
+            {topJogadores.map((jogador, index) => (
+              <Box key={jogador.user_id} className="ranking-item">
+                <h2>{index + 1}º {jogador.username}</h2>
+                <h2>{jogador.total_score}</h2>
+              </Box>
+            ))}
+            {jogadorAtual && (
+              <Box className="your-item">
+                <h2>{posicaoAtual}º Você</h2>
+                <h2>{pontosAtual}</h2>
+              </Box>
+            )}
+          </Box>
+        </>
+      )}
 
       <Button variant="solid" size="md" onClick={() => setScreen('main-menu')}>VOLTAR</Button>
-
     </Box>
   );
-}
+};
