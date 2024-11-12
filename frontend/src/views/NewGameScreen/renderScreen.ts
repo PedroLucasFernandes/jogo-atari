@@ -17,9 +17,12 @@ export default function renderScreen(
   currentPlayerId: string,
   backgroundImage: HTMLImageElement,
 ) {
+  interpolate(0.5);
+
+
   const context = canvasScreen.getContext('2d');
   if (!context) throw new Error("Could not get 2D context from canvas.");
-  console.log("speed: ", gameState.ball.speedX, gameState.ball.speedY);
+  //console.log("speed: ", gameState.ball.speedX, gameState.ball.speedY);
   // Clear and draw background
   context.clearRect(0, 0, gameState.canvas.width, gameState.canvas.height);
   context.drawImage(backgroundImage, 0, 0, gameState.canvas.width, gameState.canvas.height);
@@ -133,6 +136,25 @@ export default function renderScreen(
       context.textBaseline = 'top'; // Alinha o texto acima da linha de base (aqui fica logo abaixo da imagem)
       context.fillText(player.username, centerX + player.size / 2, centerY + player.size); // Desenha o nome abaixo da imagem
   });
+
+
+  // Função para interpolar entre a posição inicial e a posição alvo
+	function interpolate(interpolationFactor: number) {
+		if (!gameState) return;
+
+		Object.keys(gameState.players).forEach((playerId) => {
+			const player = gameState.players[playerId];
+			const interpolatedX = player.x + (player.toX - player.x) * interpolationFactor;
+			const interpolatedY = player.y + (player.toY - player.y) * interpolationFactor;
+
+			// Atualiza as posições de cada jogador no objeto interpolado
+			gameState.players[playerId] = {
+				...player,
+				x: interpolatedX,
+				y: interpolatedY,
+			};
+		});
+	}
 }
 
 

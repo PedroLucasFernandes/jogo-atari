@@ -44,6 +44,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [moveNumber, setMoveNumber] = useState<number>(0);
   const [moveHistory, setMoveHistory] = useState<IMove[]>([]);
   const gameStateRef = useRef<IGameState | null>(gameState);
+  const socketIdRef = useRef<string | null>(socketId);
 
 
   function updateTarget(playerId: string, x: number, y: number) {
@@ -257,17 +258,22 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       //setGameState(data.data.gameState)
 
       const playerId = data.data.playerId;
+      console.log("Player Id: " + playerId);
+      console.log("Socket Id: " + socketIdRef.current);
 
       if (!playerId) {
         console.log("Erro ao identificar jogador");
         setLastMessage({ type: 'error', data: { message: 'Erro ao identificar jogador movimentado. Unexpected server response' } });
         return;
       }
+      console.log("gamestateref", gameStateRef.current);
 
-      if (playerId === socketId) {
+      if (playerId === socketIdRef.current) {
         //validateAndReconcile(localPlayer, update);
+        console.log("reconciliação");
       }
       else if (gameStateRef.current && gameStateRef.current.players[playerId]) {
+        console.log("interpolação");
         updateTarget(data.data.playeId, data.data.move.x, data.data.move.y);
 
       }
@@ -392,6 +398,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   useEffect(() => {
     gameStateRef.current = gameState;
   }, [gameState]);
+
+  useEffect(() => {
+    socketIdRef.current = socketId;
+  }, [socketId]);
 
 
 
@@ -527,6 +537,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       return;
     }
 
+    console.log("move", move);
+
     const updatedPlayer = {
       ...player,
       x: move.x,
@@ -538,6 +550,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       [socketId]: updatedPlayer
     };
 
+    console.log("updatedPlayers", updatedPlayers);
+
     setGameState(prevState => {
       if (!prevState) return null;
       return {
@@ -545,6 +559,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         players: updatedPlayers
       };
     });
+
+    console.log("setGameState", gameState);
 
     addMoveOnHistory(move.direction, move.x, move.y);
 

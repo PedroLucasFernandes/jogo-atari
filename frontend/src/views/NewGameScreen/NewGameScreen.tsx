@@ -44,10 +44,7 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 		const canvas = canvasRef.current;
 		if (!canvas || !socketId || !roomState || !gameState || !backgroundImage) return;
 
-		interpolate(0.5);
-
 		const animationFrameId = requestAnimationFrame(() => {
-
 			renderScreen(canvas, gameState, requestAnimationFrame, socketId, backgroundImage);
 		});
 
@@ -103,29 +100,6 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 			document.removeEventListener('keyup', handleKeyUp);
 		};
 	}, [stableMovePlayer]); // `stableMovePlayer` é uma dependência estável
-
-	// Função para interpolar entre a posição inicial e a posição alvo
-	function interpolate(interpolationFactor: number) {
-		if (!gameState) return;
-
-		Object.keys(gameState.players).forEach((playerId) => {
-			const player = gameState.players[playerId];
-			const interpolatedX = player.x + (player.toX - player.x) * interpolationFactor;
-			const interpolatedY = player.y + (player.toY - player.x) * interpolationFactor;
-
-			// Atualiza as posições de cada jogador no objeto interpolado
-			gameState.players[playerId] = {
-				...player,
-				x: interpolatedX,
-				y: interpolatedY,
-			};
-		});
-	}
-	/* 	function interpolate(this.x, this.toX, t) {
-			return this.x + (this.toX - this.x) * t;
-			//return 
-		} */
-
 
 	return (
 		<div className="relative">
