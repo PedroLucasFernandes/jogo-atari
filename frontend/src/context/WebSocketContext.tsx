@@ -520,11 +520,32 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
 
     const move = movePlayerPredict(gameState, socketId, keyPressed);
+    const player = gameState.players[socketId];
 
-    if (!move) {
-      console.error('Can\'t move player. Invalid move.');
+    if (!player || !move) {
+      console.error('Can\'t move player.');
       return;
     }
+
+    const updatedPlayer = {
+      ...player,
+      x: move.x,
+      y: move.y
+    };
+
+    const updatedPlayers = {
+      ...gameState.players,
+      [socketId]: updatedPlayer
+    };
+
+    setGameState(prevState => {
+      if (!prevState) return null;
+      return {
+        ...prevState,
+        players: updatedPlayers
+      };
+    });
+
     addMoveOnHistory(move.direction, move.x, move.y);
 
     const data = { roomId: roomId, keyPressed: keyPressed, moveNumber, playerId: socketId }

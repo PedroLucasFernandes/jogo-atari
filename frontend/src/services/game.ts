@@ -1,7 +1,6 @@
 import { IGameState, IPlayer } from "../interfaces/game";
 
 export function movePlayerPredict(gameState: IGameState, playerId: string, keyPressed: string) {
-  let moveNumber = 0;
   const player = gameState.players[playerId];
   if (!player || !keyPressed) return;
 
