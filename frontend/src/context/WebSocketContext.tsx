@@ -1,8 +1,9 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { webSocketService } from '../services/WebSocketService';
-import { IGameMessage, IGameState, IWinner, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialPlanetsState, IRoomState } from '../interfaces/game';
+import { IGameMessage, IGameState, IWinner, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialPlanetsState, IRoomState, IMove, PlayersRecord, IPlayer } from '../interfaces/game';
 import { useUser } from './UserContext';
 import { gameAudio } from '../utils/audioManager';
+import { movePlayerPredict } from '../services/game';
 
 interface WebSocketContextType {
   //isConnected: boolean; // removido, socketId já faz essa função
@@ -39,6 +40,27 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [lastMessage, setLastMessage] = useState<IGameMessage | null>(null);
 
   const { user } = useUser();
+
+  const [moveNumber, setMoveNumber] = useState<number>(0);
+  const [moveHistory, setMoveHistory] = useState<IMove[]>([]);
+  const gameStateRef = useRef<IGameState | null>(gameState);
+
+
+  function updateTarget(playerId: string, x: number, y: number) {
+    if (!gameState) {
+      return;
+    }
+
+    const player = gameState.players[playerId];
+
+    if (!player) {
+      return;
+    }
+
+    player.toX = x;
+    player.toY = y;
+  }
+
 
   useEffect(() => {
     if (!user) {
@@ -232,7 +254,25 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     });
 
     webSocketService.registerCallback('playerMoved', (data) => {
-      setGameState(data.data.gameState)
+      //setGameState(data.data.gameState)
+
+      const playerId = data.data.playerId;
+
+      if (!playerId) {
+        console.log("Erro ao identificar jogador");
+        setLastMessage({ type: 'error', data: { message: 'Erro ao identificar jogador movimentado. Unexpected server response' } });
+        return;
+      }
+
+      if (playerId === socketId) {
+        //validateAndReconcile(localPlayer, update);
+      }
+      else if (gameStateRef.current && gameStateRef.current.players[playerId]) {
+        updateTarget(data.data.playeId, data.data.move.x, data.data.move.y);
+
+      }
+
+
     });
 
     webSocketService.registerCallback('playerLeftGame', (data) => {
@@ -327,7 +367,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
     });
 
-
     webSocketService.registerCallback('gameOver', (data) => {
       if (data.data && data.data.winner) {
         gameAudio.stopAll();
@@ -349,6 +388,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
     });
   }, [user]);
+
+  useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
 
 
 
@@ -471,7 +514,20 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       return;
     }
 
-    const data = { roomId: roomId, keyPressed: keyPressed, playerId: socketId }
+    if (!gameState) {
+      console.error('Can\'t move player without a gameState');
+      return;
+    }
+
+    const move = movePlayerPredict(gameState, socketId, keyPressed);
+
+    if (!move) {
+      console.error('Can\'t move player. Invalid move.');
+      return;
+    }
+    addMoveOnHistory(move.direction, move.x, move.y);
+
+    const data = { roomId: roomId, keyPressed: keyPressed, moveNumber, playerId: socketId }
     webSocketService.send({ type: 'movePlayer', data });
   }
 
@@ -484,6 +540,19 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     const data = { roomId: roomId, playerId: socketId }
     webSocketService.send({ type: 'leaveGame', data });
+  }
+
+  function addMoveOnHistory(direction: string, x: number, y: number) {
+    setMoveNumber(moveNumber => moveNumber + 1);
+
+    const newMove = {
+      moveNumber,
+      direction,
+      x,
+      y,
+    };
+
+    setMoveHistory(prevMoveHistory => [...prevMoveHistory, newMove]);
   }
 
   return (
