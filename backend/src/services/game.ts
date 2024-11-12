@@ -52,6 +52,7 @@ export default function createGame(roomState: IRoomState) {
 
 
   function movePlayer(playerId: string, keyPressed: string) {
+    let moveNumber = 0;
     const player = gameState.players[playerId];
     if (!player || !keyPressed) return;
 
@@ -183,6 +184,7 @@ export default function createGame(roomState: IRoomState) {
 
     const data = {
       gameState,
+      moveNumber: moveNumber++,
     };
     notifyAll({ type: 'playerMoved', data });
   }

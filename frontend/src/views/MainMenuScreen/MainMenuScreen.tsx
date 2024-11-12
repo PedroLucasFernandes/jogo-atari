@@ -123,12 +123,6 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
           Encontrar partida
         </Button>
         <Button className='button-menu'
-          onClick={() => setScreen('waiting-room')}
-          sx={{ backgroundColor: '#03B46D', color: 'white', '&:hover': { backgroundColor: '#006400' } }}
-        >
-          Sala de espera
-        </Button>
-        <Button className='button-menu'
           onClick={() => setScreen('ranking-room')}
           sx={{ backgroundColor: '#03B46D', color: 'white', '&:hover': { backgroundColor: '#006400' } }}
         >
