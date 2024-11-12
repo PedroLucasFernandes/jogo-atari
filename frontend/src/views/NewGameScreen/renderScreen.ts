@@ -17,7 +17,9 @@ export default function renderScreen(
   currentPlayerId: string,
   backgroundImage: HTMLImageElement,
 ) {
+  console.log("Player antes", JSON.stringify(gameState.players));
   interpolate(0.5);
+  console.log("Player depois", JSON.stringify(gameState.players));
 
 
   const context = canvasScreen.getContext('2d');
@@ -143,6 +145,8 @@ export default function renderScreen(
 		if (!gameState) return;
 
 		Object.keys(gameState.players).forEach((playerId) => {
+      if (playerId === currentPlayerId) return;
+      
 			const player = gameState.players[playerId];
 			const interpolatedX = player.x + (player.toX - player.x) * interpolationFactor;
 			const interpolatedY = player.y + (player.toY - player.y) * interpolationFactor;

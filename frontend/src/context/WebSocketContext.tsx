@@ -235,6 +235,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     webSocketService.registerCallback('gameStarted', (data) => {
       const roomState = data.data.roomState;
       const gameState = data.data.gameState;
+      console.log("gamestate recebido", JSON.stringify(gameState.players));
+      console.log("gamestate recebido", JSON.stringify(data.data.gameState.players));
+      console.log("roomstate recebido", JSON.stringify(roomState));
+      console.log("roomstate recebido", JSON.stringify(data.data.roomState));
 
       if (!roomState) {
         console.log("Erro ao indentificar estado da sala");

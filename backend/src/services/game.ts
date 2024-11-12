@@ -52,6 +52,7 @@ export default function createGame(roomState: IRoomState) {
 
 
   function movePlayer(playerId: string, keyPressed: string, moveNumber: number) {
+    console.log("players moved");
     const player = gameState.players[playerId];
     if (!player || !keyPressed) return;
 
@@ -186,6 +187,7 @@ export default function createGame(roomState: IRoomState) {
       move: { direction: keyPressed, x: player.x, y: player.y, moveNumber },
       playerId
     };
+    console.log("data apos mover", data);
     notifyAll({ type: 'playerMoved', data });
   }
 
@@ -448,6 +450,7 @@ export default function createGame(roomState: IRoomState) {
         });
       }
     });
+    console.log("gamestate apos add players", gameState.players);
   }
 
 
