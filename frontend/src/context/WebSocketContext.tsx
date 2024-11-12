@@ -45,6 +45,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [moveHistory, setMoveHistory] = useState<IMove[]>([]);
   const gameStateRef = useRef<IGameState | null>(gameState);
   const socketIdRef = useRef<string | null>(socketId);
+  const [isReconciling, setIsReconciling] = useState<boolean>(false);
+
 
 
   function updateTarget(playerId: string, x: number, y: number) {
@@ -271,9 +273,16 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         return;
       }
       console.log("gamestateref", gameStateRef.current);
+      const serverMovement = data.data.move;
+
+      if (!serverMovement) {
+        console.log("Erro ao identificar movimento do jogador");
+        setLastMessage({ type: 'error', data: { message: 'Erro ao identificar jogador movimentado. Unexpected server response' } });
+        return;
+      }
 
       if (playerId === socketIdRef.current) {
-        //validateAndReconcile(localPlayer, update);
+        validateAndReconcile(data.data.move);
         console.log("reconciliação");
       }
       else if (gameStateRef.current && gameStateRef.current.players[playerId]) {
@@ -281,8 +290,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         updateTarget(data.data.playeId, data.data.move.x, data.data.move.y);
 
       }
-
-
     });
 
     webSocketService.registerCallback('playerLeftGame', (data) => {
@@ -533,20 +540,20 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       return;
     }
 
-    const move = movePlayerPredict(gameState, socketId, keyPressed);
+    const newPosition = movePlayerPredict(gameState, socketId, keyPressed);
     const player = gameState.players[socketId];
 
-    if (!player || !move) {
+    if (!player || !newPosition) {
       console.error('Can\'t move player.');
       return;
     }
 
-    console.log("move", move);
+    console.log("move", newPosition);
 
     const updatedPlayer = {
       ...player,
-      x: move.x,
-      y: move.y
+      x: newPosition.x,
+      y: newPosition.y
     };
 
     const updatedPlayers = {
@@ -566,7 +573,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     console.log("setGameState", gameState);
 
-    addMoveOnHistory(move.direction, move.x, move.y);
+    addMoveOnHistory(newPosition.direction, newPosition.x, newPosition.y);
 
     const data = { roomId: roomId, keyPressed: keyPressed, moveNumber, playerId: socketId }
     webSocketService.send({ type: 'movePlayer', data });
@@ -594,6 +601,61 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     };
 
     setMoveHistory(prevMoveHistory => [...prevMoveHistory, newMove]);
+  }
+
+  function validateAndReconcile(serverMovement: IMove) {
+    if (!gameState || !socketId) {
+      console.log('Can\'t validate and reconcile without a gameState or socketId');
+      return;
+    }
+    const player = gameState.players[socketId];
+    const serverMoveNumber = serverMovement.moveNumber;
+    const localMove = getMoveFromSequenceNumber(serverMoveNumber);
+
+    if (localMove) {
+      if (localMove.x !== serverMovement.x || localMove.y !== serverMovement.y) {
+        console.log("Starting reconciliation from move number:", serverMoveNumber);
+        player.x = serverMovement.x;
+        player.y = serverMovement.y;
+        setIsReconciling(true);
+
+        const movesToReapply = getAndDeleteUnacknowledgedMoves(serverMoveNumber);
+
+        movesToReapply.forEach((move) => {
+          const newPosition = movePlayerPredict(gameState, socketId, move.direction);
+          if (newPosition) {
+            addMoveOnHistory(move.direction, newPosition.x, newPosition.y);
+          }
+        });
+
+        setIsReconciling(false);
+        console.log("Reconciliation complete");
+      } else {
+        keepUnacknowledgedMoves(serverMoveNumber);
+      }
+    } else {
+      player.x = serverMovement.x;
+      player.y = serverMovement.y;
+      keepUnacknowledgedMoves(serverMoveNumber);
+    }
+  }
+
+  function getMoveFromSequenceNumber(moveNumber: number) {
+    return moveHistory.find((move) => move.moveNumber === moveNumber);
+  }
+
+  function getAndDeleteUnacknowledgedMoves(fromMoveNumber: number) {
+    const moves = moveHistory.filter((move) => move.moveNumber > fromMoveNumber);
+    setMoveHistory([]);
+    setMoveNumber(fromMoveNumber);
+    return moves;
+  }
+
+  function keepUnacknowledgedMoves(fromMoveNumber: number) {
+    setMoveHistory((prevMoveHistory) => {
+      const newMoveHistory = prevMoveHistory.filter((move) => move.moveNumber > fromMoveNumber);
+      return newMoveHistory;
+    });
   }
 
   return (
