@@ -20,7 +20,7 @@ export const RankingScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   const [jogadores, setJogadores] = useState<Jogador[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { user, setUser } = useUser();
+  const { user } = useUser();
 
   const currentUserId = user?.id;
 
@@ -57,6 +57,8 @@ export const RankingScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   const posicaoAtual = jogadorAtual ? jogadores.indexOf(jogadorAtual) + 1 : null;
   const pontosAtual = jogadorAtual ? jogadorAtual.total_score : null;
 
+  const estaNoTop5 = topJogadores.some(jogador => jogador.user_id === currentUserId);
+
   return (
     <Box id="ranking-room">
       <h1>Melhores jogadores</h1>
@@ -73,12 +75,12 @@ export const RankingScreen: React.FC<ScreenProps> = ({ setScreen }) => {
 
           <Box id="ranking-box">
             {topJogadores.map((jogador, index) => (
-              <Box key={jogador.user_id} className="ranking-item">
+              <Box key={jogador.user_id} className={`ranking-item ${jogador.user_id === currentUserId ? 'highlight' : ''}`}>
                 <h2>{index + 1}º {jogador.username}</h2>
                 <h2>{jogador.total_score}</h2>
               </Box>
             ))}
-            {jogadorAtual && (
+            {!estaNoTop5 && jogadorAtual && (
               <Box className="your-item">
                 <h2>{posicaoAtual}º Você</h2>
                 <h2>{pontosAtual}</h2>
