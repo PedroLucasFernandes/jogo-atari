@@ -32,7 +32,8 @@ const CreateRoomScreen: React.FC<CreateRoomScreenProps> = ({ setScreen }) => {
         <div id="create-room">
             <div className='square-create-room'>
             <h2 className="title-create">Criar sala</h2>
-            <p>Informe um código para criar uma sala</p>
+            <p style={{fontFamily: '"Tilt Neon", sans-serif', fontSize: '3vh', margin: '15px', width: '15vw', textAlign: 'center', color: '#11205F'
+            }}>Informe um código para criar uma sala</p>
 
             <input
                 type="text"
@@ -41,17 +42,18 @@ const CreateRoomScreen: React.FC<CreateRoomScreenProps> = ({ setScreen }) => {
                 placeholder="Código"
                 className="input-create"
                 maxLength={6}
+                style={{margin: '15px', fontFamily: '"Tilt Neon", sans-serif', fontSize: '2.5vh'}}
             />
 
                 <button
                     onClick={handleCreateRoom}
                     className="button-create"
                     disabled={!roomCode || loading}
-                    style={{backgroundColor: "#00a447"}}
+                    style={{backgroundColor: "#00a447", borderRadius: '2rem',  border: '1.6px solid #11205F'}}
                 >
                     Criar nova sala
                 </button>
-            <button className="button-create" onClick={() => setScreen('main-menu')}>Voltar ao menu</button>
+            <button className="button-create" style={{borderRadius: '2rem', border: '1.6px solid #11205F'}} onClick={() => setScreen('main-menu')}>Voltar ao menu</button>
             </div>
 
         </div>
