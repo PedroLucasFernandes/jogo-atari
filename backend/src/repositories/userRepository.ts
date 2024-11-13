@@ -80,7 +80,6 @@ export const getUserByUsername = async (username: string) => {
     const query = "SELECT * FROM users WHERE username=$1";
     try {
         const result = await pool.query(query, [username]);
-        console.log("Result rows do getUserByUsername:", result.rows);
         return result.rows;
     } catch (error) {
         console.log(error);

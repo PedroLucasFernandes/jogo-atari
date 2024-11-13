@@ -100,14 +100,17 @@ export const createUserLeaderboardData = async (userId: string, statType: string
         if (statType === "total_score") {
             // Se for total_score, cria com incremento de 1 em total_score e total_games_played
             const query = `INSERT INTO leaderboard (user_id, total_score, total_games_played) VALUES ($1, 1, 1)`;
-            const { rows } = await pool.query(query, [userId]);
-            return rows[0];
+            await pool.query(query, [userId]);
         } else if (statType === "total_games_played") {
             // Se for total_games_played, cria com incremento apenas de total_games_played
             const query = `INSERT INTO leaderboard (user_id, total_score, total_games_played) VALUES ($1, 0, 1)`;
-            const { rows } = await pool.query(query, [userId]);
-            return rows[0];
+            await pool.query(query, [userId]);
         }
+        // Seleciona o registro atualizado do leaderboard
+        const querySelect = `SELECT user_id, total_score, total_games_played FROM leaderboard WHERE user_id = $1`;
+        const { rows } = await pool.query(querySelect, [userId]);
+
+        return rows[0];
     } catch (error) {
         console.error("Error creating user leaderboard data:", error);
         throw new Error("Database query failed while creating user leaderboard data.");
