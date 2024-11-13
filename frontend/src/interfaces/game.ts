@@ -165,3 +165,8 @@ export interface IMove {
   y: number;
   moveNumber: number;
 }
+
+export interface ILastMove {
+  playerId: string;
+  move: IMove
+}

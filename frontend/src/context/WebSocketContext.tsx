@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { webSocketService } from '../services/WebSocketService';
 import { IGameMessage, IGameState, IWinner, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialPlanetsState, IRoomState, IMove, PlayersRecord, IPlayer } from '../interfaces/game';
 import { useUser } from './UserContext';
@@ -43,27 +43,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const [moveNumber, setMoveNumber] = useState<number>(0);
   const [moveHistory, setMoveHistory] = useState<IMove[]>([]);
+  const [isReconciling, setIsReconciling] = useState<boolean>(false);
   const gameStateRef = useRef<IGameState | null>(gameState);
   const socketIdRef = useRef<string | null>(socketId);
-  const [isReconciling, setIsReconciling] = useState<boolean>(false);
-
-
-
-  function updateTarget(playerId: string, x: number, y: number) {
-    if (!gameState) {
-      return;
-    }
-
-    const player = gameState.players[playerId];
-
-    if (!player) {
-      return;
-    }
-
-    player.toX = x;
-    player.toY = y;
-  }
-
+  const moveNumberRef = useRef<number | null>(moveNumber);
 
   useEffect(() => {
     if (!user) {
@@ -92,6 +75,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setSocketId(data.socketId);
       setStatus('online');
     });
+  }, [user]);
+
+  useEffect(() => {
+    if (!user || !socketId) return;
 
     webSocketService.registerCallback('gameInProgress', (data) => {
       console.log("tem jogo em progresso");
@@ -266,28 +253,31 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       const playerId = data.data.playerId;
       console.log("Player Id: " + playerId);
       console.log("Socket Id: " + socketIdRef.current);
+      console.log("moveNumber", moveNumber);
 
       if (!playerId) {
         console.log("Erro ao identificar jogador");
         setLastMessage({ type: 'error', data: { message: 'Erro ao identificar jogador movimentado. Unexpected server response' } });
         return;
       }
-      console.log("gamestateref", gameStateRef.current);
-      const serverMovement = data.data.move;
 
+      const serverMovement = data.data.move;
       if (!serverMovement) {
         console.log("Erro ao identificar movimento do jogador");
         setLastMessage({ type: 'error', data: { message: 'Erro ao identificar jogador movimentado. Unexpected server response' } });
         return;
       }
 
+      console.log("Movement", data.data.move);
+
       if (playerId === socketIdRef.current) {
         validateAndReconcile(data.data.move);
         console.log("reconciliação");
       }
-      else if (gameStateRef.current && gameStateRef.current.players[playerId]) {
+      //else if (gameStateRef.current && gameStateRef.current.players[playerId]) {
+      else if (gameState && gameState.players[playerId]) {
         console.log("interpolação");
-        updateTarget(data.data.playeId, data.data.move.x, data.data.move.y);
+        updateTarget(data.data.playerId, data.data.move.x, data.data.move.y);
 
       }
     });
@@ -404,7 +394,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setLastMessage({ type: 'error', data: { message: 'Erro ao processar jogo. Unexpected server response' } });
       }
     });
-  }, [user]);
+  }, [socketId, user, roomState, gameState, moveNumber, moveHistory, isReconciling, updateTarget,
+    validateAndReconcile, addMoveOnHistory, getMoveFromSequenceNumber, getAndDeleteUnacknowledgedMoves, keepUnacknowledgedMoves]);
 
   useEffect(() => {
     gameStateRef.current = gameState;
@@ -413,6 +404,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   useEffect(() => {
     socketIdRef.current = socketId;
   }, [socketId]);
+
+  useEffect(() => {
+    moveNumberRef.current = moveNumber;
+  }, [moveNumber]);
 
 
 
@@ -528,7 +523,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     webSocketService.send({ type: 'startGame', data });
   }
 
-  const movePlayer = (roomId: string, keyPressed: string) => {
+  const movePlayer = useCallback((roomId: string, keyPressed: string) => {
     if (!socketId) {
       setLastMessage({ type: 'error', data: { message: 'Falha ao conectar com o servidor' } });
       console.log('Can\'t move player without a socketId');
@@ -573,11 +568,17 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     console.log("setGameState", gameState);
 
-    addMoveOnHistory(newPosition.direction, newPosition.x, newPosition.y);
 
-    const data = { roomId: roomId, keyPressed: keyPressed, moveNumber, playerId: socketId }
-    webSocketService.send({ type: 'movePlayer', data });
-  }
+    const newMoveNumber = addMoveOnHistory(newPosition.direction, newPosition.x, newPosition.y);
+    console.log("movenumber no move player", newMoveNumber);
+
+
+    if (newMoveNumber) {
+      const data = { roomId: roomId, keyPressed: keyPressed, moveNumber: newMoveNumber + 1, playerId: socketId }
+      webSocketService.send({ type: 'movePlayer', data });
+    }
+
+  }, [socketId, gameState, moveNumber]);
 
   const leaveGame = (roomId: string) => {
     if (!socketId) {
@@ -591,20 +592,61 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }
 
   function addMoveOnHistory(direction: string, x: number, y: number) {
-    setMoveNumber(moveNumber => moveNumber + 1);
+    /* setMoveNumber(moveNumber => moveNumber + 1);
 
     const newMove = {
-      moveNumber,
+      moveNumber: moveNumber + 1,
       direction,
       x,
       y,
     };
 
-    setMoveHistory(prevMoveHistory => [...prevMoveHistory, newMove]);
+    console.log("movenumber do newMove", newMove);
+
+    setMoveHistory(prevMoveHistory => [...prevMoveHistory, newMove]); */
+    setMoveNumber(prevMoveNumber => {
+      const newMoveNumber = prevMoveNumber + 1;
+      const newMove = {
+        moveNumber: newMoveNumber,
+        direction,
+        x,
+        y,
+      };
+
+      console.log("movenumber do newMove", newMove);
+
+      setMoveHistory(prevMoveHistory => [...prevMoveHistory, newMove]);
+
+      return newMoveNumber; // Atualiza moveNumber com base no valor anterior
+    });
+
+    return moveNumberRef.current;
+  }
+
+  function updateTarget(playerId: string, x: number, y: number) {
+    console.log("updateTarget");
+
+    if (!gameState) {
+      return;
+    }
+
+    console.log("GAME STATE ANTIGO", gameState.players);
+
+    const player = gameState.players[playerId];
+
+    if (!player) {
+      return;
+    }
+
+    player.toX = x;
+    player.toY = y;
+    console.log("GAME STATE ATUALIZADO", gameState.players);
   }
 
   function validateAndReconcile(serverMovement: IMove) {
     if (!gameState || !socketId) {
+      console.log("gameState inside", gameState);
+      console.log("socketid inside", socketId);
       console.log('Can\'t validate and reconcile without a gameState or socketId');
       return;
     }

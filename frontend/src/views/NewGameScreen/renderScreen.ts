@@ -17,9 +17,9 @@ export default function renderScreen(
   currentPlayerId: string,
   backgroundImage: HTMLImageElement,
 ) {
-  console.log("Player antes", JSON.stringify(gameState.players));
+  //console.log("Player antes", JSON.stringify(gameState.players));
   interpolate(0.5);
-  console.log("Player depois", JSON.stringify(gameState.players));
+  //console.log("Player depois", JSON.stringify(gameState.players));
 
 
   const context = canvasScreen.getContext('2d');
