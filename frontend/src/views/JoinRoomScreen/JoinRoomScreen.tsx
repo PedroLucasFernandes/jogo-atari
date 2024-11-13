@@ -85,18 +85,19 @@ export const JoinRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
 
     {/* Dialog para entrar na sala */}
     <Dialog open={openModal} onClose={() => setOpenModal(false)} className="custom-dialog">
-      <DialogTitle className="custom-dialog-title">Entrar na Sala</DialogTitle>
+      <DialogTitle className="custom-dialog-title" sx={{fontFamily: '"Chewy", system-ui', fontSize:'3.5vh', marginBottom:'1.5vh', color: '#11205f'}}>Entrar na Sala</DialogTitle>
       <DialogContent className="custom-dialog-content">
         <Input
           placeholder="Insira o código da sala"
           value={code}
           onChange={(e) => setCode(e.target.value)}
           fullWidth
+          sx={{fontFamily: '"Tilt Neon", sans-serif', fontSize: '3vh', maxWidth: '15vw', alignSelf: 'center', borderRadius: '2rem'}}
         />
       </DialogContent>
       <DialogActions className="custom-dialog-actions">
-        <button className="button-search-room" onClick={() => setOpenModal(false)}>Cancelar</button>
-        <button className="button-search-room" onClick={handleJoinRoom} disabled={!code}>Entrar</button>
+        <button className="button-search-room-3" onClick={() => setOpenModal(false)}>Cancelar</button>
+        <button className="button-search-room-3" onClick={handleJoinRoom} disabled={!code}>Entrar</button>
       </DialogActions>
     </Dialog>
 

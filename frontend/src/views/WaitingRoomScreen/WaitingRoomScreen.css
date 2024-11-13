@@ -28,15 +28,15 @@
 
 .div-waiting {
   background-color: white;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Tilt Neon, sans-serif;
   width: 60vw;
-  height: 85vh;
+  height: 90vh;
   border-radius: 3vw;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 1.5vw;
+  font-size: 2.5vh;
   margin: 0 1vw;
   padding: 1vh;
   color: #11205f;
@@ -45,12 +45,12 @@
 
 .title-create {
   font-size: 2vw;
-  margin: 0;
+  margin: 15px;
 }
 
 .p-waiting {
-  margin: 0;
-  font-size: 1.2vw;
+  margin: 15px;
+  font-size: 1.5vw;
 }
 
 .player-list {
@@ -62,16 +62,18 @@
 }
 
 .button-waiting-final {
-  padding: 1vh;
-  width: 100%;
-  max-width: 30vw;
-  border-radius: 1vw;
+  padding: 1.5vh;
+  width: 8vw;
+  max-width: 10vw;
+  border-radius: 2rem;
   margin-left: 1vw;
-  font-size: 2vh;
+  margin-top: 1rem;
+  font-size: 2.5vh;
   font-family: "Chewy", system-ui;
   background-color: #750de5;
   color: white;
   cursor: pointer;
+  border: 1.6px solid #11205F;
 }
 
 .button-waiting-final:disabled {

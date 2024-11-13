@@ -53,7 +53,7 @@
   background-color: #f1d9ff;
   border-radius: 1vw;
   margin: 1vh 0;
-  padding: 1vh;
+  padding: 2vh;
   width: 90%;
   text-align: left;
   display: flex;
@@ -80,10 +80,10 @@
 }
 
 .custom-dialog-title {
-  font-size: 2.5vh;
-  font-weight: bold;
-  text-align: center;
-  color: #333; 
+  font-family: "Chewy", system-ui;
+  font-size: 2rem;
+  margin: 0;
+  color: #11205f;
   margin-bottom: 2vh;
 }
 
@@ -115,15 +115,30 @@
 
 .button-search-room {
   padding: 1vh;
-  width: 50%;
-  max-width: 20vw;
-  border-radius: 1vw;
-  font-size: 2vh;
+  width: 10vw;
+  max-width: 12vw;
+  border-radius: 2rem;
+  font-size: 2.5vh;
   font-family: "Chewy", system-ui;
   background-color: #750de5;
   color: white;
   cursor: pointer;
   margin: 1rem;
+  border: 1.6px solid #11205F;
+}
+
+.button-search-room-3 {
+  padding: 1vh;
+  width: 7vw;
+  max-width: 7vw;
+  border-radius: 1vw;
+  font-size: 2.5vh;
+  font-family: "Chewy", system-ui;
+  background-color: #750de5;
+  color: white;
+  cursor: pointer;
+  margin: 1rem;
+  border: 1.6px solid #11205F;
 }
 
 .room-item-2{
@@ -133,14 +148,15 @@
 
 .button-search-room-2 {
   padding: 1vh;
-  width: 20%;
-  max-width: 20vw;
-  border-radius: 1vw;
-  font-size: 2vh;
+  width: 8vw;
+  max-width: 10vw;
+  border-radius: 2rem;
+  font-size: 2.5vh;
   font-family: "Chewy", system-ui;
   background-color: #FF0062;
   color: white;
   cursor: pointer;
+  border: 1.6px solid #11205F;
 }
 
 button:disabled {

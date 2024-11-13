@@ -100,15 +100,14 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
             </>
           ) : (
             <>
-              <p className='p-waiting'>Id da sala: {roomState.roomId}</p>
-              <p className='p-waiting'>Código da sala: {roomState.code}</p>
+              <p className='p-waiting'>Id da sala: {roomState.roomId} | Código da sala: {roomState.code}</p>
               <div className="player-list">
   {avatarAssets.map((avatar, index) => {
     const player = roomState.players[index];
     return (
       <div key={index} className="player-item">
         <img src={avatar} alt={`Avatar do jogador ${index + 1}`} className="image" />
-        <span className="player-name">
+        <span className="player-name" style={{fontFamily: '"Chewy", system-ui', fontSize: '2.5vh'}}>
           {player ? player.username : `Jogador ${index + 1}`} - {player?.ready ? 'Pronto' : 'Aguardando'}
         </span>
 
@@ -119,9 +118,28 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
         )}
 
         {player?.playerId === socketId ? (
-          <Button variant="outlined" size="sm" onClick={() => handleToggleReady(roomState.roomId)}>
-            {player.ready ? 'Desmarcar Pronto' : 'Marcar Pronto'}
-          </Button>
+          <Button
+          variant="outlined"
+          size="sm"
+          onClick={() => handleToggleReady(roomState.roomId)}
+          sx={{
+            backgroundColor: '#FF0062',
+            color: 'white',
+            border: '1.2px solid #11205F',
+            opacity: 0.8, 
+            '&:hover': {
+              backgroundColor: '#d10065',
+              opacity: 1, 
+            },
+            fontFamily: '"Tilt Neon", sans-serif',
+            fontSize: '2.5vh',
+            fontWeight:'300',
+            borderRadius: '2rem'
+          }}
+        >
+          {player.ready ? 'Desmarcar Pronto' : 'Marcar Pronto'}
+        </Button>
+        
         ) : (
           isHost && player && (
             <Button variant="outlined" size="sm" color="danger" onClick={() => handleRemovePlayer(roomState.roomId, player.playerId)}>
