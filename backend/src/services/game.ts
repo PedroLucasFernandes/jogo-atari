@@ -14,8 +14,8 @@ export default function createGame(roomState: IRoomState) {
 
   // REFACTOR, ARRUMAR COM OS VALORES DAS NOVAS POSIÇÕES DOS PLAYERS!!
   const speed = 10;
-  const MAX_SPEED = 20; // Limite de velocidade
-  const INITIAL_SPEED = 1;
+  const MAX_SPEED = 120; // Limite de velocidade
+  const INITIAL_SPEED = 30;
   const ACCELERATION_FACTOR = 2.5; // Fator de aceleração ao colidir com um planeta
   const DECAY_RATE = 0.995; // Taxa de redução da velocidade após a aceleração
   /* const initialPositions = [

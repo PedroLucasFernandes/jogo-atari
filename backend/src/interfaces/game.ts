@@ -126,8 +126,8 @@ export const initialBallState: IBall = {
   x: 400,
   y: 300,
   radius: 10,
-  speedX: 5,
-  speedY: 5,
+  speedX: 30,
+  speedY: 30,
   color: 'white'
 };
 
