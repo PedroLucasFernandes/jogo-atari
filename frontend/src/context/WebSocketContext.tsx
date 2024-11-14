@@ -553,32 +553,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       return;
     }
 
-    console.log("move", newPosition);
-
-    const updatedPlayer = {
-      ...player,
-      x: newPosition.x,
-      y: newPosition.y
-    };
-
-    const updatedPlayers = {
-      ...gameState.players,
-      [socketId]: updatedPlayer
-    };
-
-    console.log("updatedPlayers", updatedPlayers);
-
-    setGameState(prevState => {
-      if (!prevState) return null;
-      return {
-        ...prevState,
-        players: updatedPlayers
-      };
-    });
-
-    console.log("setGameState", gameState);
-
-
     const newMoveNumber = addMoveOnHistory(newPosition.direction, newPosition.x, newPosition.y);
     console.log("movenumber no move player", newMoveNumber);
 
@@ -588,7 +562,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       webSocketService.send({ type: 'movePlayer', data });
     }
 
-  }, [socketId, gameState, moveNumber]);
+  }, [socketId, gameState]);
 
   const leaveGame = (roomId: string) => {
     if (!socketId) {
