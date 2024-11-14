@@ -69,6 +69,7 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   const handleCloseRoom = (roomId: string) => {
     if (isHost) {
       closeRoom(roomId);
+      setScreen('main-menu')
     } else {
       console.log("Apenas o host pode iniciar o jogo.");
     }
@@ -155,10 +156,11 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
 
 
               <div className="buttons">
+              {roomState?.players.length > 1 && (
                 <button className='button-waiting-final' onClick={() => handleLeaveRoom(roomState.roomId)}>
                   Sair da sala
                 </button>
-
+                )}
                 {isHost && (
                   <>
                     <button className='button-waiting-final' onClick={() => handleCloseRoom(roomState.roomId)}>
@@ -167,7 +169,7 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
                     <button
                       className='button-waiting-final'
                       onClick={() => handleStartGame(roomState.roomId)}
-                      disabled={!roomState.players.every(player => player.ready)}
+                      disabled={!roomState.players.every(player => player.ready) || roomState?.players.length <= 1}
                     >
                       Iniciar jogo
                     </button>
