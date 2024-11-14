@@ -130,14 +130,14 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
         </Button>
       </div>
 
-      <Dialog open={openModal} onClose={() => setOpenModal(false)}>
-        <DialogTitle>Entrar na Sala</DialogTitle>
-        <DialogContent>
+      <Dialog open={openModal} onClose={() => setOpenModal(false)} className="custom-dialog">
+      <DialogTitle className="custom-dialog-title" sx={{fontFamily: '"Chewy", system-ui', fontSize:'3.5vh', marginBottom:'1.5vh', color: '#11205f'}}>Entrar na Sala</DialogTitle>
+        <DialogContent sx={{fontFamily: '"Tilt Neon", sans-serif', fontSize: '3vh', maxWidth: '22vw', alignSelf: 'center', borderRadius: '2rem', textAlign: 'center', width:'25vw'}}>
           <p>Você está em uma partida em andamento, deseja continuá-la?</p>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleAbandon}>Abandonar</Button>
-          <Button onClick={handleRejoin}>Continuar</Button>
+        <button className="button-search-room-3" onClick={handleAbandon}>Abandonar</button>
+          <button className="button-search-room-3" onClick={handleRejoin}>Continuar</button>
         </DialogActions>
       </Dialog>
 

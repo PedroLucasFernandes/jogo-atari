@@ -142,7 +142,20 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
         
         ) : (
           isHost && player && (
-            <Button variant="outlined" size="sm" color="danger" onClick={() => handleRemovePlayer(roomState.roomId, player.playerId)}>
+            <Button variant="outlined" size="sm" color="danger" sx={{
+              backgroundColor: '#FF0062',
+              color: 'white',
+              border: '1.2px solid #11205F',
+              opacity: 0.8, 
+              '&:hover': {
+                backgroundColor: '#d10065',
+                opacity: 1, 
+              },
+              fontFamily: '"Tilt Neon", sans-serif',
+              fontSize: '2.5vh',
+              fontWeight:'300',
+              borderRadius: '2rem'
+            }} onClick={() => handleRemovePlayer(roomState.roomId, player.playerId)}>
               Remover
             </Button>
           )
