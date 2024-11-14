@@ -11,7 +11,7 @@ const LoginGoogleButton: React.FC = () => {
         if (response.credential) {
             try {
                 // Enviar o token do Google para o backend
-                const res = await fetch("http://localhost:3001/api/auth/google", {
+                const res = await fetch(`${process.env.REACT_APP_BACKEND_API_ADDRESS}/auth/google`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"

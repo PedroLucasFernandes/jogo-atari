@@ -17,7 +17,7 @@ const PORT = process.env.PORT;
 const app: Express = express();
 
 const corsOptions = {
-	origin: "http://localhost:3000",
+	origin: process.env.NODE_ENV === 'production' ? 'https://alpha04.alphaedtech.org.br' : 'http://localhost:3000',
 	credentials: true,
 };
 
