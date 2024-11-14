@@ -32,7 +32,13 @@ export const authenticateUser = async (email: string, password: string) => {
                 }, SECRET_KEY, {
                     expiresIn: "5d",
                 });
-                return { auth: true, token, user };
+                const data = {
+                    id: user.id,
+                    username: user.username,
+                    email: user.email
+                }
+
+                return { auth: true, token, user: data };
             }
         }
         return { auth: false, error: "Invalid username and/or password." };
