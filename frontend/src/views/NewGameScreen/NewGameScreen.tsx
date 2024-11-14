@@ -13,6 +13,7 @@ interface ScreenProps {
 const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }) => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const { socketId, roomState, gameState, movePlayer } = useWebSocket();
+	const [backgroundImage, setBackgroundImage] = useState<string | null>(null);
 	const activeKeysRef = useRef(new Set<string>());
 	const intervalIdRef = useRef<NodeJS.Timeout | null>(null);
 	const gameStateRef = useRef(gameState);
@@ -33,21 +34,6 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 			setScreen('game-over');
 		}
 	}, [gameState?.winner]);
-
-	useEffect(() => {
-		const img = new Image();
-		img.src = '/assets/bg-space.svg';
-
-		img.onload = () => {
-			if (canvasRef.current) {
-				canvasRef.current.style.backgroundImage = `url(${img.src})`;
-			}
-		};
-
-		img.onerror = () => {
-			console.error("Error loading background image.");
-		};
-	}, []);
 
 	// Setup game rendering
 	useEffect(() => {
@@ -133,12 +119,31 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 		};
 	}, [stableMovePlayer]); // `stableMovePlayer` é uma dependência estável
 
+	useEffect(() => {
+		const img = new Image();
+		img.src = '/assets/bg-space.svg';
+
+		img.onload = () => {
+			setBackgroundImage(img.src); // Define a URL da imagem no estado
+		};
+
+		img.onerror = () => {
+			console.error("Erro ao carregar a imagem de fundo.");
+		};
+	}, []);
+
+	useEffect(() => {
+		console.log("aa")
+		if (canvasRef.current) {
+			canvasRef.current.style.backgroundImage = `url(/assets/bg-space.svg)`;
+			canvasRef.current.style.backgroundSize = "cover"; // Ajusta a imagem ao canvas
+			canvasRef.current.style.backgroundPosition = "center"
+		}
+	}, [canvasRef.current]);
+
 	return (
 		<div className="relative">
-			<canvas ref={canvasRef} width={800} height={600} style={{
-				backgroundSize: 'cover',
-				backgroundPosition: 'center'
-			}} />
+			<canvas ref={canvasRef} width={800} height={600} />
 		</div>
 	);
 };

@@ -32,7 +32,9 @@ export default function createGame(roomState: IRoomState) {
   function start() {
     const frequency = 1000 / 30
 
-    intervalId = setInterval(moveBall, frequency);
+    setTimeout(() => {
+      intervalId = setInterval(moveBall, frequency);
+    }, 3000);
   }
 
   function subscribe(observerFunction: (message: IGameMessage) => void) {
