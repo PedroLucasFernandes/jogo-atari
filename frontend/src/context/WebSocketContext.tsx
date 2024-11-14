@@ -1,8 +1,9 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { webSocketService } from '../services/WebSocketService';
-import { IGameMessage, IGameState, IWinner, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialPlanetsState, IRoomState } from '../interfaces/game';
+import { IGameMessage, IGameState, IWinner, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialPlanetsState, IRoomState, IMove, PlayersRecord, IPlayer } from '../interfaces/game';
 import { useUser } from './UserContext';
 import { gameAudio } from '../utils/audioManager';
+import { movePlayerPredict } from '../services/game';
 
 interface WebSocketContextType {
   //isConnected: boolean; // removido, socketId já faz essa função
@@ -40,6 +41,13 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const { user } = useUser();
 
+  const [moveNumber, setMoveNumber] = useState<number>(0);
+  const [moveHistory, setMoveHistory] = useState<IMove[]>([]);
+  const [isReconciling, setIsReconciling] = useState<boolean>(false);
+  const gameStateRef = useRef<IGameState | null>(gameState);
+  const socketIdRef = useRef<string | null>(socketId);
+  const moveNumberRef = useRef<number | null>(moveNumber);
+
   useEffect(() => {
     if (!user) {
       if (socketId) {
@@ -67,6 +75,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setSocketId(data.socketId);
       setStatus('online');
     });
+  }, [user]);
+
+  useEffect(() => {
+    if (!user || !socketId) return;
 
     webSocketService.registerCallback('gameInProgress', (data) => {
       console.log("tem jogo em progresso");
@@ -212,6 +224,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     webSocketService.registerCallback('gameStarted', (data) => {
       const roomState = data.data.roomState;
       const gameState = data.data.gameState;
+      console.log("gamestate recebido", JSON.stringify(gameState.players));
+      console.log("gamestate recebido", JSON.stringify(data.data.gameState.players));
+      console.log("roomstate recebido", JSON.stringify(roomState));
+      console.log("roomstate recebido", JSON.stringify(data.data.roomState));
 
       if (!roomState) {
         console.log("Erro ao indentificar estado da sala");
@@ -232,7 +248,38 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     });
 
     webSocketService.registerCallback('playerMoved', (data) => {
-      setGameState(data.data.gameState)
+      //setGameState(data.data.gameState)
+
+      const playerId = data.data.playerId;
+      console.log("Player Id: " + playerId);
+      console.log("Socket Id: " + socketIdRef.current);
+      console.log("moveNumber", moveNumber);
+
+      if (!playerId) {
+        console.log("Erro ao identificar jogador");
+        setLastMessage({ type: 'error', data: { message: 'Erro ao identificar jogador movimentado. Unexpected server response' } });
+        return;
+      }
+
+      const serverMovement = data.data.move;
+      if (!serverMovement) {
+        console.log("Erro ao identificar movimento do jogador");
+        setLastMessage({ type: 'error', data: { message: 'Erro ao identificar jogador movimentado. Unexpected server response' } });
+        return;
+      }
+
+      console.log("Movement", data.data.move);
+
+      if (playerId === socketIdRef.current) {
+        validateAndReconcile(data.data.move);
+        console.log("reconciliação");
+      }
+      //else if (gameStateRef.current && gameStateRef.current.players[playerId]) {
+      else if (gameState && gameState.players[playerId]) {
+        console.log("interpolação");
+        updateTarget(data.data.move.x, data.data.move.y, data.data.playerId);
+
+      }
     });
 
     webSocketService.registerCallback('playerLeftGame', (data) => {
@@ -269,7 +316,17 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     });
 
     webSocketService.registerCallback('updateBall', (data) => {
-      if (data.data && data.data.ball) {
+      const position = data.data.position;
+
+      if (!position) {
+        console.error('Erro ao atualizar a posição da bola:', data);
+        setLastMessage({ type: 'error', data: { message: 'Erro ao atualizar a posição da bola. Unexpected server response' } });
+        return;
+      }
+
+      updateTarget(position.x, position.y);
+
+      /* if (data.data && data.data.ball) {
         // Check for collisions by comparing with previous state
         setGameState(prevGameState => {
           // Se o estado anterior for nulo, você pode retornar um novo estado inicial
@@ -295,7 +352,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       } else {
         console.error('Erro ao atualizar o estado da bola:', data);
         setLastMessage({ type: 'error', data: { message: 'Erro ao processar jogo. Unexpected server response' } });
-      }
+      } */
     });
 
     webSocketService.registerCallback('updatePlanet', (data) => {
@@ -327,7 +384,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
     });
 
-
     webSocketService.registerCallback('gameOver', (data) => {
       if (data.data && data.data.winner) {
         gameAudio.stopAll();
@@ -348,7 +404,20 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setLastMessage({ type: 'error', data: { message: 'Erro ao processar jogo. Unexpected server response' } });
       }
     });
-  }, [user]);
+  }, [socketId, user, roomState, gameState, moveNumber, moveHistory, isReconciling, updateTarget,
+    validateAndReconcile, addMoveOnHistory, getMoveFromSequenceNumber, getAndDeleteUnacknowledgedMoves, keepUnacknowledgedMoves]);
+
+  useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
+
+  useEffect(() => {
+    socketIdRef.current = socketId;
+  }, [socketId]);
+
+  useEffect(() => {
+    moveNumberRef.current = moveNumber;
+  }, [moveNumber]);
 
 
 
@@ -464,16 +533,36 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     webSocketService.send({ type: 'startGame', data });
   }
 
-  const movePlayer = (roomId: string, keyPressed: string) => {
+  const movePlayer = useCallback((roomId: string, keyPressed: string) => {
     if (!socketId) {
       setLastMessage({ type: 'error', data: { message: 'Falha ao conectar com o servidor' } });
       console.log('Can\'t move player without a socketId');
       return;
     }
 
-    const data = { roomId: roomId, keyPressed: keyPressed, playerId: socketId }
-    webSocketService.send({ type: 'movePlayer', data });
-  }
+    if (!gameState) {
+      console.error('Can\'t move player without a gameState');
+      return;
+    }
+
+    const newPosition = movePlayerPredict(gameState, socketId, keyPressed);
+    const player = gameState.players[socketId];
+
+    if (!player || !newPosition) {
+      console.error('Can\'t move player.');
+      return;
+    }
+
+    const newMoveNumber = addMoveOnHistory(newPosition.direction, newPosition.x, newPosition.y);
+    console.log("movenumber no move player", newMoveNumber);
+
+
+    if (newMoveNumber) {
+      const data = { roomId: roomId, keyPressed: keyPressed, moveNumber: newMoveNumber + 1, playerId: socketId }
+      webSocketService.send({ type: 'movePlayer', data });
+    }
+
+  }, [socketId, gameState]);
 
   const leaveGame = (roomId: string) => {
     if (!socketId) {
@@ -484,6 +573,129 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     const data = { roomId: roomId, playerId: socketId }
     webSocketService.send({ type: 'leaveGame', data });
+  }
+
+  function addMoveOnHistory(direction: string, x: number, y: number) {
+    /* setMoveNumber(moveNumber => moveNumber + 1);
+
+    const newMove = {
+      moveNumber: moveNumber + 1,
+      direction,
+      x,
+      y,
+    };
+
+    console.log("movenumber do newMove", newMove);
+
+    setMoveHistory(prevMoveHistory => [...prevMoveHistory, newMove]); */
+    setMoveNumber(prevMoveNumber => {
+      const newMoveNumber = prevMoveNumber + 1;
+      const newMove = {
+        moveNumber: newMoveNumber,
+        direction,
+        x,
+        y,
+      };
+
+      console.log("movenumber do newMove", newMove);
+
+      setMoveHistory(prevMoveHistory => [...prevMoveHistory, newMove]);
+
+      return newMoveNumber; // Atualiza moveNumber com base no valor anterior
+    });
+
+    return moveNumberRef.current;
+  }
+
+  function updateTarget(x: number, y: number, playerId?: string) {
+    if (!gameState) return;
+
+    if (playerId) {
+      const player = gameState.players[playerId];
+
+      if (!player) return;
+
+      player.toX = x;
+      player.toY = y;
+
+    } else {
+      setGameState(prevGameState => {
+        if (prevGameState === null) {
+          return {
+            players: initialPlayersState,
+            planets: initialPlanetsState,
+            ball: initialBallState,
+            canvas: initialCanvasState,
+            room: initialRoomState,
+          };
+        }
+        return {
+          ...prevGameState,
+          ball: {
+            ...prevGameState.ball,
+            toX: x,
+            toY: y,
+          },
+        };
+      });
+    }
+  }
+
+  function validateAndReconcile(serverMovement: IMove) {
+    if (!gameState || !socketId) {
+      console.log("gameState inside", gameState);
+      console.log("socketid inside", socketId);
+      console.log('Can\'t validate and reconcile without a gameState or socketId');
+      return;
+    }
+    const player = gameState.players[socketId];
+    const serverMoveNumber = serverMovement.moveNumber;
+    const localMove = getMoveFromSequenceNumber(serverMoveNumber);
+
+    if (localMove) {
+      if (localMove.x !== serverMovement.x || localMove.y !== serverMovement.y) {
+        console.log("Starting reconciliation from move number:", serverMoveNumber);
+        player.x = serverMovement.x;
+        player.y = serverMovement.y;
+        setIsReconciling(true);
+
+        const movesToReapply = getAndDeleteUnacknowledgedMoves(serverMoveNumber);
+
+        movesToReapply.forEach((move) => {
+          const newPosition = movePlayerPredict(gameState, socketId, move.direction);
+          if (newPosition) {
+            addMoveOnHistory(move.direction, newPosition.x, newPosition.y);
+          }
+        });
+
+        setIsReconciling(false);
+        console.log("Reconciliation complete");
+      } else {
+        keepUnacknowledgedMoves(serverMoveNumber);
+      }
+    } else {
+      player.x = serverMovement.x;
+      player.y = serverMovement.y;
+      keepUnacknowledgedMoves(serverMoveNumber);
+    }
+  }
+
+  function getMoveFromSequenceNumber(moveNumber: number) {
+    return moveHistory.find((move) => move.moveNumber === moveNumber);
+  }
+
+  function getAndDeleteUnacknowledgedMoves(fromMoveNumber: number) {
+    const moves = moveHistory.filter((move) => move.moveNumber > fromMoveNumber);
+    setMoveHistory([]);
+    setMoveNumber(fromMoveNumber);
+    return moves;
+  }
+
+  function keepUnacknowledgedMoves(fromMoveNumber: number) {
+    setMoveHistory((prevMoveHistory) => {
+      const newMoveHistory = prevMoveHistory.filter((move) => move.moveNumber > fromMoveNumber);
+      return newMoveHistory;
+    });
   }
 
   return (

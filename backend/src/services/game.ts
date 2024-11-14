@@ -14,8 +14,8 @@ export default function createGame(roomState: IRoomState) {
 
   // REFACTOR, ARRUMAR COM OS VALORES DAS NOVAS POSIÇÕES DOS PLAYERS!!
   const speed = 10;
-  const MAX_SPEED = 20; // Limite de velocidade
-  const INITIAL_SPEED = 5;
+  const MAX_SPEED = 40; // Limite de velocidade
+  const INITIAL_SPEED = 10;
   const ACCELERATION_FACTOR = 2.5; // Fator de aceleração ao colidir com um planeta
   const DECAY_RATE = 0.995; // Taxa de redução da velocidade após a aceleração
   /* const initialPositions = [
@@ -30,9 +30,11 @@ export default function createGame(roomState: IRoomState) {
   let intervalId: NodeJS.Timeout | null = null;
 
   function start() {
-    const frequency = 1000 / 60
+    const frequency = 1000 / 30
 
-    intervalId = setInterval(moveBall, frequency);
+    setTimeout(() => {
+      intervalId = setInterval(moveBall, frequency);
+    }, 3000);
   }
 
   function subscribe(observerFunction: (message: IGameMessage) => void) {
@@ -51,8 +53,9 @@ export default function createGame(roomState: IRoomState) {
 
 
 
-  function movePlayer(playerId: string, keyPressed: string) {
-    let moveNumber = 0;
+  function movePlayer(playerId: string, keyPressed: string, moveNumber: number) {
+    console.log("moveNumber2: " + moveNumber);
+    console.log("players moved");
     const player = gameState.players[playerId];
     if (!player || !keyPressed) return;
 
@@ -183,16 +186,21 @@ export default function createGame(roomState: IRoomState) {
     }
 
     const data = {
-      gameState,
-      moveNumber: moveNumber++,
+      //gameState,
+      move: { direction: keyPressed, x: player.x, y: player.y, moveNumber },
+      playerId
     };
+    console.log("data apos mover", data);
     notifyAll({ type: 'playerMoved', data });
   }
 
   function notifyBallUpdate() {
-    const data = {
+    /* const data = {
       ball: gameState.ball,
-    };
+    }; */
+    const data = {
+      position: { x: gameState.ball.x, y: gameState.ball.y }
+    }
 
     notifyAll({ type: 'updateBall', data });
   }
@@ -425,6 +433,8 @@ export default function createGame(roomState: IRoomState) {
           username: player.username,
           x: position.player.x,
           y: position.player.y,
+          toX: position.player.x,
+          toY: position.player.y,
           initialX: position.player.x,
           initialY: position.player.y,
           size: 80,
@@ -446,6 +456,7 @@ export default function createGame(roomState: IRoomState) {
         });
       }
     });
+    console.log("gamestate apos add players", gameState.players);
   }
 
 

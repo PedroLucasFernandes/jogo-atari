@@ -16,6 +16,8 @@ export interface IPlayer {
   username: string;
   x: number;
   y: number;
+  toX: number;
+  toY: number;
   initialX: number;
   initialY: number;
   size: number;
@@ -29,6 +31,8 @@ export type PlayersRecord = Record<string, IPlayer>;
 export interface IBall {
   x: number;
   y: number;
+  toX: number;
+  toY: number;
   radius: number;
   speedX: number;
   speedY: number;
@@ -76,6 +80,8 @@ export interface IGameMessage {
     roomId?: string;
     code?: string;
     keyPressed?: string;
+    moveNumber?: number;
+    move?: IMove;
     gameState?: IGameState;
     ball?: IBall;
     message?: string;
@@ -84,12 +90,13 @@ export interface IGameMessage {
     planets?: IPlanet[];
     player?: IPlayer;
     winner?: Winner;
+    position?: IPosition;
   }
 }
 
 export interface IGame {
   gameState: IGameState;
-  movePlayer: (playerId: string, keyPressed: string) => void;
+  movePlayer: (playerId: string, keyPressed: string, moveNumber: number) => void;
   subscribe(observerFunction: (message: IGameMessage) => void): void;
   setState(newState: Partial<IGameState>): void;
   addPlayers(players: IPlayerRoom[]): void;
@@ -105,10 +112,10 @@ export const initialPlanetsState: IPlanet[] = [
 ];
 
 export const initialPlayersState: PlayersRecord = {
-  'player0': { username: 'Player 0', x: 170, y: 150, initialX: 170, initialY: 150, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 0 },
-  'player1': { username: 'Player 1', x: 550, y: 150, initialX: 550, initialY: 150, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 1 },
-  'player2': { username: 'Player 2', x: 170, y: 370, initialX: 170, initialY: 370, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 2 },
-  'player3': { username: 'Player 3', x: 550, y: 370, initialX: 550, initialY: 370, size: 80, isBot: false, imageSrc: '', defendingPlanetId: 3 }
+  'player0': { username: 'Player 0', x: 170, y: 150, initialX: 170, initialY: 150, toX: 170, toY: 150, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 0 },
+  'player1': { username: 'Player 1', x: 550, y: 150, initialX: 550, initialY: 150, toX: 550, toY: 150, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 1 },
+  'player2': { username: 'Player 2', x: 170, y: 370, initialX: 170, initialY: 370, toX: 170, toY: 370, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 2 },
+  'player3': { username: 'Player 3', x: 550, y: 370, initialX: 550, initialY: 370, toX: 550, toY: 370, size: 80, isBot: false, imageSrc: '', defendingPlanetId: 3 }
 };
 
 export const planetsByPlayersPosition = [
@@ -121,9 +128,11 @@ export const planetsByPlayersPosition = [
 export const initialBallState: IBall = {
   x: 400,
   y: 300,
+  toX: 400,
+  toY: 300,
   radius: 10,
-  speedX: 5,
-  speedY: 5,
+  speedX: 10,
+  speedY: 10,
   color: 'white'
 };
 
@@ -147,6 +156,19 @@ export const initialRoomState: IRoomState = {
   players: initialPlayersRoomState
 }
 
+export interface IMove {
+  direction: string;
+  x: number;
+  y: number;
+  moveNumber: number;
+}
 
+export interface ILastMove {
+  playerId: string;
+  move: IMove
+}
 
-
+export interface IPosition {
+  x: number;
+  y: number;
+}

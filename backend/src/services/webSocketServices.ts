@@ -111,7 +111,7 @@ class WebSocketService {
 	private handleMessage(clientId: string, message: any) {
 		switch (message.type) {
 			case 'movePlayer':
-				this.handlePlayerMove(clientId, message.data.roomId, message.data.keyPressed);
+				this.handlePlayerMove(clientId, message.data.roomId, message.data.keyPressed, message.data.moveNumber);
 				break;
 			case 'checkGameInProgress':
 				this.checkGameInProgress(clientId);
@@ -626,8 +626,9 @@ class WebSocketService {
 		this.notifyRoomObservers();
 	}
 
-	private handlePlayerMove(clientId: string, roomId: string, keyPressed: string) {
-		console.log(this.gamesByRoom[roomId].gameState);
+	private handlePlayerMove(clientId: string, roomId: string, keyPressed: string, moveNumber: number) {
+		//console.log(this.gamesByRoom[roomId].gameState);
+		console.log("moveNumber1: " + moveNumber);
 
 		const room = this.rooms[roomId];
 		const gameRoom = this.gamesByRoom[roomId]
@@ -648,15 +649,7 @@ class WebSocketService {
 			return;
 		}
 
-		gameRoom.movePlayer(clientId, keyPressed)
-
-
-
-
-
-
-
-
+		gameRoom.movePlayer(clientId, keyPressed, moveNumber);
 
 		/* const roomId = Object.keys(this.rooms).find(roomId =>
 			this.rooms[roomId].players.some(player => player.playerId === clientId)
