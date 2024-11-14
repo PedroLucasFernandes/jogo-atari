@@ -13,20 +13,17 @@ interface ScreenProps {
 const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }) => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const { socketId, roomState, gameState, movePlayer } = useWebSocket();
-	const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
 	const activeKeysRef = useRef(new Set<string>());
 	const intervalIdRef = useRef<NodeJS.Timeout | null>(null);
 	const gameStateRef = useRef(gameState);
 	const animationFrameIdRef = useRef<number | null>(null);
 	const lastRenderTimeRef = useRef<number>(0);  // Armazena o timestamp do último frame
-	const FPS = 60;  // Define a taxa de atualização desejada (ex.: 30 FPS)
+	const FPS = 60;
 	const interval = 1000 / FPS;
 
-	// Atualiza a ref do gameState a cada nova alteração
 	useEffect(() => {
 		gameStateRef.current = gameState;
 	}, [gameState]);
-
 
 	useEffect(() => {
 		if (gameState?.winner) {
@@ -38,12 +35,13 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 	}, [gameState?.winner]);
 
 	useEffect(() => {
-		const bgImage = '/assets/bg-space.svg';
 		const img = new Image();
-		img.src = bgImage;
+		img.src = '/assets/bg-space.svg';
 
 		img.onload = () => {
-			setBackgroundImage(img);
+			if (canvasRef.current) {
+				canvasRef.current.style.backgroundImage = `url(${img.src})`;
+			}
 		};
 
 		img.onerror = () => {
@@ -54,7 +52,7 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 	// Setup game rendering
 	useEffect(() => {
 		const canvas = canvasRef.current;
-		if (!canvas || !socketId || !roomState || !backgroundImage || !gameStateRef.current) return;
+		if (!canvas || !socketId || !roomState || !gameStateRef.current) return;
 
 		/* const animationFrameId = requestAnimationFrame(() => {
 			renderScreen(canvas, gameState, requestAnimationFrame, socketId, backgroundImage);
@@ -70,7 +68,7 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 
 			if (timeSinceLastRender >= interval) {
 				// Renderiza apenas se o tempo decorrido for maior que o intervalo desejado
-				renderScreen(canvas, gameStateRef, socketId, backgroundImage);
+				renderScreen(canvas, gameStateRef, socketId);
 				lastRenderTimeRef.current = timestamp;
 			}
 
@@ -93,15 +91,7 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 				animationFrameIdRef.current = null;
 			}
 		};
-	}, [roomState, socketId, backgroundImage, interval]);
-
-	// Exibe tela de vencedor se houver um ganhador
-	// useEffect(() => {
-	// 	if (gameState?.winner) {
-	// 		setScreen('game-over');
-	// 	return;
-	// 	}
-	// }, [gameState?.winner]);
+	}, [roomState, socketId, interval]);
 
 	// Cria uma versão estável de movePlayer
 	const stableMovePlayer = useCallback((direction: string) => {
@@ -145,7 +135,10 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 
 	return (
 		<div className="relative">
-			<canvas ref={canvasRef} width={800} height={600} className="border border-gray-600 rounded-lg" />
+			<canvas ref={canvasRef} width={800} height={600} style={{
+				backgroundSize: 'cover',
+				backgroundPosition: 'center'
+			}} />
 		</div>
 	);
 };

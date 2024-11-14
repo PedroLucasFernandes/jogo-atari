@@ -15,7 +15,7 @@ export default function renderScreen(
   gameStateRef: React.MutableRefObject<IGameState | null>,
   //requestAnimationFrame: (callback: FrameRequestCallback) => number,
   currentPlayerId: string,
-  backgroundImage: HTMLImageElement,
+  //backgroundImage: HTMLImageElement,
 ) {
   const gameState = gameStateRef.current;
   if (!gameState) return;
@@ -28,7 +28,7 @@ export default function renderScreen(
 
   // Clear and draw background
   context.clearRect(0, 0, gameState.canvas.width, gameState.canvas.height);
-  context.drawImage(backgroundImage, 0, 0, gameState.canvas.width, gameState.canvas.height);
+  //context.drawImage(backgroundImage, 0, 0, gameState.canvas.width, gameState.canvas.height);
 
   // Atualizar o histórico de posições da bola
   ballTrailPositions.push({
