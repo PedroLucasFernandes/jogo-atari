@@ -16,6 +16,17 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 	const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
 	const activeKeysRef = useRef(new Set<string>());
 	const intervalIdRef = useRef<NodeJS.Timeout | null>(null);
+	const gameStateRef = useRef(gameState);
+	const animationFrameIdRef = useRef<number | null>(null);
+	const lastRenderTimeRef = useRef<number>(0);  // Armazena o timestamp do último frame
+	const FPS = 60;  // Define a taxa de atualização desejada (ex.: 30 FPS)
+	const interval = 1000 / FPS;
+
+	// Atualiza a ref do gameState a cada nova alteração
+	useEffect(() => {
+		gameStateRef.current = gameState;
+	}, [gameState]);
+
 
 	useEffect(() => {
 		if (gameState?.winner) {
@@ -43,16 +54,46 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 	// Setup game rendering
 	useEffect(() => {
 		const canvas = canvasRef.current;
-		if (!canvas || !socketId || !roomState || !gameState || !backgroundImage) return;
+		if (!canvas || !socketId || !roomState || !backgroundImage || !gameStateRef.current) return;
 
-		const animationFrameId = requestAnimationFrame(() => {
-			renderScreen(canvas, gameState, socketId, backgroundImage);
+		/* const animationFrameId = requestAnimationFrame(() => {
+			renderScreen(canvas, gameState, requestAnimationFrame, socketId, backgroundImage);
 		});
 
 		return () => {
 			cancelAnimationFrame(animationFrameId);
+		}; */
+
+		// Função de loop de renderização com controle de taxa de atualização
+		const renderLoop = (timestamp: number) => {
+			const timeSinceLastRender = timestamp - lastRenderTimeRef.current;
+
+			if (timeSinceLastRender >= interval) {
+				// Renderiza apenas se o tempo decorrido for maior que o intervalo desejado
+				renderScreen(canvas, gameStateRef, socketId, backgroundImage);
+				lastRenderTimeRef.current = timestamp;
+			}
+
+			// Solicita o próximo frame
+			animationFrameIdRef.current = requestAnimationFrame(renderLoop);
 		};
-	}, [roomState, gameState, socketId, backgroundImage, gameState?.winner]);
+
+		// Certifique-se de cancelar qualquer animação pendente para evitar loops duplicados
+		if (animationFrameIdRef.current !== null) {
+			cancelAnimationFrame(animationFrameIdRef.current);
+		}
+
+		// Inicia o loop de renderização
+		animationFrameIdRef.current = requestAnimationFrame(renderLoop);
+
+		// Limpa o requestAnimationFrame quando o componente é desmontado
+		return () => {
+			if (animationFrameIdRef.current !== null) {
+				cancelAnimationFrame(animationFrameIdRef.current);
+				animationFrameIdRef.current = null;
+			}
+		};
+	}, [roomState, socketId, backgroundImage, interval]);
 
 	// Exibe tela de vencedor se houver um ganhador
 	// useEffect(() => {

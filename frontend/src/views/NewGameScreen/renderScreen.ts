@@ -12,20 +12,20 @@ const TRAIL_LENGTH = 10; // Quantidade de posições que queremos manter no hist
 
 export default function renderScreen(
   canvasScreen: HTMLCanvasElement,
-  gameState: IGameState,
+  gameStateRef: React.MutableRefObject<IGameState | null>,
   //requestAnimationFrame: (callback: FrameRequestCallback) => number,
   currentPlayerId: string,
   backgroundImage: HTMLImageElement,
 ) {
-  //console.log("Player antes", JSON.stringify(gameState.players));
-  interpolateBall(1);
-  interpolatePlayer(0.5);
-  //console.log("Player depois", JSON.stringify(gameState.players));
+  const gameState = gameStateRef.current;
+  if (!gameState) return;
 
+  interpolateBall(0.5);
+  interpolatePlayer(0.5);
 
   const context = canvasScreen.getContext('2d');
   if (!context) throw new Error("Could not get 2D context from canvas.");
-  //console.log("speed: ", gameState.ball.speedX, gameState.ball.speedY);
+
   // Clear and draw background
   context.clearRect(0, 0, gameState.canvas.width, gameState.canvas.height);
   context.drawImage(backgroundImage, 0, 0, gameState.canvas.width, gameState.canvas.height);
