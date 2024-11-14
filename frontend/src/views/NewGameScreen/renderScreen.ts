@@ -13,12 +13,13 @@ const TRAIL_LENGTH = 10; // Quantidade de posições que queremos manter no hist
 export default function renderScreen(
   canvasScreen: HTMLCanvasElement,
   gameState: IGameState,
-  requestAnimationFrame: (callback: FrameRequestCallback) => number,
+  //requestAnimationFrame: (callback: FrameRequestCallback) => number,
   currentPlayerId: string,
   backgroundImage: HTMLImageElement,
 ) {
   //console.log("Player antes", JSON.stringify(gameState.players));
-  interpolate(0.5);
+  interpolateBall(1);
+  interpolatePlayer(0.5);
   //console.log("Player depois", JSON.stringify(gameState.players));
 
 
@@ -141,7 +142,7 @@ export default function renderScreen(
 
 
   // Função para interpolar entre a posição inicial e a posição alvo
-	function interpolate(interpolationFactor: number) {
+	function interpolatePlayer(interpolationFactor: number) {
 		if (!gameState) return;
 
 		Object.keys(gameState.players).forEach((playerId) => {
@@ -158,6 +159,21 @@ export default function renderScreen(
 				y: interpolatedY,
 			};
 		});
+	}
+
+  function interpolateBall(interpolationFactor: number) {
+		if (!gameState) return;
+    
+    const ball = gameState.ball;
+    const interpolatedX = ball.x + (ball.toX - ball.x) * interpolationFactor;
+    const interpolatedY = ball.y + (ball.toY - ball.y) * interpolationFactor;
+
+    // Atualiza as posições de cada jogador no objeto interpolado
+    gameState.ball = {
+      ...ball,
+      x: interpolatedX,
+      y: interpolatedY,
+    };
 	}
 }
 

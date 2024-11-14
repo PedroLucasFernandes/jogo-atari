@@ -31,6 +31,8 @@ export type PlayersRecord = Record<string, IPlayer>;
 export interface IBall {
   x: number;
   y: number;
+  toX: number;
+  toY: number;
   radius: number;
   speedX: number;
   speedY: number;
@@ -88,6 +90,7 @@ export interface IGameMessage {
     planets?: IPlanet[];
     player?: IPlayer;
     winner?: Winner;
+    position?: IPosition;
   }
 }
 
@@ -125,9 +128,11 @@ export const planetsByPlayersPosition = [
 export const initialBallState: IBall = {
   x: 400,
   y: 300,
+  toX: 400,
+  toY: 300,
   radius: 10,
-  speedX: 30,
-  speedY: 30,
+  speedX: 10,
+  speedY: 10,
   color: 'white'
 };
 
@@ -158,4 +163,12 @@ export interface IMove {
   moveNumber: number;
 }
 
+export interface ILastMove {
+  playerId: string;
+  move: IMove
+}
 
+export interface IPosition {
+  x: number;
+  y: number;
+}

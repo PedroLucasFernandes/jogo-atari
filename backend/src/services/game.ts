@@ -14,8 +14,8 @@ export default function createGame(roomState: IRoomState) {
 
   // REFACTOR, ARRUMAR COM OS VALORES DAS NOVAS POSIÇÕES DOS PLAYERS!!
   const speed = 10;
-  const MAX_SPEED = 120; // Limite de velocidade
-  const INITIAL_SPEED = 30;
+  const MAX_SPEED = 40; // Limite de velocidade
+  const INITIAL_SPEED = 10;
   const ACCELERATION_FACTOR = 2.5; // Fator de aceleração ao colidir com um planeta
   const DECAY_RATE = 0.995; // Taxa de redução da velocidade após a aceleração
   /* const initialPositions = [
@@ -30,7 +30,7 @@ export default function createGame(roomState: IRoomState) {
   let intervalId: NodeJS.Timeout | null = null;
 
   function start() {
-    const frequency = 1000 / 10
+    const frequency = 1000 / 30
 
     intervalId = setInterval(moveBall, frequency);
   }
@@ -193,9 +193,12 @@ export default function createGame(roomState: IRoomState) {
   }
 
   function notifyBallUpdate() {
-    const data = {
+    /* const data = {
       ball: gameState.ball,
-    };
+    }; */
+    const data = {
+      position: { x: gameState.ball.x, y: gameState.ball.y }
+    }
 
     notifyAll({ type: 'updateBall', data });
   }

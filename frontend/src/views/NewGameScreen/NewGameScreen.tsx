@@ -19,6 +19,7 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 
 	useEffect(() => {
 		if (gameState?.winner) {
+			if (intervalIdRef.current) clearInterval(intervalIdRef.current);
 			setWinner(gameState.winner);
 			gameAudio.stopAll(); //Para caso o jogador reconecte após o jogo encerrar
 			setScreen('game-over');
@@ -45,7 +46,7 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 		if (!canvas || !socketId || !roomState || !gameState || !backgroundImage) return;
 
 		const animationFrameId = requestAnimationFrame(() => {
-			renderScreen(canvas, gameState, requestAnimationFrame, socketId, backgroundImage);
+			renderScreen(canvas, gameState, socketId, backgroundImage);
 		});
 
 		return () => {

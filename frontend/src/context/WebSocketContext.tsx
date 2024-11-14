@@ -277,7 +277,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       //else if (gameStateRef.current && gameStateRef.current.players[playerId]) {
       else if (gameState && gameState.players[playerId]) {
         console.log("interpolação");
-        updateTarget(data.data.playerId, data.data.move.x, data.data.move.y);
+        updateTarget(data.data.move.x, data.data.move.y, data.data.playerId);
 
       }
     });
@@ -316,7 +316,17 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     });
 
     webSocketService.registerCallback('updateBall', (data) => {
-      if (data.data && data.data.ball) {
+      const position = data.data.position;
+
+      if (!position) {
+        console.error('Erro ao atualizar a posição da bola:', data);
+        setLastMessage({ type: 'error', data: { message: 'Erro ao atualizar a posição da bola. Unexpected server response' } });
+        return;
+      }
+
+      updateTarget(position.x, position.y);
+
+      /* if (data.data && data.data.ball) {
         // Check for collisions by comparing with previous state
         setGameState(prevGameState => {
           // Se o estado anterior for nulo, você pode retornar um novo estado inicial
@@ -342,7 +352,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       } else {
         console.error('Erro ao atualizar o estado da bola:', data);
         setLastMessage({ type: 'error', data: { message: 'Erro ao processar jogo. Unexpected server response' } });
-      }
+      } */
     });
 
     webSocketService.registerCallback('updatePlanet', (data) => {
@@ -623,24 +633,38 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     return moveNumberRef.current;
   }
 
-  function updateTarget(playerId: string, x: number, y: number) {
-    console.log("updateTarget");
+  function updateTarget(x: number, y: number, playerId?: string) {
+    if (!gameState) return;
 
-    if (!gameState) {
-      return;
+    if (playerId) {
+      const player = gameState.players[playerId];
+
+      if (!player) return;
+
+      player.toX = x;
+      player.toY = y;
+
+    } else {
+      setGameState(prevGameState => {
+        if (prevGameState === null) {
+          return {
+            players: initialPlayersState,
+            planets: initialPlanetsState,
+            ball: initialBallState,
+            canvas: initialCanvasState,
+            room: initialRoomState,
+          };
+        }
+        return {
+          ...prevGameState,
+          ball: {
+            ...prevGameState.ball,
+            toX: x,
+            toY: y,
+          },
+        };
+      });
     }
-
-    console.log("GAME STATE ANTIGO", gameState.players);
-
-    const player = gameState.players[playerId];
-
-    if (!player) {
-      return;
-    }
-
-    player.toX = x;
-    player.toY = y;
-    console.log("GAME STATE ATUALIZADO", gameState.players);
   }
 
   function validateAndReconcile(serverMovement: IMove) {
