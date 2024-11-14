@@ -9,7 +9,7 @@ interface ExtendedRequest extends Request {
 }
 
 class WebSocketService {
-	private clients: { [key: string]: { ws: WebSocket, user: any } } = {};
+	private clients: { [key: string]: { ws: WebSocket, user: any,  isAlive: boolean, } } = {};
 	//private rooms: { [key: string]: string[] } = {}; // roomId -> array of client IDs
 	private rooms: {
 		[key: string]: {
@@ -21,6 +21,7 @@ class WebSocketService {
 	} = {};
 	private gamesByRoom: { [key: string]: IGame } = {}; // roomId -> game instance
 	private roomObservers: Set<string> = new Set(); // Armazena os clientIds dos observadores
+	private PING_INTERVAL = 30000; // 30 segundos
 
 	constructor(private wss: WebSocketServer) {
 		this.initialize();
@@ -74,7 +75,8 @@ class WebSocketService {
 					user: {
 						id: decoded.id,
 						// Adicione outros dados do usuário que você precise
-					}
+					},
+					isAlive: true // Indica se o cliente está ativ
 				};
 
 				// Enviar o ID do socket para o cliente
@@ -86,7 +88,12 @@ class WebSocketService {
 						const parsedMessage = JSON.parse(
 							typeof message === 'string' ? message : message.toString()
 						);
-						this.handleMessage(clientId, parsedMessage);
+						if (parsedMessage.type === 'ping') {
+							this.clients[clientId].isAlive = true; // Atualizar status do cliente
+							ws.send(JSON.stringify({ type: 'pong' }));
+						} else {
+							this.handleMessage(clientId, parsedMessage);
+						}
 					} catch (error) {
 						console.error('Error parsing message:', error);
 						ws.send(JSON.stringify({
@@ -96,8 +103,25 @@ class WebSocketService {
 					}
 				});
 
+				// Configurar o ping para verificar se o cliente está ativo
+				const pingInterval = setInterval(() => {
+					if (!this.clients[clientId].isAlive) {
+						console.log(`Cliente ${clientId} inativo. Fechando conexão.`);
+						ws.terminate();
+						clearInterval(pingInterval);
+					} else {
+						this.clients[clientId].isAlive = false;
+						ws.ping(); // Enviar ping para o cliente
+					}
+				}, this.PING_INTERVAL);
+
 				ws.on('close', () => {
 					this.handleDisconnect(clientId);
+				});
+
+				// Limpar intervalo ao fechar a conexão
+				ws.on('close', () => {
+					clearInterval(pingInterval);
 				});
 
 				ws.on('error', (error) => {
