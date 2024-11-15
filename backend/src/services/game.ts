@@ -330,9 +330,29 @@ export default function createGame(roomState: IRoomState) {
           gameState.ball.speedX += randomVariationX;
           gameState.ball.speedY += randomVariationY;
 
+          // Afastar a bola para evitar que ela fique presa
+          pushBallOut(player);
+
           resolveCollision();
           break;
         }
+      }
+    };
+
+    // Função para afastar a bola após a colisão
+    const pushBallOut = (player: IPlayer) => {
+      const pushBackDistance = 2; // Ajuste a distância conforme necessário
+      // Empurra a bola para fora da área do jogador na direção correta
+      if (gameState.ball.x < player.x) {
+        gameState.ball.x -= pushBackDistance;
+      } else if (gameState.ball.x > player.x + player.size) {
+        gameState.ball.x += pushBackDistance;
+      }
+
+      if (gameState.ball.y < player.y) {
+        gameState.ball.y -= pushBackDistance;
+      } else if (gameState.ball.y > player.y + player.size) {
+        gameState.ball.y += pushBackDistance;
       }
     };
 

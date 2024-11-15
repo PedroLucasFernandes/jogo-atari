@@ -68,6 +68,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     const connectWebSocket = () => {
       webSocketService.connect();
+      getRooms();
     };
     connectWebSocket();
 
