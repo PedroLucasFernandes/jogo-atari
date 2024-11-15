@@ -9,7 +9,7 @@ interface ExtendedRequest extends Request {
 }
 
 class WebSocketService {
-	private clients: { [key: string]: { ws: WebSocket, user: any } } = {};
+	private clients: { [key: string]: { ws: WebSocket, user: any, isAlive: boolean, } } = {};
 	//private rooms: { [key: string]: string[] } = {}; // roomId -> array of client IDs
 	private rooms: {
 		[key: string]: {
@@ -21,6 +21,7 @@ class WebSocketService {
 	} = {};
 	private gamesByRoom: { [key: string]: IGame } = {}; // roomId -> game instance
 	private roomObservers: Set<string> = new Set(); // Armazena os clientIds dos observadores
+	private PING_INTERVAL = 30000;
 
 	constructor(private wss: WebSocketServer) {
 		this.initialize();
@@ -74,7 +75,8 @@ class WebSocketService {
 					user: {
 						id: decoded.id,
 						// Adicione outros dados do usuário que você precise
-					}
+					},
+					isAlive: true
 				};
 
 				// Enviar o ID do socket para o cliente
@@ -86,7 +88,12 @@ class WebSocketService {
 						const parsedMessage = JSON.parse(
 							typeof message === 'string' ? message : message.toString()
 						);
-						this.handleMessage(clientId, parsedMessage);
+						if (parsedMessage.type === 'ping') {
+							// Responder ao ping sem encerrar a conexão
+							ws.send(JSON.stringify({ type: 'pong' }));
+						} else {
+							this.handleMessage(clientId, parsedMessage);
+						}
 					} catch (error) {
 						console.error('Error parsing message:', error);
 						ws.send(JSON.stringify({
@@ -96,7 +103,24 @@ class WebSocketService {
 					}
 				});
 
+				// Configurar o ping para verificar se o cliente está ativo
+				const pingInterval = setInterval(() => {
+					// Verificar se o WebSocket ainda está aberto antes de enviar ping
+					if (ws.readyState === WebSocket.OPEN) {
+						if (!this.clients[clientId].isAlive) {
+							console.log(`Cliente ${clientId} inativo. Fechando conexão.`);
+							ws.terminate(); // Fecha a conexão imediatamente
+						} else {
+							this.clients[clientId].isAlive = false; // Resetar status
+							ws.ping(); // Enviar ping para o cliente
+						}
+					} else {
+						clearInterval(pingInterval); // Se o WebSocket não estiver aberto, parar o ping
+					}
+				}, this.PING_INTERVAL);
+
 				ws.on('close', () => {
+					clearInterval(pingInterval);
 					this.handleDisconnect(clientId);
 				});
 
