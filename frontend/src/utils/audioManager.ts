@@ -41,7 +41,7 @@ class GameAudio {
       sound.play().catch(err => console.log('Erro ao tocar som de destruição'));
     }
   }
- 
+
   public toggleMute(): void {
     this.isMuted = !this.isMuted;
     if (this.isMuted) {

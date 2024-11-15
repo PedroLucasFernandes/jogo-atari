@@ -103,24 +103,7 @@ class WebSocketService {
 					}
 				});
 
-				// Configurar o ping para verificar se o cliente está ativo
-				const pingInterval = setInterval(() => {
-					// Verificar se o WebSocket ainda está aberto antes de enviar ping
-					if (ws.readyState === WebSocket.OPEN) {
-						if (!this.clients[clientId].isAlive) {
-							console.log(`Cliente ${clientId} inativo. Fechando conexão.`);
-							ws.terminate(); // Fecha a conexão imediatamente
-						} else {
-							this.clients[clientId].isAlive = false; // Resetar status
-							ws.ping(); // Enviar ping para o cliente
-						}
-					} else {
-						clearInterval(pingInterval); // Se o WebSocket não estiver aberto, parar o ping
-					}
-				}, this.PING_INTERVAL);
-
 				ws.on('close', () => {
-					clearInterval(pingInterval);
 					this.handleDisconnect(clientId);
 				});
 
