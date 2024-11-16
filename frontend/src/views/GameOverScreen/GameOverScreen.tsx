@@ -11,7 +11,7 @@ interface GameOverScreenProps {
 }
 
 export const GameOverScreen: React.FC<GameOverScreenProps> = ({ setScreen, winner }) => {
-  const { gameState } = useWebSocket();
+  const { gameState, setGameState, setRoomState, setLastMessage } = useWebSocket();
   const [winnerPosition, setWinnerPosition] = useState<number | null>(null);
 
   useEffect(() => {
@@ -20,6 +20,13 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({ setScreen, winne
       setWinnerPosition(gameState?.players[`socket_${winner.id}`].defendingPlanetId);
     }
   }, [gameState, winner]);
+
+  const handleBackToMenu = () => {
+    setGameState(null);
+    setRoomState(null);  // Limpar o estado da sala após a vitória
+    setLastMessage(null);
+    setScreen('menu');
+  };
 
   return (
     <Box id="game-over-screen" sx={{
@@ -41,7 +48,7 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({ setScreen, winne
         <h2 className="game-over-subtitle">Parabéns por salvar o seu planeta!!</h2>
         <Button
           className='button-menu'
-          onClick={() => setScreen('main-menu')}
+          onClick={handleBackToMenu}
           sx={{
             backgroundColor: '#9D00FF',
             color: 'white',

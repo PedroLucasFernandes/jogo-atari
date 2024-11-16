@@ -26,6 +26,8 @@ interface WebSocketContextType {
   roomState: IRoomState | null;
   rooms: IRoomState[] | null;
   lastMessage: IGameMessage | null;
+  setGameState: (gameState: IGameState | null) => void;
+  setRoomState: (roomState: IRoomState | null) => void;
 }
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
@@ -703,7 +705,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     <WebSocketContext.Provider value={{
       socketId, webSocketService, status, gameState, roomState, rooms, lastMessage,
       getRooms, createRoom, closeRoom, joinRoom, leaveRoom, toggleReadyStatus, removePlayer, movePlayer,
-      startGame, leaveGame, setLastMessage, checkGameInProgress
+      startGame, leaveGame, setLastMessage, checkGameInProgress, setGameState, setRoomState
       // Opção para criar um botão de liga e desliga áudio
       // toggleAudio: gameAudio.toggleMute.bind(gameAudio), // Add audio toggle function
     }}>
