@@ -20,7 +20,6 @@ class WebSocketService {
         const data = JSON.parse(event.data);
 
         if (data.type === 'pong') {
-          console.log("Recebido pong do servidor.");
           return;
         }
 
@@ -59,7 +58,6 @@ class WebSocketService {
       this.pingIntervalId = setInterval(() => {
         if (this.socket && this.socket.readyState === WebSocket.OPEN) {
           this.send({ type: 'ping' });
-          console.log("Ping enviado para o servidor.");
         }
       }, this.PING_INTERVAL);
     }

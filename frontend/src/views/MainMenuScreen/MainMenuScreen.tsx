@@ -25,6 +25,8 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   const { user, setUser } = useUser();
   const [openModal, setOpenModal] = useState(false);
 
+  gameAudio.stopAll();
+
   useEffect(() => {
     webSocketService.registerCallback('something', (data) => {
     });

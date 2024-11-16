@@ -34,5 +34,6 @@ const wss = new WebSocketServer({ server });
 const webSocketService = new WebSocketService(wss);
 export default {
 	getClient: webSocketService.getClient.bind(webSocketService),
-	clearGameSession: webSocketService.clearGameSession.bind(webSocketService)
+	clearGameSession: webSocketService.clearGameSession.bind(webSocketService),
+	notifyClient: webSocketService.notifyClient.bind(webSocketService)
 };

@@ -1,17 +1,23 @@
 class GameAudio {
   private backgroundMusic: HTMLAudioElement;
   private destructionSound: HTMLAudioElement;
+  private victorySound: HTMLAudioElement;
+  private defeatSound: HTMLAudioElement;
   private isMuted: boolean = false;
   private masterVolume: number = 1.0;
  
   constructor() {
     this.backgroundMusic = new Audio('/sounds/bg5.mp3');
     this.destructionSound = new Audio('/sounds/hitPlanet6.mp3');
+    this.victorySound = new Audio('/sounds/win1.mp3');
+    this.defeatSound = new Audio('/sounds/loser4.mp3');
     this.backgroundMusic.loop = true;
     
     // Volume base dos sons (muito baixo)
     this.backgroundMusic.volume = 0.05 * this.masterVolume;
     this.destructionSound.volume = 0.1 * this.masterVolume;
+    this.victorySound.volume = 0.1 * this.masterVolume;
+    this.defeatSound.volume = 0.1 * this.masterVolume;
   }
   
   // Novo método para controlar volume mestre
@@ -22,6 +28,8 @@ class GameAudio {
     // Atualiza o volume de todos os sons
     this.backgroundMusic.volume = 0.05 * this.masterVolume;
     this.destructionSound.volume = 0.1 * this.masterVolume;
+    this.victorySound.volume = 0.1 * this.masterVolume;
+    this.defeatSound.volume = 0.1 * this.masterVolume;
   }
 
   public getMasterVolume(): number {
@@ -37,6 +45,22 @@ class GameAudio {
   public playDestructionSound(): void {
     if (!this.isMuted) {
       const sound = this.destructionSound.cloneNode() as HTMLAudioElement;
+      sound.volume = 0.1 * this.masterVolume; // Aplica volume mestre ao clone
+      sound.play().catch(err => console.log('Erro ao tocar som de destruição'));
+    }
+  }
+
+  public playVictorySound() : void {
+    if (!this.isMuted) {
+      const sound = this.victorySound.cloneNode() as HTMLAudioElement;
+      sound.volume = 0.1 * this.masterVolume; // Aplica volume mestre ao clone
+      sound.play().catch(err => console.log('Erro ao tocar som de destruição'));
+    }
+  }
+
+  public playDefeatSound() : void {
+    if (!this.isMuted) {
+      const sound = this.defeatSound.cloneNode() as HTMLAudioElement;
       sound.volume = 0.1 * this.masterVolume; // Aplica volume mestre ao clone
       sound.play().catch(err => console.log('Erro ao tocar som de destruição'));
     }
