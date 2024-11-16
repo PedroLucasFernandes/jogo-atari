@@ -1,6 +1,6 @@
 import { WebSocketServer, WebSocket } from 'ws';
 import createGame from './game';
-import { gameStatus, IGame, IGameMessage, IRoomState } from '../interfaces/game';
+import { chatColors, gameStatus, IGame, IGameMessage, IRoomState } from '../interfaces/game';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -9,7 +9,7 @@ interface ExtendedRequest extends Request {
 }
 
 class WebSocketService {
-	private clients: { [key: string]: { ws: WebSocket, user: any, isAlive: boolean, } } = {};
+	private clients: { [key: string]: { ws: WebSocket, user: any, isAlive: boolean } } = {};
 	//private rooms: { [key: string]: string[] } = {}; // roomId -> array of client IDs
 	private rooms: {
 		[key: string]: {
@@ -74,6 +74,7 @@ class WebSocketService {
 					ws,
 					user: {
 						id: decoded.id,
+						color: this.getRandomColor(),
 						// Adicione outros dados do usuário que você precise
 					},
 					isAlive: true
@@ -143,6 +144,9 @@ class WebSocketService {
 				break;
 			case 'toggleReadyStatus':
 				this.toggleReadyStatus(clientId, message.data.roomId, message.data.playerId);
+				break;
+			case 'sendChatMessage':
+				this.sendChatMessage(clientId, message.data.roomId, message.data.chatMessage);
 				break;
 			case 'removePlayer':
 				this.removePlayer(clientId, message.data.roomId, message.data.playerId);
@@ -499,6 +503,44 @@ class WebSocketService {
 		});
 	}
 
+	private sendChatMessage(clientId: string, roomId: string, chatMessage: string) {
+		const room = this.rooms[roomId];
+		if (!room) {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Falha ao enviar mensagem. Unidentified Room' }
+			});
+			return;
+		}
+
+		if (!chatMessage) {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'Falha ao enviar mensagem. Empty message' }
+			});
+			return;
+		}
+
+		const data = {
+			chatMessage: {
+				type: 'message',
+				playerId: clientId,
+				username: room.players.find(p => p.playerId === clientId)?.username,
+				content: chatMessage,
+				color: this.clients[clientId].user.color,
+			}
+		}
+
+		this.rooms[roomId].players.forEach(player => {
+			if (player.playerId === clientId) return;
+
+			this.notifyClient(player.playerId, {
+				type: 'receivedChatMessage',
+				data: data
+			});
+		});
+	}
+
 	private removePlayer(clientId: string, roomId: string, playerId: string) {
 		const room = this.rooms[roomId];
 
@@ -827,6 +869,11 @@ class WebSocketService {
 		if (client && client.ws.readyState === WebSocket.OPEN) {
 			client.ws.send(JSON.stringify(message));
 		}
+	}
+
+	private getRandomColor(): string {
+		const randomIndex = Math.floor(Math.random() * chatColors.length);
+		return chatColors[randomIndex];
 	}
 
 	//TODO: Modificar as mensagens de atualizações dos clientes para enviar somente
