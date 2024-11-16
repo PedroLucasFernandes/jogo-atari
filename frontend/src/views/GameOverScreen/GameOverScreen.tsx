@@ -12,7 +12,7 @@ interface GameOverScreenProps {
 }
 
 export const GameOverScreen: React.FC<GameOverScreenProps> = ({ setScreen, winner }) => {
-  const { gameState, socketId } = useWebSocket(); // Acessando o userId do contexto WebSocket
+  const { gameState, socketId, setGameState, setRoomState, setLastMessage } = useWebSocket(); // Acessando o userId do contexto WebSocket
   const [winnerPosition, setWinnerPosition] = useState<number | null>(null);
   const [playerPosition, setPlayerPosition] = useState<number | null>(null);
 
@@ -43,6 +43,13 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({ setScreen, winne
         gameAudio.playDefeatSound();
       }
     }, [gameState, winner, playerId, isWinner]);
+
+  const handleBackToMenu = () => {
+    setGameState(null);
+    setRoomState(null);  // Limpar o estado da sala após a vitória
+    setLastMessage(null);
+    setScreen('menu');
+  };
 
   return (
     <Box id="game-over-screen" sx={{
@@ -75,7 +82,7 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({ setScreen, winne
         )}
         <Button
           className='button-menu'
-          onClick={() => setScreen('main-menu')}
+          onClick={handleBackToMenu}
           sx={{
             backgroundColor: '#9D00FF',
             color: 'white',

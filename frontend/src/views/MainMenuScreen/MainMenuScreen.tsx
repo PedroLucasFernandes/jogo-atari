@@ -114,13 +114,13 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
         <h2 className='title-main-menu-2'>Qual será a aventura de hoje?</h2>
         <Button className='button-menu'
           onClick={() => setScreen('create-room')}
-          sx={{ backgroundColor: '#9D00FF', color: 'white', '&:hover': { backgroundColor: '#8900ab' },fontFamily: '"Tilt Neon", sans-serif', fontSize: '2.5vh', borderRadius: '2rem', border: '1.6px solid #11205F' }}
+          sx={{ backgroundColor: '#9D00FF', color: 'white', '&:hover': { backgroundColor: '#8900ab' }, fontFamily: '"Tilt Neon", sans-serif', fontSize: '2.5vh', borderRadius: '2rem', border: '1.6px solid #11205F' }}
         >
           Criar partida
         </Button>
         <Button className='button-menu'
           onClick={() => setScreen('join-room')}
-          sx={{ backgroundColor: '#FF0062', color: 'white', '&:hover': { backgroundColor: '#d10065' },fontFamily: '"Tilt Neon", sans-serif', fontSize: '2.5vh', borderRadius: '2rem', border: '1.6px solid #11205F' }}
+          sx={{ backgroundColor: '#FF0062', color: 'white', '&:hover': { backgroundColor: '#d10065' }, fontFamily: '"Tilt Neon", sans-serif', fontSize: '2.5vh', borderRadius: '2rem', border: '1.6px solid #11205F' }}
         >
           Encontrar partida
         </Button>
@@ -132,13 +132,16 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
         </Button>
       </div>
 
-      <Dialog open={openModal} onClose={() => setOpenModal(false)} className="custom-dialog">
-      <DialogTitle className="custom-dialog-title" sx={{fontFamily: '"Chewy", system-ui', fontSize:'3.5vh', marginBottom:'1.5vh', color: '#11205f'}}>Entrar na Sala</DialogTitle>
-        <DialogContent sx={{fontFamily: '"Tilt Neon", sans-serif', fontSize: '3vh', maxWidth: '22vw', alignSelf: 'center', borderRadius: '2rem', textAlign: 'center', width:'25vw'}}>
+      <Dialog open={openModal} onClose={(event, reason) => {
+        if (reason === "backdropClick") return; // Ignora o fechamento ao clicar fora para evitar fechar sem sair da sala
+        setOpenModal(false);
+      }} className="custom-dialog">
+        <DialogTitle className="custom-dialog-title" sx={{ fontFamily: '"Chewy", system-ui', fontSize: '3.5vh', marginBottom: '1.5vh', color: '#11205f' }}>Entrar na Sala</DialogTitle>
+        <DialogContent sx={{ fontFamily: '"Tilt Neon", sans-serif', fontSize: '3vh', maxWidth: '22vw', alignSelf: 'center', borderRadius: '2rem', textAlign: 'center', width: '25vw' }}>
           <p>Você está em uma partida em andamento, deseja continuá-la?</p>
         </DialogContent>
         <DialogActions>
-        <button className="button-search-room-3" onClick={handleAbandon}>Abandonar</button>
+          <button className="button-search-room-3" onClick={handleAbandon}>Abandonar</button>
           <button className="button-search-room-3" onClick={handleRejoin}>Continuar</button>
         </DialogActions>
       </Dialog>
