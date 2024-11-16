@@ -105,10 +105,10 @@ export interface IGame {
 }
 
 export const initialPlanetsState: IPlanet[] = [
-  { x: 0, y: 0, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '', ownerId: '' },
-  { x: 650, y: 0, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '', ownerId: '' },
-  { x: 0, y: 450, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '', ownerId: '' },
-  { x: 650, y: 450, width: 150, height: 150, active: true, parts: [true, true, true, true, true, true], imageSrc: '', ownerId: '' }
+  { x: 0, y: 0, width: 150, height: 150, active: true, parts: [false, false, false, false, false, true], imageSrc: '', ownerId: '' },
+  { x: 650, y: 0, width: 150, height: 150, active: true, parts: [false, false, false, false, false, true], imageSrc: '', ownerId: '' },
+  { x: 0, y: 450, width: 150, height: 150, active: true, parts: [false, false, false, false, false, true], imageSrc: '', ownerId: '' },
+  { x: 650, y: 450, width: 150, height: 150, active: true, parts: [false, false, false, false, false, true], imageSrc: '', ownerId: '' }
 ];
 
 export const initialPlayersState: PlayersRecord = {

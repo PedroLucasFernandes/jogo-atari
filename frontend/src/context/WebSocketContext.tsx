@@ -251,9 +251,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       //setGameState(data.data.gameState)
 
       const playerId = data.data.playerId;
-      console.log("Player Id: " + playerId);
-      console.log("Socket Id: " + socketIdRef.current);
-      console.log("moveNumber", moveNumber);
 
       if (!playerId) {
         console.log("Erro ao identificar jogador");
@@ -268,7 +265,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         return;
       }
 
-      console.log("Movement", data.data.move);
 
       if (playerId === socketIdRef.current) {
         validateAndReconcile(data.data.move);
@@ -283,12 +279,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     });
 
     webSocketService.registerCallback('playerLeftGame', (data) => {
-      console.log(`Retorno - playerLeftGame: ${data}`);
       const roomState = data.data.roomState;
       const gameState = data.data.gameState;
-
-      console.log("Room state: " + JSON.stringify(roomState));
-      console.log(`Game state: "${JSON.stringify(gameState)}`);
 
       if (!roomState) {
         console.log("Erro ao indentificar estado da sala");
@@ -308,8 +300,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     });
 
     webSocketService.registerCallback('youLeftGame', (data) => {
-      console.log(`Retorno - youLeftGame: ${data}`);
-
       setLastMessage(data);
       setRoomState(null);
       setGameState(null);
@@ -325,35 +315,38 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
 
       updateTarget(position.x, position.y);
+    });
 
-      /* if (data.data && data.data.ball) {
-        // Check for collisions by comparing with previous state
+    webSocketService.registerCallback('updatePlayerActive', (data) => {
+      if (data && data.playerActive !== undefined && data.playerId) {        
         setGameState(prevGameState => {
-          // Se o estado anterior for nulo, você pode retornar um novo estado inicial
           if (prevGameState === null) {
             return {
               players: initialPlayersState,
               planets: initialPlanetsState,
               ball: initialBallState,
               canvas: initialCanvasState,
-              room: initialRoomState,
+              room: initialRoomState
             };
           }
-
-          // Atualiza o estado do jogo
+    
+          // Atualiza o estado 'active' do jogador específico
           return {
             ...prevGameState,
-            ball: {
-              ...prevGameState.ball, // Mantém as propriedades existentes da bola
-              ...data.data.ball    // Atualiza apenas as propriedades recebidas na mensagem
-            },
+            players: {
+              ...prevGameState.players,
+              [data.playerId]: {
+                ...prevGameState.players[data.playerId],
+                active: data.playerActive
+              }
+            }
           };
         });
       } else {
-        console.error('Erro ao atualizar o estado da bola:', data);
-        setLastMessage({ type: 'error', data: { message: 'Erro ao processar jogo. Unexpected server response' } });
-      } */
+        console.error('Erro ao atualizar o estado do jogador:', data);
+      }
     });
+    
 
     webSocketService.registerCallback('updatePlanet', (data) => {
       if (data.data && data.data.planets) {

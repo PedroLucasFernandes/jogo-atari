@@ -202,25 +202,28 @@ export default function createGame(roomState: IRoomState) {
     notifyAll({ type: 'updateBall', data });
   }
 
+  function notifyPlayerActiveUpdate(playerId: string) {
+    const data = {
+      playerId: playerId,
+      playerActive: gameState.players[playerId].active
+    }
+    notifyAll({ type: 'updatePlayerActive', data });
+  }
 
-  function notifyPlanetUpdate(isInitial: boolean = false) {
+  function notifyPlanetUpdate() {
     const data = {
       planets: gameState.planets,
       planetDestruction: true,
     };
 
     // Enviar notificação inicial se todas as partes do planeta ainda estiverem ativas
-    if (isInitial) {
-      for (const planet of gameState.planets) {
-        if (planet.active && planet.parts.every(part => part)) {
-          notifyAll({ type: 'updatePlanet', data });
-          break; // Notificar apenas uma vez
-        }
+    for (const planet of gameState.planets) {
+      if (planet.active && planet.parts.every(part => part)) {
+        notifyAll({ type: 'updatePlanet', data });
+        break; // Notificar apenas uma vez
       }
-    } else {
-      // Notificar após colisões
-      notifyAll({ type: 'updatePlanet', data });
     }
+    notifyAll({ type: 'updatePlanet', data });
   }
 
   function checkIfPlanetIsDefeated(planet: IPlanet) {
@@ -400,13 +403,18 @@ export default function createGame(roomState: IRoomState) {
 
               // Verificar se o planeta foi totalmente destruído
               if (checkIfPlanetIsDefeated(planet)) {
-                planet.active = false; // Desativa o planeta
-
+                console.log("Chegou aqui no checagem do planeta totalmente destruído")
                 // Desativa o jogador, se houver um dono associado ao planeta
+                console.log("Estado do player antes do planeta ser todo destruído")
+                console.log(gameState.players[planet.ownerId].active)
+
                 if (planet.ownerId) {
                   const playerId = planet.ownerId;
                   if (gameState.players[playerId]) {
                     gameState.players[playerId].active = false; // Marca o jogador como inativo
+                    console.log("Estado do player depois do planeta ser todo destruído")
+                    console.log(gameState.players[playerId].active)
+                    notifyPlayerActiveUpdate(playerId)
                   }
                 }
               }
