@@ -91,6 +91,7 @@ export interface IGameMessage {
     player?: IPlayer;
     winner?: Winner;
     position?: IPosition;
+    result?: string;
   }
 }
 

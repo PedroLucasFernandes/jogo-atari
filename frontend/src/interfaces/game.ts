@@ -64,13 +64,18 @@ export interface IWinner {
   id: string;
 }
 
+// export interface IResult {
+//   result: string;
+// }
+
 export interface IGameState {
   players: PlayersRecord;
   planets: IPlanet[];
   ball: IBall;
   canvas: ICanvas;
   room: IRoomState;
-  winner?: IWinner
+  winner?: IWinner;
+  result?: string;
 }
 
 export interface IGameMessage {

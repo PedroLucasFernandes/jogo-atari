@@ -54,8 +54,6 @@ export default function createGame(roomState: IRoomState) {
 
 
   function movePlayer(playerId: string, keyPressed: string, moveNumber: number) {
-    console.log("moveNumber2: " + moveNumber);
-    console.log("players moved");
     const player = gameState.players[playerId];
     if (!player || !keyPressed) return;
 
@@ -190,7 +188,6 @@ export default function createGame(roomState: IRoomState) {
       move: { direction: keyPressed, x: player.x, y: player.y, moveNumber },
       playerId
     };
-    console.log("data apos mover", data);
     notifyAll({ type: 'playerMoved', data });
   }
 
@@ -407,13 +404,6 @@ export default function createGame(roomState: IRoomState) {
       notifyPlanetUpdate();
     }
 
-    /* if (Math.abs(gameState.ball.speedX) > Math.abs(INITIAL_SPEED)) {
-      gameState.ball.speedX *= DECAY_RATE;
-    }
-    if (Math.abs(gameState.ball.speedY) > Math.abs(INITIAL_SPEED)) {
-      gameState.ball.speedY *= DECAY_RATE;
-    } */
-
     // Desaceleração controlada até a velocidade inicial
     if (Math.abs(gameState.ball.speedX) > Math.abs(INITIAL_SPEED)) {
       gameState.ball.speedX *= DECAY_RATE;
@@ -476,7 +466,6 @@ export default function createGame(roomState: IRoomState) {
         });
       }
     });
-    console.log("gamestate apos add players", gameState.players);
   }
 
 
@@ -497,9 +486,8 @@ export default function createGame(roomState: IRoomState) {
       const winningPlanet = remainingPlayers[0];
       const winnerPlayerId = winningPlanet.ownerId;
       const realUserId = extractUserId(winningPlanet.ownerId);
-      const winnerPlayerName = gameState.players[winnerPlayerId]?.username || 'Unknown Player';
+      const winnerPlayerName = gameState.players[winnerPlayerId]?.username || 'um alien invasor que não se identificou!';
 
-      console.log("userId do vencedor", realUserId)
       stop();
 
       // Notifica todos os observadores sobre o vencedor
@@ -555,7 +543,6 @@ export default function createGame(roomState: IRoomState) {
       }
     }
   }
-
 
   function stop() {
     // Interrompe o intervalo se ele estiver ativo

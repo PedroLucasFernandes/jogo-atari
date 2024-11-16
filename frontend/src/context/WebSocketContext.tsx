@@ -82,7 +82,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     if (!user || !socketId) return;
 
     webSocketService.registerCallback('gameInProgress', (data) => {
-      console.log("tem jogo em progresso");
       const roomState = data.data.roomState;
 
       if (!roomState) {
@@ -405,6 +404,34 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setLastMessage({ type: 'error', data: { message: 'Erro ao processar jogo. Unexpected server response' } });
       }
     });
+  
+    // webSocketService.registerCallback('gameOver', (data) => {
+    //   console.log("Dados recebidos quando ocorre o gameOver")
+    //   console.log(data)
+    //   if (data.data) {
+    //     gameAudio.stopAll();
+
+    //     console.log("Dados recebidos do GameOver")
+    //     console.log(data.data)
+
+    //     setGameState(prevGameState => ({
+    //       ...prevGameState as IGameState,
+    //       winner: data.data.winner ? {
+    //         username: data.data.winner.username,
+    //         id: data.data.winner.id
+    //       } : undefined,
+    //       result: data.data.result
+    //     }));
+    
+    //     setRoomState(null); // Limpar o estado da sala após a vitória
+    //     setLastMessage(data.data);
+    //   } else {
+    //     console.error('Erro ao atualizar o estado dos planetas:', data);
+    //     setLastMessage({ type: 'error', data: { message: 'Erro ao processar jogo. Unexpected server response' } });
+    //   }
+    // });
+    
+  
   }, [socketId, user, roomState, gameState, moveNumber, moveHistory, isReconciling, updateTarget,
     validateAndReconcile, addMoveOnHistory, getMoveFromSequenceNumber, getAndDeleteUnacknowledgedMoves, keepUnacknowledgedMoves]);
 
@@ -423,7 +450,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
 
   const checkGameInProgress = () => {
-    console.log("checkGameInProgress");
     if (!socketId) {
       setLastMessage({ type: 'error', data: { message: 'Falha ao conectar com o servidor' } });
       console.log('Can\'t check game sessions without a socketId');
@@ -598,7 +624,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         y,
       };
 
-      console.log("movenumber do newMove", newMove);
 
       setMoveHistory(prevMoveHistory => [...prevMoveHistory, newMove]);
 
@@ -655,7 +680,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     if (localMove) {
       if (localMove.x !== serverMovement.x || localMove.y !== serverMovement.y) {
-        console.log("Starting reconciliation from move number:", serverMoveNumber);
         player.x = serverMovement.x;
         player.y = serverMovement.y;
         setIsReconciling(true);
