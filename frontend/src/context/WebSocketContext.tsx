@@ -384,26 +384,26 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
     });
 
-    webSocketService.registerCallback('gameOver', (data) => {
-      if (data.data && data.data.winner) {
-        gameAudio.stopAll();
-        setGameState(prevGameState => {
-          // Atualiza o estado do jogo
-          return {
-            ...prevGameState as IGameState,
-            winner: {
-              username: data.data.winner.username,
-              id: data.data.winner.id
-            } as IWinner,
-          };
-        });
-        setRoomState(null);  // Limpar o estado da sala após a vitória
-        setLastMessage(data.data);
-      } else {
-        console.error('Erro ao atualizar o estado dos planetas:', data);
-        setLastMessage({ type: 'error', data: { message: 'Erro ao processar jogo. Unexpected server response' } });
-      }
-    });
+    // webSocketService.registerCallback('gameOver', (data) => {
+    //   if (data.data && data.data.winner) {
+    //     gameAudio.stopAll();
+    //     setGameState(prevGameState => {
+    //       // Atualiza o estado do jogo
+    //       return {
+    //         ...prevGameState as IGameState,
+    //         winner: {
+    //           username: data.data.winner.username,
+    //           id: data.data.winner.id
+    //         } as IWinner,
+    //       };
+    //     });
+    //     setRoomState(null);  // Limpar o estado da sala após a vitória
+    //     setLastMessage(data.data);
+    //   } else {
+    //     console.error('Erro ao atualizar o estado dos planetas:', data);
+    //     setLastMessage({ type: 'error', data: { message: 'Erro ao processar jogo. Unexpected server response' } });
+    //   }
+    // });
   
     // webSocketService.registerCallback('gameOver', (data) => {
     //   console.log("Dados recebidos quando ocorre o gameOver")

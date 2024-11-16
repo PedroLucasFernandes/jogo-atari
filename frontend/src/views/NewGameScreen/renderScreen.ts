@@ -101,6 +101,8 @@ export default function renderScreen(
   });
 
   Object.entries(gameState.players).forEach(([playerId, player], index) => {
+    if (!player.active) return; // Ignorar jogadores inativos
+    
     const playerImage = playersImages[player.defendingPlanetId];
     const centerX = player.x;
     const centerY = player.y;

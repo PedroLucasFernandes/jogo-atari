@@ -1,4 +1,4 @@
-import { IGameMessage, IGameState, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialPlanetsState, IPlayer, IPlayerRoom, PlayersRecord, planetsByPlayersPosition, IRoomState } from "../interfaces/game"
+import { IGameMessage, IGameState, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialPlanetsState, IPlayer, IPlayerRoom, PlayersRecord, planetsByPlayersPosition, IRoomState, IPlanet } from "../interfaces/game"
 import * as leaderboardServices from "../services/leaderboardServices";
 import webSocketService from '../index';
 
@@ -223,6 +223,10 @@ export default function createGame(roomState: IRoomState) {
     }
   }
 
+  function checkIfPlanetIsDefeated(planet: IPlanet) {
+    return planet.parts.every(part => !part);
+  }
+
 
   function moveBall() {
     let collisionDetected = false;
@@ -285,6 +289,9 @@ export default function createGame(roomState: IRoomState) {
     const handlePlayerCollision = () => {
       for (const playerId in gameState.players) {
         const player = gameState.players[playerId];
+
+        // Ignore jogadores inativos
+        if (!player.active) continue;
 
         // Calcula os limites da bola e do jogador
         const ballLeft = gameState.ball.x - gameState.ball.radius;
@@ -390,6 +397,20 @@ export default function createGame(roomState: IRoomState) {
               gameState.ball.speedY *= -ACCELERATION_FACTOR;
 
               collisionDetected = true;
+
+              // Verificar se o planeta foi totalmente destruído
+              if (checkIfPlanetIsDefeated(planet)) {
+                planet.active = false; // Desativa o planeta
+
+                // Desativa o jogador, se houver um dono associado ao planeta
+                if (planet.ownerId) {
+                  const playerId = planet.ownerId;
+                  if (gameState.players[playerId]) {
+                    gameState.players[playerId].active = false; // Marca o jogador como inativo
+                  }
+                }
+              }
+
               break;
             }
           }
@@ -425,6 +446,207 @@ export default function createGame(roomState: IRoomState) {
   }
 
 
+  // function moveBall() {
+  //   let collisionDetected = false;
+
+  //   // Armazena a posição anterior da bola
+  //   const previousX = gameState.ball.x;
+  //   const previousY = gameState.ball.y;
+
+  //   // Atualiza a posição da bola
+  //   gameState.ball.x += gameState.ball.speedX;
+  //   gameState.ball.y += gameState.ball.speedY;
+
+  //   // Função auxiliar para resolver colisões
+  //   const resolveCollision = () => {
+  //     // Retorna a bola para a posição anterior à colisão
+  //     gameState.ball.x = previousX;
+  //     gameState.ball.y = previousY;
+
+  //     // Adiciona um pequeno deslocamento na direção oposta à colisão
+  //     const pushBackDistance = 1;
+  //     if (Math.abs(gameState.ball.speedX) > Math.abs(gameState.ball.speedY)) {
+  //       gameState.ball.x += gameState.ball.speedX > 0 ? -pushBackDistance : pushBackDistance;
+  //     } else {
+  //       gameState.ball.y += gameState.ball.speedY > 0 ? -pushBackDistance : pushBackDistance;
+  //     }
+  //   };
+
+  //   // Verifica colisão com as bordas do canvas
+  //   const handleWallCollision = () => {
+  //     let hasCollision = false;
+
+  //     if (gameState.ball.x <= 0 || gameState.ball.x + gameState.ball.radius >= gameState.canvas.width) {
+  //       gameState.ball.speedX *= -1;
+
+  //       // Adiciona variação controlada à velocidade
+  //       const maxVariation = 0.3;
+  //       const randomVariation = (Math.random() - 0.5) * maxVariation;
+  //       gameState.ball.speedX += randomVariation;
+
+  //       hasCollision = true;
+  //     }
+
+  //     if (gameState.ball.y <= 0 || gameState.ball.y + gameState.ball.radius >= gameState.canvas.height) {
+  //       gameState.ball.speedY *= -1;
+
+  //       // Adiciona variação controlada à velocidade
+  //       const maxVariation = 0.3;
+  //       const randomVariation = (Math.random() - 0.5) * maxVariation;
+  //       gameState.ball.speedY += randomVariation;
+
+  //       hasCollision = true;
+  //     }
+
+  //     if (hasCollision) {
+  //       resolveCollision();
+  //     }
+  //   };
+
+  //   // Verifica colisão com jogadores
+  //   const handlePlayerCollision = () => {
+  //     for (const playerId in gameState.players) {
+  //       const player = gameState.players[playerId];
+
+  //       // Calcula os limites da bola e do jogador
+  //       const ballLeft = gameState.ball.x - gameState.ball.radius;
+  //       const ballRight = gameState.ball.x + gameState.ball.radius;
+  //       const ballTop = gameState.ball.y - gameState.ball.radius;
+  //       const ballBottom = gameState.ball.y + gameState.ball.radius;
+
+  //       const playerLeft = player.x;
+  //       const playerRight = player.x + player.size;
+  //       const playerTop = player.y;
+  //       const playerBottom = player.y + player.size;
+
+  //       if (
+  //         ballRight > playerLeft &&
+  //         ballLeft < playerRight &&
+  //         ballBottom > playerTop &&
+  //         ballTop < playerBottom
+  //       ) {
+  //         // Determina a direção da colisão
+  //         const overlapLeft = ballRight - playerLeft;
+  //         const overlapRight = playerRight - ballLeft;
+  //         const overlapTop = ballBottom - playerTop;
+  //         const overlapBottom = playerBottom - ballTop;
+
+  //         // Encontra a menor sobreposição para determinar a direção da colisão
+  //         const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
+
+  //         // Aplica a resposta à colisão baseada na direção
+  //         if (minOverlap === overlapLeft || minOverlap === overlapRight) {
+  //           gameState.ball.speedX *= -1;
+  //         } else {
+  //           gameState.ball.speedY *= -1;
+  //         }
+
+  //         // Adiciona variação controlada à velocidade
+  //         const maxVariation = 0.5;
+  //         const randomVariationX = (Math.random() - 0.5) * maxVariation;
+  //         const randomVariationY = (Math.random() - 0.5) * maxVariation;
+
+  //         gameState.ball.speedX += randomVariationX;
+  //         gameState.ball.speedY += randomVariationY;
+
+  //         // Afastar a bola para evitar que ela fique presa
+  //         pushBallOut(player);
+
+  //         resolveCollision();
+  //         break;
+  //       }
+  //     }
+  //   };
+
+  //   // Função para afastar a bola após a colisão
+  //   const pushBallOut = (player: IPlayer) => {
+  //     const pushBackDistance = 2; // Ajuste a distância conforme necessário
+  //     // Empurra a bola para fora da área do jogador na direção correta
+  //     if (gameState.ball.x < player.x) {
+  //       gameState.ball.x -= pushBackDistance;
+  //     } else if (gameState.ball.x > player.x + player.size) {
+  //       gameState.ball.x += pushBackDistance;
+  //     }
+
+  //     if (gameState.ball.y < player.y) {
+  //       gameState.ball.y -= pushBackDistance;
+  //     } else if (gameState.ball.y > player.y + player.size) {
+  //       gameState.ball.y += pushBackDistance;
+  //     }
+  //   };
+
+  //   // Aplica limite máximo à velocidade
+  //   const clampSpeed = () => {
+  //     //const MAX_SPEED = 20;
+  //     gameState.ball.speedX = Math.min(Math.max(gameState.ball.speedX, -MAX_SPEED), MAX_SPEED);
+  //     gameState.ball.speedY = Math.min(Math.max(gameState.ball.speedY, -MAX_SPEED), MAX_SPEED);
+  //   };
+
+  //   // Executa as verificações de colisão
+  //   handleWallCollision();
+  //   handlePlayerCollision();
+
+
+  //   for (const planet of gameState.planets) {
+  //     if (planet.active) {
+  //       // notifyPlanetUpdate();
+  //       const partWidth = planet.width / 2;
+  //       const partHeight = planet.height / 3;
+
+  //       for (let i = 0; i < planet.parts.length; i++) {
+  //         if (planet.parts[i]) {
+  //           const partX = planet.x + (i % 2) * partWidth;
+  //           const partY = planet.y + Math.floor(i / 2) * partHeight;
+
+  //           if (
+  //             gameState.ball.x + gameState.ball.radius > partX &&
+  //             gameState.ball.x - gameState.ball.radius < partX + partWidth &&
+  //             gameState.ball.y + gameState.ball.radius > partY &&
+  //             gameState.ball.y - gameState.ball.radius < partY + partHeight
+  //           ) {
+
+  //             planet.parts[i] = false;
+  //             // gameState.ball.speedX *= -1;
+  //             // gameState.ball.speedY *= -1;
+  //             gameState.ball.speedX *= -ACCELERATION_FACTOR;
+  //             gameState.ball.speedY *= -ACCELERATION_FACTOR;
+
+  //             collisionDetected = true;
+  //             break;
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+
+  //   clampSpeed();
+
+
+  //   if (collisionDetected) {
+  //     notifyPlanetUpdate();
+  //   }
+
+  //   // Desaceleração controlada até a velocidade inicial
+  //   if (Math.abs(gameState.ball.speedX) > Math.abs(INITIAL_SPEED)) {
+  //     gameState.ball.speedX *= DECAY_RATE;
+  //     if (Math.abs(gameState.ball.speedX) < Math.abs(INITIAL_SPEED)) {
+  //       gameState.ball.speedX = INITIAL_SPEED * Math.sign(gameState.ball.speedX);
+  //     }
+  //   }
+
+  //   if (Math.abs(gameState.ball.speedY) > Math.abs(INITIAL_SPEED)) {
+  //     gameState.ball.speedY *= DECAY_RATE;
+  //     if (Math.abs(gameState.ball.speedY) < Math.abs(INITIAL_SPEED)) {
+  //       gameState.ball.speedY = INITIAL_SPEED * Math.sign(gameState.ball.speedY);
+  //     }
+  //   }
+
+  //   notifyBallUpdate();
+  //   // Chama a função para verificar se há um vencedor
+  //   checkForWinner();
+  // }
+
+
   function addPlayers(players: IPlayerRoom[]) {
     // Limpa os jogadores e planetas no gameState
     gameState.players = {};
@@ -451,6 +673,7 @@ export default function createGame(roomState: IRoomState) {
           isBot: false,
           imageSrc: '',
           defendingPlanetId: position.defendingPlanetId!, // Usa a non-null assertion
+          active: true,
         };
 
         // Adiciona o planeta correspondente ao jogador no estado do jogo
@@ -535,7 +758,7 @@ export default function createGame(roomState: IRoomState) {
         console.log(`Player ${winnerPlayerName} venceu o jogo!`);
 
         // Limpando sala e sessão do jogo
-        webSocketService.clearGameSession(gameState.room.roomId);
+        // webSocketService.clearGameSession(gameState.room.roomId);
 
 
       } catch (error) {
