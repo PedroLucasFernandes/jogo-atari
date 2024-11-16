@@ -822,7 +822,7 @@ class WebSocketService {
 		delete this.clients[clientId];
 	}
 
-	private notifyClient(clientId: string, message: any) {
+	public notifyClient(clientId: string, message: any) {
 		const client = this.clients[clientId];
 		if (client && client.ws.readyState === WebSocket.OPEN) {
 			client.ws.send(JSON.stringify(message));
