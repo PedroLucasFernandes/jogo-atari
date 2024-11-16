@@ -21,6 +21,8 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 	const lastRenderTimeRef = useRef<number>(0);  // Armazena o timestamp do último frame
 	const FPS = 60;
 	const interval = 1000 / FPS;
+	let frameTimes: number[] = [];
+	const startTimeOverall = performance.now();
 
 	useEffect(() => {
 		gameStateRef.current = gameState;
@@ -36,6 +38,7 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 	}, [gameState?.winner]);
 
 	// Setup game rendering
+
 	useEffect(() => {
 		const canvas = canvasRef.current;
 		if (!canvas || !socketId || !roomState || !gameStateRef.current) return;
@@ -53,9 +56,27 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 			const timeSinceLastRender = timestamp - lastRenderTimeRef.current;
 
 			if (timeSinceLastRender >= interval) {
+				const startTime = performance.now();
+
+
 				// Renderiza apenas se o tempo decorrido for maior que o intervalo desejado
 				renderScreen(canvas, gameStateRef, socketId);
 				lastRenderTimeRef.current = timestamp;
+
+
+
+				const endTime = performance.now();
+				const renderTime = endTime - startTime;
+				frameTimes.push(renderTime);
+				if (frameTimes.length > 1000) {
+					frameTimes.shift(); // Remove o tempo mais antigo
+				}
+				const averageRenderTime = frameTimes.reduce((sum, time) => sum + time, 0) / frameTimes.length;
+				const elapsedTime = endTime - startTimeOverall;
+				console.log(`Render time: ${renderTime.toFixed(2)} ms`);
+				console.log(`Average render time: ${averageRenderTime.toFixed(2)} ms`);
+				console.log(`Elapsed time: ${(elapsedTime / 1000).toFixed(2)} seconds`);
+				console.log(`-----------------------------`)
 			}
 
 			// Solicita o próximo frame
