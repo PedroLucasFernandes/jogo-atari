@@ -224,10 +224,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     webSocketService.registerCallback('gameStarted', (data) => {
       const roomState = data.data.roomState;
       const gameState = data.data.gameState;
-      console.log("gamestate recebido", JSON.stringify(gameState.players));
-      console.log("gamestate recebido", JSON.stringify(data.data.gameState.players));
-      console.log("roomstate recebido", JSON.stringify(roomState));
-      console.log("roomstate recebido", JSON.stringify(data.data.roomState));
 
       if (!roomState) {
         console.log("Erro ao indentificar estado da sala");
@@ -317,8 +313,44 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       updateTarget(position.x, position.y);
     });
 
+    // webSocketService.registerCallback('updatePlayerActive', (data) => {
+    //   const playerActive = data.data.playerActive;
+    //   const playerId = data.data.playerId;
+    //   console.log("Dados chegando sobre atualização do player no front", data)
+    //   if (data.data && playerActive !== undefined && playerId) {        
+    //     setGameState(prevGameState => {
+    //       if (prevGameState === null) {
+    //         return {
+    //           players: initialPlayersState,
+    //           planets: initialPlanetsState,
+    //           ball: initialBallState,
+    //           canvas: initialCanvasState,
+    //           room: initialRoomState
+    //         };
+    //       }
+    
+    //       // Atualiza o estado 'active' do jogador específico
+    //       return {
+    //         ...prevGameState,
+    //         players: {
+    //           ...prevGameState.players,
+    //           [data.playerId]: {
+    //             ...prevGameState.players[playerId],
+    //             active: playerActive
+    //           }
+    //         }
+    //       };
+    //     });
+    //     console.log("Estado dos players no jogo depois de atualizar o active", gameState?.players)
+    //   } else {
+    //     console.error('Erro ao atualizar o estado do jogador:', data);
+    //   }
+    // });
+    
     webSocketService.registerCallback('updatePlayerActive', (data) => {
-      if (data && data.playerActive !== undefined && data.playerId) {        
+      console.log("Dados chegando sobre atualização do player no front", data);
+    
+      if (data.data && data.data.playerActive !== undefined && data.data.playerId) {        
         setGameState(prevGameState => {
           if (prevGameState === null) {
             return {
@@ -329,24 +361,30 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
               room: initialRoomState
             };
           }
-    
-          // Atualiza o estado 'active' do jogador específico
-          return {
+          
+          const updatedGameState = {
             ...prevGameState,
             players: {
               ...prevGameState.players,
-              [data.playerId]: {
-                ...prevGameState.players[data.playerId],
-                active: data.playerActive
+              [data.data.playerId]: {
+                ...prevGameState.players[data.data.playerId],
+                active: data.data.playerActive
               }
             }
           };
+    
+          // Atualiza gameStateRef com o novo estado
+          gameStateRef.current = updatedGameState;
+          return updatedGameState;
         });
+    
+        console.log("Estado dos players no jogo depois de atualizar o active", gameStateRef.current?.players);
       } else {
         console.error('Erro ao atualizar o estado do jogador:', data);
       }
     });
     
+
 
     webSocketService.registerCallback('updatePlanet', (data) => {
       if (data.data && data.data.planets) {
@@ -377,53 +415,26 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
     });
 
-    // webSocketService.registerCallback('gameOver', (data) => {
-    //   if (data.data && data.data.winner) {
-    //     gameAudio.stopAll();
-    //     setGameState(prevGameState => {
-    //       // Atualiza o estado do jogo
-    //       return {
-    //         ...prevGameState as IGameState,
-    //         winner: {
-    //           username: data.data.winner.username,
-    //           id: data.data.winner.id
-    //         } as IWinner,
-    //       };
-    //     });
-    //     setRoomState(null);  // Limpar o estado da sala após a vitória
-    //     setLastMessage(data.data);
-    //   } else {
-    //     console.error('Erro ao atualizar o estado dos planetas:', data);
-    //     setLastMessage({ type: 'error', data: { message: 'Erro ao processar jogo. Unexpected server response' } });
-    //   }
-    // });
-  
-    // webSocketService.registerCallback('gameOver', (data) => {
-    //   console.log("Dados recebidos quando ocorre o gameOver")
-    //   console.log(data)
-    //   if (data.data) {
-    //     gameAudio.stopAll();
-
-    //     console.log("Dados recebidos do GameOver")
-    //     console.log(data.data)
-
-    //     setGameState(prevGameState => ({
-    //       ...prevGameState as IGameState,
-    //       winner: data.data.winner ? {
-    //         username: data.data.winner.username,
-    //         id: data.data.winner.id
-    //       } : undefined,
-    //       result: data.data.result
-    //     }));
-    
-    //     setRoomState(null); // Limpar o estado da sala após a vitória
-    //     setLastMessage(data.data);
-    //   } else {
-    //     console.error('Erro ao atualizar o estado dos planetas:', data);
-    //     setLastMessage({ type: 'error', data: { message: 'Erro ao processar jogo. Unexpected server response' } });
-    //   }
-    // });
-    
+    webSocketService.registerCallback('gameOver', (data) => {
+      if (data.data && data.data.winner) {
+        gameAudio.stopAll();
+        setGameState(prevGameState => {
+          // Atualiza o estado do jogo
+          return {
+            ...prevGameState as IGameState,
+            winner: {
+              username: data.data.winner.username,
+              id: data.data.winner.id
+            } as IWinner,
+          };
+        });
+        setRoomState(null);  // Limpar o estado da sala após a vitória
+        setLastMessage(data.data);
+      } else {
+        console.error('Erro ao atualizar o estado dos planetas:', data);
+        setLastMessage({ type: 'error', data: { message: 'Erro ao processar jogo. Unexpected server response' } });
+      }
+    });
   
   }, [socketId, user, roomState, gameState, moveNumber, moveHistory, isReconciling, updateTarget,
     validateAndReconcile, addMoveOnHistory, getMoveFromSequenceNumber, getAndDeleteUnacknowledgedMoves, keepUnacknowledgedMoves]);

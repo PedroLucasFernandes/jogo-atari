@@ -82,10 +82,7 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 	// Cria uma versão estável de movePlayer
 	const stableMovePlayer = useCallback((direction: string) => {
 		if (roomState) {
-			// movePlayer(roomState.roomId, direction);
 			const currentPlayer = gameStateRef.current?.players[socketId as string];
-			console.log("currentPlayer no NewGameScreen", currentPlayer)
-			console.log("currentPlayer atvio no NewGameScreen?", currentPlayer?.active)
 			if (currentPlayer?.active) {
 			movePlayer(roomState.roomId, direction);
 			}

@@ -766,7 +766,7 @@ export default function createGame(roomState: IRoomState) {
         console.log(`Player ${winnerPlayerName} venceu o jogo!`);
 
         // Limpando sala e sessão do jogo
-        // webSocketService.clearGameSession(gameState.room.roomId);
+        webSocketService.clearGameSession(gameState.room.roomId);
 
 
       } catch (error) {
