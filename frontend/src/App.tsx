@@ -9,6 +9,7 @@ import { Register } from './views/Register/Register';
 import { UserProvider } from './context/UserContext';
 import ProtectedRoute from './components/ProtectedRoutes/ProtectedRoutes';
 import { ToastContainer } from 'react-toastify';
+import RedirectRoute from './components/RedirectRoute/RedirectRoute';
 
 function App() {
   const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
@@ -23,7 +24,7 @@ function App() {
         <WebSocketProvider> {/* Passei o websocket para dentro, reverter se aparecer algum problema */}
           <Router>
             <Routes>
-              <Route path='/' element={<Login />} />
+              <Route path='/' element={<RedirectRoute children={<Login />} />} />
               <Route path='/register' element={<Register />} />
 
               {/* <Route path="/game" element={<Game />} /> */}
