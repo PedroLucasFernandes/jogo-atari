@@ -16,13 +16,14 @@ export const GlobalSound: React.FC<GlobalSoundProps> = ({ currentScreen }) => {
       return;
     }
     // Tocar música com base na tela atual
-    if (location.pathname === '/monolito') {
-      if (currentScreen === 'game') {
-        gameAudio.startBackgroundMusic();
-      } else {
-        gameAudio.playMenuSound();
-      }
+    // Restaurar o áudio com base no estado após o recarregamento
+  if (location.pathname === '/monolito') {
+    if (currentScreen === 'game' && !gameAudio.isPlayingGameMusic) {
+      gameAudio.startBackgroundMusic();
+    } else if (!gameAudio.isPlayingHomeMusic) {
+      gameAudio.playMenuSound();
     }
+  }
   }, [location, currentScreen]);
 
   return null;

@@ -8,8 +8,8 @@ class GameAudio {
   private clickSound: HTMLAudioElement;
   private erroSound: HTMLAudioElement;
   private menuSound: HTMLAudioElement;
-  private isPlayingHomeMusic: boolean = false;
-  private isPlayingGameMusic: boolean = false;
+  public isPlayingHomeMusic: boolean = false;
+  public isPlayingGameMusic: boolean = false;
 
   constructor() {
     this.backgroundMusic = new Audio('/sounds/bg5.mp3');
@@ -28,6 +28,37 @@ class GameAudio {
     this.menuSound.load();
 
     this.updateVolume();
+
+      // Carregar estado persistido do áudio
+      this.loadAudioState();
+  }
+
+  private loadAudioState(): void {
+    const savedMuteState = localStorage.getItem('isMuted');
+    const savedHomeMusicState = localStorage.getItem('isPlayingHomeMusic');
+    const savedGameMusicState = localStorage.getItem('isPlayingGameMusic');
+    
+    if (savedMuteState !== null) {
+      this.isMuted = savedMuteState === 'true';
+    }
+
+    if (savedHomeMusicState !== null) {
+      this.isPlayingHomeMusic = savedHomeMusicState === 'true';
+    }
+
+    if (savedGameMusicState !== null) {
+      this.isPlayingGameMusic = savedGameMusicState === 'true';
+    }
+
+    // Atualiza o volume com base no estado do mute
+    this.updateVolume();
+  }
+
+  // Métodos para salvar o estado atual
+  private saveAudioState(): void {
+    localStorage.setItem('isMuted', String(this.isMuted));
+    localStorage.setItem('isPlayingHomeMusic', String(this.isPlayingHomeMusic));
+    localStorage.setItem('isPlayingGameMusic', String(this.isPlayingGameMusic));
   }
 
   // Método para atualizar o volume de todos os sons de acordo com o volume mestre
@@ -56,19 +87,21 @@ class GameAudio {
   public toggleMute(): void {
     this.isMuted = !this.isMuted;
     this.updateVolume();
+    
+    // Salva o estado do áudio após a alteração
+    this.saveAudioState();
 
     if (this.isMuted) {
       this.stopAll();
     } else {
-      // Retomar a música que estava tocando antes do mute
+      // Continuar a música que estava tocando antes do mute
       if (this.isPlayingHomeMusic) {
-        this.playMenuSound();
+        this.menuSound.play();
       } else if (this.isPlayingGameMusic) {
-        this.startBackgroundMusic();
+        this.backgroundMusic.play();
       }
     }
   }
-
   
   public isAudioMuted(): boolean {
     return this.isMuted;
@@ -83,6 +116,7 @@ class GameAudio {
   }
 
   public playMenuSound(): void {
+    console.log("!this.isPlayingHomeMusic antes de iniciar a musica do jogo", !this.isPlayingHomeMusic)
     if (!this.isMuted && !this.isPlayingHomeMusic) {
       this.menuSound.play().catch(err => console.log('Erro ao tocar som do menu'));
       this.isPlayingHomeMusic = true;
@@ -91,6 +125,7 @@ class GameAudio {
   }
 
   public startBackgroundMusic(): void {
+    console.log("!this.isPlayingGameMusic antes de iniciar a musica do jogo",!this.isPlayingGameMusic )
     if (!this.isMuted && !this.isPlayingGameMusic) {
       this.backgroundMusic.play().catch(err => console.log('Erro ao tocar som de background'));
       this.isPlayingHomeMusic = false;
@@ -127,14 +162,18 @@ class GameAudio {
     }
   }
 
-
-
   public stopAll(): void {
     this.backgroundMusic.pause();
     this.menuSound.pause();
-    this.isPlayingHomeMusic = false;
-    this.isPlayingGameMusic = false;
+    // Não redefinir os estados aqui para manter a referência do som que estava tocando
   }
+
+  // public stopAll(): void {
+  //   this.backgroundMusic.pause();
+  //   this.menuSound.pause();
+  //   this.isPlayingHomeMusic = false;
+  //   this.isPlayingGameMusic = false;
+  // }
 }
 
 export const gameAudio = new GameAudio();
