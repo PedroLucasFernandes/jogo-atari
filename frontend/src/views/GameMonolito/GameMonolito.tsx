@@ -8,7 +8,7 @@ import { WaitingRoomScreen } from '../WaitingRoomScreen/WaitingRoomScreen';
 import CreateRoomScreen from '../CreateRoomScreen/CreateRoomScreen';
 import { GameOverScreen } from '../GameOverScreen/GameOverScreen';
 import { IWinner } from '../../interfaces/game';
-
+import { GlobalSound } from '../../components/GlobalSound/GlobalSound';
 // Testando em como renderizar o conteúdo de uma rota dinamicamente
 
 
@@ -39,6 +39,8 @@ export const GameMonolito: React.FC = () => {
 
     return (
         <div id="monolito" className='slide-diagonal-bounce'>
+            {/* Passar a tela atual para o GlobalSound */}
+            <GlobalSound currentScreen={screen} />
             {renderScreen()}
         </div>
     );

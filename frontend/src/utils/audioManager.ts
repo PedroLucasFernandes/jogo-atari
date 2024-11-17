@@ -8,6 +8,8 @@ class GameAudio {
   private clickSound: HTMLAudioElement;
   private erroSound: HTMLAudioElement;
   private menuSound: HTMLAudioElement;
+  private isPlayingHomeMusic: boolean = false;
+  private isPlayingGameMusic: boolean = false;
 
   constructor() {
     this.backgroundMusic = new Audio('/sounds/bg5.mp3');
@@ -19,6 +21,8 @@ class GameAudio {
     this.menuSound = new Audio('/sounds/mainmenu.mp3');
 
     this.backgroundMusic.loop = true;
+    this.menuSound.loop = true;
+
     this.updateVolume();
   }
 
@@ -45,6 +49,27 @@ class GameAudio {
     return this.masterVolume;
   }
 
+  public toggleMute(): void {
+    this.isMuted = !this.isMuted;
+    this.updateVolume();
+
+    if (this.isMuted) {
+      this.stopAll();
+    } else {
+      // Retomar a música que estava tocando antes do mute
+      if (this.isPlayingHomeMusic) {
+        this.playMenuSound();
+      } else if (this.isPlayingGameMusic) {
+        this.startBackgroundMusic();
+      }
+    }
+  }
+
+  
+  public isAudioMuted(): boolean {
+    return this.isMuted;
+  }
+
   public playClickSound(): void {
     if (!this.isMuted) {
       const sound = this.clickSound.cloneNode() as HTMLAudioElement;
@@ -53,25 +78,27 @@ class GameAudio {
     }
   }
 
-  public playMenuSound(loop: boolean = false): void {
+  public playMenuSound(): void {
     if (!this.isMuted) {
-      this.menuSound.loop = loop;  // Define se o som será repetido
-      this.menuSound.play().catch(err => console.log('Áudio precisa de interação do usuário'));
+      this.menuSound.play().catch(err => console.log('Erro ao tocar som do menu'));
+      this.isPlayingHomeMusic = true;
+      this.isPlayingGameMusic = false;
     }
   }
-  
+
+  public startBackgroundMusic(): void {
+    if (!this.isMuted) {
+      this.backgroundMusic.play().catch(err => console.log('Erro ao tocar som de background'));
+      this.isPlayingHomeMusic = false;
+      this.isPlayingGameMusic = true;
+    }
+  }
   
 
   public playErrorSound(): void {
     if (!this.isMuted) {
       const sound = this.erroSound.cloneNode() as HTMLAudioElement;
       sound.play().catch(err => console.log('Erro ao tocar som de erro'));
-    }
-  }
-
-  public startBackgroundMusic(): void {
-    if (!this.isMuted) {
-      this.backgroundMusic.play().catch(err => console.log('Áudio precisa de interação do usuário'));
     }
   }
 
@@ -96,12 +123,7 @@ class GameAudio {
     }
   }
 
-  public toggleMute(): void {
-    this.isMuted = !this.isMuted;
-    if (this.isMuted) {
-      this.stopAll(); 
-    } 
-  }
+
 
   public stopAll(): void {
     this.backgroundMusic.pause();

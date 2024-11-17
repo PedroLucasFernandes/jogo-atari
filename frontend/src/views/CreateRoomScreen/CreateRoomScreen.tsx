@@ -4,7 +4,7 @@ import { useWebSocket } from '../../context/WebSocketContext';
 import CustomInput from '../../components/CustomInput/CustomInput';
 import { gameAudio } from '../../utils/audioManager';
 import { LogoutButton } from '../../components/LogoutButton/LogoutButton';
-
+import { SoundToggleButton } from '../../components/SoundToggleButton/SoundToggleButton';
 
 interface CreateRoomScreenProps {
     setScreen: (screen: string) => void;
@@ -33,7 +33,8 @@ const CreateRoomScreen: React.FC<CreateRoomScreenProps> = ({ setScreen }) => {
 
     return (
         <div id="create-room">
-         <LogoutButton />
+            <LogoutButton />
+            <SoundToggleButton />
             <div className='square-create-room'>
             <h2 className="title-create">Criar sala</h2>
             <p style={{fontFamily: '"Tilt Neon", sans-serif', fontSize: '1rem', margin: '15px', width: '15vw', textAlign: 'center', color: '#11205F'

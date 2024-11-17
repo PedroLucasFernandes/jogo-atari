@@ -3,6 +3,7 @@ import Button from "@mui/joy/Button";
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useWebSocket } from '../../context/WebSocketContext';
 import { LogoutButton } from '../../components/LogoutButton/LogoutButton';
+import { SoundToggleButton } from '../../components/SoundToggleButton/SoundToggleButton';
 
 interface ScreenProps {
   setScreen: Dispatch<SetStateAction<string>>;
@@ -86,6 +87,7 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   return (
     <div id="waiting-room">
        <LogoutButton />
+       <SoundToggleButton />
       {loading ? (
         <div className="div-waiting-loading">
           <h2>Carregando...</h2>

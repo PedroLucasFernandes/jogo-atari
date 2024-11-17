@@ -13,7 +13,8 @@ import DialogContent from '@mui/joy/DialogContent';
 import Input from '@mui/joy/Input';
 import DialogActions from '@mui/joy/DialogActions';
 import { gameAudio } from '../../utils/audioManager';
-import { LogoutButton } from '../../components/LogoutButton/LogoutButton'
+import { LogoutButton } from '../../components/LogoutButton/LogoutButton';
+import { SoundToggleButton } from '../../components/SoundToggleButton/SoundToggleButton';
 
 interface ScreenProps {
   setScreen: Dispatch<SetStateAction<string>>;
@@ -52,8 +53,8 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
 
   return (
     <Box id="main-menu">
-      <LogoutButton />
-  
+         <LogoutButton />
+         <SoundToggleButton />
       <div id='modal'>
         <h1 className='title-main-menu'>Olá, navegante {user?.username}!</h1>
         <h2 className='title-main-menu-2'>Qual será a aventura de hoje?</h2>

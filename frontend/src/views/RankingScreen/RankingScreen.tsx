@@ -4,6 +4,7 @@ import Button from "@mui/joy/Button";
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useUser } from '../../context/UserContext';
 import { LogoutButton } from '../../components/LogoutButton/LogoutButton';
+import { SoundToggleButton } from '../../components/SoundToggleButton/SoundToggleButton';
 
 interface ScreenProps {
   setScreen: Dispatch<SetStateAction<string>>;
@@ -62,7 +63,8 @@ export const RankingScreen: React.FC<ScreenProps> = ({ setScreen }) => {
 
   return (
     <Box id="ranking-room">
-       <LogoutButton />
+         <LogoutButton />
+         <SoundToggleButton />
       <h1>Melhores jogadores</h1>
 
       {isLoading && <p>Carregando...</p>}

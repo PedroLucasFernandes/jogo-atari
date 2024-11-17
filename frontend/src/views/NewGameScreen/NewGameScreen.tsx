@@ -3,6 +3,7 @@ import { useWebSocket } from '../../context/WebSocketContext';
 import renderScreen from './renderScreen';
 import { IWinner } from '../../interfaces/game';
 import { gameAudio } from '../../utils/audioManager';
+import { SoundToggleButton } from '../../components/SoundToggleButton/SoundToggleButton';
 
 interface ScreenProps {
 	setScreen: Dispatch<SetStateAction<string>>;
@@ -167,6 +168,7 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 
 	return (
 		<div className="relative">
+			   <SoundToggleButton />
 			<canvas ref={canvasRef} width={800} height={600} />
 		</div>
 	);

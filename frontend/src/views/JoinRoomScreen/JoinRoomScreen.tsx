@@ -9,6 +9,7 @@ import DialogTitle from '@mui/joy/DialogTitle';
 import DialogContent from '@mui/joy/DialogContent';
 import DialogActions from '@mui/joy/DialogActions';
 import { LogoutButton } from '../../components/LogoutButton/LogoutButton';
+import { SoundToggleButton } from '../../components/SoundToggleButton/SoundToggleButton';
 
 interface ScreenProps {
   setScreen: Dispatch<SetStateAction<string>>;
@@ -45,7 +46,8 @@ export const JoinRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
 
   return (
     <div id="join-room">
-       <LogoutButton />
+         <LogoutButton />
+         <SoundToggleButton />
   <div className="div-join">
     <h2 className="title-join">Procurar sala</h2>
 

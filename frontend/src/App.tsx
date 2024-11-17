@@ -10,6 +10,9 @@ import { UserProvider } from './context/UserContext';
 import ProtectedRoute from './components/ProtectedRoutes/ProtectedRoutes';
 import { ToastContainer } from 'react-toastify';
 import  {GlobalSound} from './components/GlobalSound/GlobalSound'; 
+import { LogoutButton } from './components/LogoutButton/LogoutButton';
+import { SoundToggleButton } from './components/SoundToggleButton/SoundToggleButton';
+
 
 function App() {
   const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
@@ -23,7 +26,6 @@ function App() {
       <UserProvider>
         <WebSocketProvider>
           <Router>
-            <GlobalSound /> 
             <Routes>
               <Route path='/' element={<Login />} />
               <Route path='/register' element={<Register />} />
