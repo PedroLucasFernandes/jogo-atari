@@ -75,15 +75,7 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   }
 
   return (
-    <Box id="main-menu" sx={{
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      gap: '2px',
-      position: 'relative',
-    }}>
-
+    <Box id="main-menu">
       <Box
         onClick={() => setShowLogout(!showLogout)}
         sx={{
@@ -105,32 +97,147 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
           right: '16px',
           zIndex: 9,
         }}>
-          <Button onClick={handleLogout} className='button-menu'>Logout</Button>
+          <Button onClick={handleLogout} className='button-menu neon-button'>Logout</Button>
         </div>
       )}
 
-      <div id='modal'>
+      {/* <div id='modal'>
         <h1 className='title-main-menu'>Olá, navegante {user?.username}!</h1>
         <h2 className='title-main-menu-2'>Qual será a aventura de hoje?</h2>
-        <Button className='button-menu'
+        <Button className='button-menu neon-button-1'
           onClick={() => setScreen('create-room')}
-          sx={{ backgroundColor: '#9D00FF', color: 'white', '&:hover': { backgroundColor: '#8900ab' }, fontFamily: '"Tilt Neon", sans-serif', fontSize: '2.5vh', borderRadius: '2rem', border: '1.6px solid #11205F' }}
+          sx={{ backgroundColor: '#a721fa', color: 'white', boxShadow: '0 0 15px rgba(157, 0, 255, 0.7), inset 0 0 10px rgba(157, 0, 255, 0.6)', '&:hover': { backgroundColor: '#8900ab' , boxShadow: '0 0 25px rgba(157, 0, 255, 1), 0 0 35px rgba(157, 0, 255, 0.8)' }}}
         >
           Criar partida
         </Button>
-        <Button className='button-menu'
+        <Button className='button-menu neon-button-2'
           onClick={() => setScreen('join-room')}
-          sx={{ backgroundColor: '#FF0062', color: 'white', '&:hover': { backgroundColor: '#d10065' }, fontFamily: '"Tilt Neon", sans-serif', fontSize: '2.5vh', borderRadius: '2rem', border: '1.6px solid #11205F' }}
+          sx={{ backgroundColor: '#fd68a1', color: 'white', boxShadow: '0 0 15px rgba(255, 0, 98, 0.7), inset 0 0 10px rgba(255, 0, 98, 0.6)', '&:hover': { backgroundColor: '#d10065' , boxShadow: '0 0 25px rgba(255, 0, 98, 1), 0 0 35px rgba(255, 0, 98, 0.8)' }}}
         >
           Encontrar partida
         </Button>
-        <Button className='button-menu'
+        <Button className='button-menu neon-button-3'
           onClick={() => setScreen('ranking-room')}
-          sx={{ backgroundColor: '#03B46D', color: 'white', '&:hover': { backgroundColor: '#006400' }, fontFamily: '"Tilt Neon", sans-serif', fontSize: '2.5vh', borderRadius: '2rem', border: '1.6px solid #11205F' }}
+          sx={{ backgroundColor: '#03B46D', color: 'white', boxShadow: '0 0 15px rgba(3, 180, 109, 0.7), inset 0 0 10px rgba(3, 180, 109, 0.6)', '&:hover': { backgroundColor: '#006400' , boxShadow: '0 0 25px rgba(3, 180, 109, 1), 0 0 35px rgba(3, 180, 109, 0.8)' }}}
         >
           Ranking
         </Button>
+      </div> */}
+
+      <div id='modal' className="relative min-h-screen bg-gradient-to-b from-indigo-900 via-purple-900 to-pink-800 flex flex-col items-center justify-center p-4 overflow-hidden">
+  {/* Efeito de fundo estrelado */}
+  <div className="absolute inset-0 overflow-hidden">
+        <div className="stars"></div>
+        <div className="twinkling"></div>
       </div>
+
+  {/* Conteúdo do modal */}
+  <div className="modal-content">
+    <h1 className='title-main-menu'>Olá, navegante {user?.username}!</h1>
+    <h2 className='title-main-menu-2'>Qual será a aventura de hoje?</h2>
+
+    <Button className='button-menu neon-button-1'
+      onClick={() => setScreen('create-room')}
+      sx={{
+        backgroundColor: '#a721fa',
+        color: 'white',
+        padding: '10px',
+        boxShadow: '0 0 15px rgba(157, 0, 255, 0.7), inset 0 0 10px rgba(157, 0, 255, 0.6)',
+        '&:hover': {
+          backgroundColor: '#8900ab',
+          boxShadow: '0 0 25px rgba(157, 0, 255, 1), 0 0 35px rgba(157, 0, 255, 0.8)'
+        }
+      }}
+    >
+      Criar partida
+    </Button>
+
+    <Button className='button-menu neon-button-2'
+      onClick={() => setScreen('join-room')}
+      sx={{
+        backgroundColor: '#fd68a1',
+        color: 'white',
+        padding: '10px',
+        boxShadow: '0 0 15px rgba(255, 0, 98, 0.7), inset 0 0 10px rgba(255, 0, 98, 0.6)',
+        '&:hover': {
+          backgroundColor: '#d10065',
+          boxShadow: '0 0 25px rgba(255, 0, 98, 1), 0 0 35px rgba(255, 0, 98, 0.8)'
+        }
+      }}
+    >
+      Encontrar partida
+    </Button>
+
+    <Button className='button-menu neon-button-3'
+      onClick={() => setScreen('ranking-room')}
+      sx={{
+        backgroundColor: '#03B46D',
+        color: 'white',
+        padding: '10px',
+        boxShadow: '0 0 15px rgba(3, 180, 109, 0.7), inset 0 0 10px rgba(3, 180, 109, 0.6)',
+        '&:hover': {
+          backgroundColor: '#006400',
+          boxShadow: '0 0 25px rgba(3, 180, 109, 1), 0 0 35px rgba(3, 180, 109, 0.8)'
+        }
+      }}
+    >
+      Ranking
+    </Button>
+  </div>
+
+  {/* Estilos personalizados */}
+  <style>{`
+    .modal-background {
+      position: relative;
+      padding: 20px;
+      border-radius: 15px;
+      overflow: hidden;
+      background-color: rgba(0, 0, 0, 0.5); /* Fundo preto semi-transparente */
+    }
+
+    #modal h1,
+    #modal h2 {
+      color: #ffffff;
+    }
+
+   .stars, .twinkling {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          width: 100%;
+          height: 100%;
+        }
+
+        .stars {
+          background: #000 url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/stars.png') repeat top center;
+          z-index: 0;
+        }
+
+        .twinkling {
+          background: transparent url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/twinkling.png') repeat top center;
+          z-index: 1;
+          animation: move-twink-back 200s linear infinite;
+        }
+
+        @keyframes move-twink-back {
+          from {background-position: 0 0;}
+          to {background-position: -10000px 5000px;}
+        }
+
+      .modal-content {
+           position: relative;
+    z-index: 2;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+      }
+  `}</style>
+</div>
+
 
       <Dialog open={openModal} onClose={(event, reason) => {
         if (reason === "backdropClick") return; // Ignora o fechamento ao clicar fora para evitar fechar sem sair da sala
@@ -141,8 +248,8 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
           <p>Você está em uma partida em andamento, deseja continuá-la?</p>
         </DialogContent>
         <DialogActions>
-          <button className="button-search-room-3" onClick={handleAbandon}>Abandonar</button>
-          <button className="button-search-room-3" onClick={handleRejoin}>Continuar</button>
+          <button className="button-search-room-3 neon-button" onClick={handleAbandon}>Abandonar</button>
+          <button className="button-search-room-3 neon-button" onClick={handleRejoin}>Continuar</button>
         </DialogActions>
       </Dialog>
 
