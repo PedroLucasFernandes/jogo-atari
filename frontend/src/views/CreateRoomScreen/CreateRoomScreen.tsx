@@ -51,7 +51,7 @@ const CreateRoomScreen: React.FC<CreateRoomScreenProps> = ({ setScreen }) => {
             />
 
                 <button
-                    onClick={handleCreateRoom}
+                    onClick={() => { gameAudio.playClickSound(); handleCreateRoom(); }}
                     className="button-create"
                     disabled={!roomCode || loading}
                 >

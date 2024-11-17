@@ -10,6 +10,7 @@ import DialogContent from '@mui/joy/DialogContent';
 import DialogActions from '@mui/joy/DialogActions';
 import { LogoutButton } from '../../components/LogoutButton/LogoutButton';
 import { SoundToggleButton } from '../../components/SoundToggleButton/SoundToggleButton';
+import { gameAudio } from '../../utils/audioManager';
 
 interface ScreenProps {
   setScreen: Dispatch<SetStateAction<string>>;
@@ -73,10 +74,7 @@ export const JoinRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
                 </p>
               </div>
               <button className='button-search-room-2'
-                onClick={() => {
-                  setSelectedRoomId(room.roomId);
-                  setOpenModal(true);
-                }}
+              onClick={() => { gameAudio.playClickSound(); setSelectedRoomId(room.roomId); setOpenModal(true); }}
                 disabled={room.players.length === 4}
               >
                 Entrar na sala
@@ -100,13 +98,13 @@ export const JoinRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
         />
       </DialogContent>
       <DialogActions className="custom-dialog-actions">
-        <button className="button-search-room-3" onClick={() => setOpenModal(false)}>Cancelar</button>
-        <button className="button-search-room-3" onClick={handleJoinRoom} disabled={!code}>Entrar</button>
+        <button className="button-search-room-3" onClick={() => { gameAudio.playClickSound(); setOpenModal(false); }}>Cancelar</button>
+        <button className="button-search-room-3" onClick={() => { gameAudio.playClickSound(); handleJoinRoom(); }} disabled={!code}>Entrar</button>
       </DialogActions>
     </Dialog>
 
     {/* Botão para voltar ao menu */}
-    <button className='button-search-room' onClick={() => setScreen('main-menu')}>
+    <button className='button-search-room' onClick={() => { gameAudio.playClickSound(); setScreen('main-menu'); }}>
       Voltar ao menu
     </button>
   </div>

@@ -5,6 +5,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useUser } from '../../context/UserContext';
 import { LogoutButton } from '../../components/LogoutButton/LogoutButton';
 import { SoundToggleButton } from '../../components/SoundToggleButton/SoundToggleButton';
+import { gameAudio } from '../../utils/audioManager';
 
 interface ScreenProps {
   setScreen: Dispatch<SetStateAction<string>>;
@@ -94,7 +95,7 @@ export const RankingScreen: React.FC<ScreenProps> = ({ setScreen }) => {
         </>
       )}
 
-      <Button variant="solid" size="md" onClick={() => setScreen('main-menu')}>VOLTAR</Button>
+      <Button variant="solid" size="md" onClick={() =>{gameAudio.playClickSound(); setScreen('main-menu')}}>VOLTAR</Button>
     </Box>
   );
 };
