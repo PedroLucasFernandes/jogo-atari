@@ -15,12 +15,26 @@
 
   Button {
     margin-top: 1rem;
+    padding: 1rem;
   }
 }
 
-.title-main-menu {
+#main-menu .title-game {
+  margin-bottom: 1rem;
+  font-size: 3rem;
+  color: #ffffff !important;
+}
+
+#main-menu .title-main-menu {
   margin-bottom: 0;
   font-size: 2rem;
+  color: #ffffff !important;
+}
+
+#main-menu .title-main-menu-2 {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  color: #ffffff !important;
 }
 
 

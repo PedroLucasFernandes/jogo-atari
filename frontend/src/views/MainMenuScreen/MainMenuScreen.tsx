@@ -133,8 +133,9 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
 
   {/* Conteúdo do modal */}
   <div className="modal-content">
-    <h1 className='title-main-menu'>Olá, navegante {user?.username}!</h1>
-    <h2 className='title-main-menu-2'>Qual será a aventura de hoje?</h2>
+  <h1 className='title-game'>COSMIC DEFENDERS</h1>
+  <h1 className='title-main-menu'>Olá, navegante {user?.username}!</h1>
+  <h4 className='title-main-menu-2'>Qual será a aventura de hoje?</h4>
 
     <Button className='button-menu neon-button-1'
       onClick={() => setScreen('create-room')}
@@ -194,11 +195,8 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
       overflow: hidden;
       background-color: rgba(0, 0, 0, 0.5); /* Fundo preto semi-transparente */
     }
-
-    #modal h1,
-    #modal h2 {
-      color: #ffffff;
-    }
+      
+   
 
    .stars, .twinkling {
           position: absolute;
@@ -228,12 +226,13 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
 
       .modal-content {
            position: relative;
-    z-index: 2;
-    text-align: center;
-    align-items: center;
-    justify-content: center;
-    display: flex;
-    flex-direction: column;
+          z-index: 2;
+          text-align: center;
+          align-items: center;
+          justify-content: center;
+          display: flex;
+          flex-direction: column;
+          width: 35vw;
       }
   `}</style>
 </div>
