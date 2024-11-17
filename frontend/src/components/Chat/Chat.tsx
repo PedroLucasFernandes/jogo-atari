@@ -7,14 +7,16 @@ import { useUser } from '../../context/UserContext';
 
 interface ChatProps {
   roomId: string;
+  onFocusChange: (isFocused: boolean) => void;
 }
 
-const Chat: React.FC<ChatProps> = ({ roomId }) => {
+const Chat: React.FC<ChatProps> = ({ roomId, onFocusChange }) => {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<IChatMessage[]>([]);
   const { lastChatMessage, setLastChatMessage, sendChatMessage } = useWebSocket();
   const { user } = useUser();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isFocused, setIsFocused] = useState(false);
 
   useEffect(() => {
     if (!lastChatMessage) return;
@@ -63,6 +65,16 @@ const Chat: React.FC<ChatProps> = ({ roomId }) => {
     scrollToBottom();
   }, [messages]);
 
+  const handleFocus = () => {
+    setIsFocused(true);
+    onFocusChange(true);
+  };
+
+  const handleBlur = () => {
+    setIsFocused(false);
+    onFocusChange(false);
+  };
+
   return (
     <div id="chat-container">
       <div id="messages" ref={messagesEndRef}>
@@ -77,7 +89,12 @@ const Chat: React.FC<ChatProps> = ({ roomId }) => {
         ))}
       </div>
       <form name="publish" onSubmit={handleSendMessage}>
-        <input type="text" id="message" name="message" value={message} onChange={(e) => setMessage(e.target.value)} />
+        <input type="text" id="message" name="message" placeholder="Hello World!"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+        />
         <input type="submit" id="send-button" value="Chat" />
       </form>
     </div>

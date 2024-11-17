@@ -4,7 +4,6 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useWebSocket } from '../../context/WebSocketContext';
 import Chat from '../../components/Chat/Chat';
 import Box from '@mui/joy/Box';
-import MemoizedChat from '../../components/Chat/Chat';
 
 interface ScreenProps {
   setScreen: Dispatch<SetStateAction<string>>;
@@ -14,6 +13,7 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   const { startGame, socketId, roomState, toggleReadyStatus, removePlayer, closeRoom, leaveRoom, lastMessage, setLastMessage } = useWebSocket();
   const [loading, setLoading] = useState(true);
   const [isHost, setIsHost] = useState(false);
+  const [chatFocus, setChatFocus] = useState(false);
 
   useEffect(() => {
     if (lastMessage && (lastMessage.type === 'youLeft' || lastMessage.type === 'roomClosed' || lastMessage.type === 'youAreRemoved')) {
@@ -84,6 +84,10 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
     '/assets/player3.svg',
     '/assets/player4.svg'
   ];
+
+  const handleFocusChange = (isFocused: boolean) => {
+    setChatFocus(isFocused);
+  };
 
   return (
     <div id="waiting-room">
@@ -169,10 +173,10 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
                 })}
               </div>
               <Box sx={{
-                width: '100%',
+                width: '72%',
                 marginTop: '0.5vw',
               }}>
-                <MemoizedChat roomId={roomState.roomId} />
+                <Chat roomId={roomState.roomId} onFocusChange={handleFocusChange} />
               </Box>
 
               <div className="buttons">

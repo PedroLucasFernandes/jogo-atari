@@ -895,6 +895,21 @@ class WebSocketService {
 								}
 							});
 						});
+
+						this.rooms[roomId].players.forEach(player => {
+							this.notifyClient(player.playerId, {
+								type: 'receivedChatMessage',
+								data: {
+									chatMessage: {
+										type: 'left',
+										playerId: player.playerId,
+										username: player.username,
+										content: 'saiu!',
+										color: this.clients[player.playerId].user.color,
+									}
+								}
+							});
+						});
 					}
 
 					this.notifyRoomObservers();
@@ -912,6 +927,21 @@ class WebSocketService {
 									players: this.rooms[roomId].players
 								},
 								message: `${client?.username} perdeu a conexão`
+							}
+						});
+					});
+
+					this.rooms[roomId].players.forEach(player => {
+						this.notifyClient(player.playerId, {
+							type: 'receivedChatMessage',
+							data: {
+								chatMessage: {
+									type: 'disconnected',
+									playerId: player.playerId,
+									username: player.username,
+									content: 'perdeu a conexão!',
+									color: this.clients[player.playerId].user.color,
+								}
 							}
 						});
 					});
