@@ -96,6 +96,7 @@ export interface IGameMessage {
     rooms?: IRoomState[];
     winner?: IWinner;
     position?: IPosition;
+    chatMessage?: IChatMessage;
   }
 }
 
@@ -113,9 +114,9 @@ export const initialPlanetsState: IPlanet[] = [
 
 export const initialPlayersState: PlayersRecord = {
   'player0': { username: 'Player 0', x: 170, y: 150, initialX: 170, initialY: 150, toX: 170, toY: 150, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 0, active: false },
-  'player1': { username: 'Player 1', x: 550, y: 150, initialX: 550, initialY: 150, toX: 550, toY: 150, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 1, active: false  },
-  'player2': { username: 'Player 2', x: 170, y: 370, initialX: 170, initialY: 370, toX: 170, toY: 370, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 2, active: false  },
-  'player3': { username: 'Player 3', x: 550, y: 370, initialX: 550, initialY: 370, toX: 550, toY: 370, size: 80, isBot: false, imageSrc: '', defendingPlanetId: 3, active: false  }
+  'player1': { username: 'Player 1', x: 550, y: 150, initialX: 550, initialY: 150, toX: 550, toY: 150, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 1, active: false },
+  'player2': { username: 'Player 2', x: 170, y: 370, initialX: 170, initialY: 370, toX: 170, toY: 370, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 2, active: false },
+  'player3': { username: 'Player 3', x: 550, y: 370, initialX: 550, initialY: 370, toX: 550, toY: 370, size: 80, isBot: false, imageSrc: '', defendingPlanetId: 3, active: false }
 };
 
 export const planetsByPlayersPosition = [
@@ -185,4 +186,12 @@ export interface ILastMove {
 export interface IPosition {
   x: number;
   y: number;
+}
+
+export interface IChatMessage {
+  type: string;
+  playerId?: string;
+  username: string;
+  content: string;
+  color: string;
 }

@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { webSocketService } from '../services/WebSocketService';
-import { IGameMessage, IGameState, IWinner, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialPlanetsState, IRoomState, IMove, PlayersRecord, IPlayer } from '../interfaces/game';
+import { IGameMessage, IGameState, IWinner, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialPlanetsState, IRoomState, IMove, PlayersRecord, IPlayer, IChatMessage } from '../interfaces/game';
 import { useUser } from './UserContext';
 import { gameAudio } from '../utils/audioManager';
 import { movePlayerPredict } from '../services/game';
@@ -16,6 +16,7 @@ interface WebSocketContextType {
   joinRoom: (roomId: string, code: string) => void;
   leaveRoom: (roomId: string) => void;
   toggleReadyStatus: (roomId: string) => void;
+  sendChatMessage: (roomId: string, chatMessage: string) => void;
   removePlayer: (roomId: string, playerId: string) => void;
   movePlayer: (roomId: string, keyPressed: string) => void;
   startGame: (roomId: string) => void;
@@ -26,8 +27,11 @@ interface WebSocketContextType {
   roomState: IRoomState | null;
   rooms: IRoomState[] | null;
   lastMessage: IGameMessage | null;
+  lastChatMessage: IChatMessage | null;
   setGameState: (gameState: IGameState | null) => void;
   setRoomState: (roomState: IRoomState | null) => void;
+  setLastChatMessage: (chatMessage: IChatMessage | null) => void;
+
 }
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
@@ -40,8 +44,9 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [roomState, setRoomState] = useState<IRoomState | null>(null);
   const [rooms, setRooms] = useState<IRoomState[] | null>(null);
   const [lastMessage, setLastMessage] = useState<IGameMessage | null>(null);
+  const [lastChatMessage, setLastChatMessage] = useState<IChatMessage | null>(null);
 
-  const { user } = useUser();
+  const { user, setUser } = useUser();
 
   const [moveNumber, setMoveNumber] = useState<number>(0);
   const [moveHistory, setMoveHistory] = useState<IMove[]>([]);
@@ -76,6 +81,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     webSocketService.registerCallback('uuid', (data) => {
       setSocketId(data.socketId);
+      setUser(prevUser => ({ ...prevUser!, color: data.color }))
       setStatus('online');
     });
   }, [user]);
@@ -151,7 +157,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     });
 
     webSocketService.registerCallback('playerJoined', (data) => {
-
       const roomState = data.data.roomState;
 
       if (!roomState) {
@@ -209,6 +214,22 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setLastMessage(data);
       setRoomState(roomState)
     });
+
+    webSocketService.registerCallback('receivedChatMessage', (data) => {
+      const chatMessage = data.data.chatMessage;
+      console.log("chegou", chatMessage);
+
+      if (!chatMessage) {
+        console.log("Erro ao processar mensagem de chat. Unexpected server response");
+        return;
+      }
+      setLastChatMessage(chatMessage);
+      /* setTimeout(() => {
+      }, 10000); */
+
+    });
+
+
 
     webSocketService.registerCallback('playerRemoved', (data) => {
       const roomState = data.data.roomState;
@@ -330,7 +351,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     //           room: initialRoomState
     //         };
     //       }
-    
+
     //       // Atualiza o estado 'active' do jogador específico
     //       return {
     //         ...prevGameState,
@@ -348,11 +369,11 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     //     console.error('Erro ao atualizar o estado do jogador:', data);
     //   }
     // });
-    
+
     webSocketService.registerCallback('updatePlayerActive', (data) => {
       console.log("Dados chegando sobre atualização do player no front", data);
-    
-      if (data.data && data.data.playerActive !== undefined && data.data.playerId) {        
+
+      if (data.data && data.data.playerActive !== undefined && data.data.playerId) {
         setGameState(prevGameState => {
           if (prevGameState === null) {
             return {
@@ -363,7 +384,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
               room: initialRoomState
             };
           }
-          
+
           const updatedGameState = {
             ...prevGameState,
             players: {
@@ -374,18 +395,18 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
               }
             }
           };
-    
+
           // Atualiza gameStateRef com o novo estado
           gameStateRef.current = updatedGameState;
           return updatedGameState;
         });
-    
+
         console.log("Estado dos players no jogo depois de atualizar o active", gameStateRef.current?.players);
       } else {
         console.error('Erro ao atualizar o estado do jogador:', data);
       }
     });
-    
+
 
 
     webSocketService.registerCallback('updatePlanet', (data) => {
@@ -437,7 +458,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setLastMessage({ type: 'error', data: { message: 'Erro ao processar jogo. Unexpected server response' } });
       }
     });
-  
+
   }, [socketId, user, roomState, gameState, moveNumber, moveHistory, isReconciling, updateTarget,
     validateAndReconcile, addMoveOnHistory, getMoveFromSequenceNumber, getAndDeleteUnacknowledgedMoves, keepUnacknowledgedMoves]);
 
@@ -542,6 +563,25 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     const data = { roomId: roomId, playerId: socketId }
     webSocketService.send({ type: 'toggleReadyStatus', data });
+  }
+
+  const sendChatMessage = (roomId: string, chatMessage: string) => {
+    if (!socketId) {
+      setLastMessage({ type: 'error', data: { message: 'Falha ao conectar com o servidor' } });
+      console.log('Can\'t send chat message without a socketId');
+      return;
+    }
+
+    if (!roomId) {
+      setLastMessage({ type: 'error', data: { message: 'Falha ao identificar sala' } });
+      console.log('Id da sala não informado ou nulo');
+      return;
+    }
+
+    if (!chatMessage) return;
+
+    const data = { roomId: roomId, chatMessage: chatMessage, playerId: socketId, }
+    webSocketService.send({ type: 'sendChatMessage', data });
   }
 
   const removePlayer = (roomId: string, playerId: string) => {
@@ -731,9 +771,9 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   return (
     <WebSocketContext.Provider value={{
-      socketId, webSocketService, status, gameState, roomState, rooms, lastMessage,
-      getRooms, createRoom, closeRoom, joinRoom, leaveRoom, toggleReadyStatus, removePlayer, movePlayer,
-      startGame, leaveGame, setLastMessage, checkGameInProgress, setGameState, setRoomState
+      socketId, webSocketService, status, gameState, roomState, rooms, lastMessage, lastChatMessage,
+      getRooms, createRoom, closeRoom, joinRoom, leaveRoom, toggleReadyStatus, sendChatMessage, setLastChatMessage, removePlayer,
+      movePlayer, startGame, leaveGame, setLastMessage, checkGameInProgress, setGameState, setRoomState
       // Opção para criar um botão de liga e desliga áudio
       // toggleAudio: gameAudio.toggleMute.bind(gameAudio), // Add audio toggle function
     }}>

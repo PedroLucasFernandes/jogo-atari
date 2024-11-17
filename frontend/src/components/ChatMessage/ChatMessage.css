@@ -1,0 +1,16 @@
+#message-container {
+  display: flex;
+  padding: 3px 6px;
+  margin-right: 4px;
+  border-radius: 4px;
+
+
+  .author {
+    font-weight: 700;
+  }
+
+}
+
+#message-container:hover {
+  background-color: #f1f1f1;
+}

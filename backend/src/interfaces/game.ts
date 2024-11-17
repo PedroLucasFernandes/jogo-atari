@@ -1,4 +1,5 @@
 export type gameStatus = 'lobby' | 'waiting' | 'inprogress' | 'paused' | 'finished';
+export const chatColors = ["aquamarine", "blue", "blush", "bronze", "brown", "chocolate", "coral", "crimson", "cyan", "fuchsia", "gold", "gray", "green", "indigo", "lime", "magenta", "maroon", "olive", "orange", "pink", "plum", "purple", "red", "salmon", "silver", "tan", "teal", "tomato", "turquoise", "violet"]
 
 export interface IPlanet {
   x: number;
@@ -94,6 +95,7 @@ export interface IGameMessage {
     position?: IPosition;
     result?: string;
     playerActive?: boolean
+    chatMessage?: IChatMessage;
   }
 }
 
@@ -174,4 +176,12 @@ export interface ILastMove {
 export interface IPosition {
   x: number;
   y: number;
+}
+
+export interface IChatMessage {
+  type: string;
+  playerId?: string;
+  username: string;
+  content: string;
+  color: string;
 }
