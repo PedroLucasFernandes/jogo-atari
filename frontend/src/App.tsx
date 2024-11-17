@@ -24,7 +24,6 @@ function App() {
         <WebSocketProvider>
           <Router>
             <GlobalSound /> 
-
             <Routes>
               <Route path='/' element={<Login />} />
               <Route path='/register' element={<Register />} />

@@ -30,7 +30,7 @@ class GameAudio {
     this.destructionSound.volume = 0.1 * volume;
     this.victorySound.volume = 0.1 * volume;
     this.defeatSound.volume = 0.1 * volume;
-    this.clickSound.volume = 0.1 * volume;
+    this.clickSound.volume = 0.04 * volume;
     this.erroSound.volume = 0.1 * volume;
     this.menuSound.volume = 0.1 * volume;
   }
@@ -48,6 +48,7 @@ class GameAudio {
   public playClickSound(): void {
     if (!this.isMuted) {
       const sound = this.clickSound.cloneNode() as HTMLAudioElement;
+      sound.volume = this.clickSound.volume;
       sound.play().catch(err => console.log('Erro ao tocar som de clique'));
     }
   }
@@ -99,9 +100,7 @@ class GameAudio {
     this.isMuted = !this.isMuted;
     if (this.isMuted) {
       this.stopAll(); 
-    } else {
-      this.startBackgroundMusic(); 
-    }
+    } 
   }
 
   public stopAll(): void {

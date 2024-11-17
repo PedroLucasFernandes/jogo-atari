@@ -13,6 +13,7 @@ import DialogContent from '@mui/joy/DialogContent';
 import Input from '@mui/joy/Input';
 import DialogActions from '@mui/joy/DialogActions';
 import { gameAudio } from '../../utils/audioManager';
+import { LogoutButton } from '../../components/LogoutButton/LogoutButton'
 
 interface ScreenProps {
   setScreen: Dispatch<SetStateAction<string>>;
@@ -21,16 +22,8 @@ interface ScreenProps {
 export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   const navigate = useNavigate();
   const { webSocketService, socketId, checkGameInProgress, roomState, gameState, leaveGame } = useWebSocket();
-  const [showLogout, setShowLogout] = useState(false);
   const { user, setUser } = useUser();
   const [openModal, setOpenModal] = useState(false);
-
-
-  useEffect(() => {
-    webSocketService.registerCallback('something', (data) => {
-    });
-
-  }, [webSocketService]);
 
   useEffect(() => {
     if (!socketId) return;
@@ -42,23 +35,6 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
     setOpenModal(true);
 
   }, [roomState, gameState])
-
-  const handleLogout = async () => {
-    const { success, error } = await logoutApi();
-
-    if (error) {
-      //TODO: Alerta
-      console.error(error);
-      return;
-    }
-
-    if (success) {
-      console.log("Deslogado com sucesso");
-      setUser(null); // Limpar o estado de usuário
-    gameAudio.stopAll(); // Parar todos os sons
-    navigate('/'); // Redireciona para a tela de login
-    }
-  }
 
   const handleAbandon = () => {
     if (!roomState) {
@@ -76,31 +52,8 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
 
   return (
     <Box id="main-menu">
-      <Box
-        onClick={() => setShowLogout(!showLogout)}
-        sx={{
-          position: 'fixed',
-          top: '16px',
-          right: '16px',
-          cursor: 'pointer',
-          color: 'white',
-          zIndex: 10,
-        }}
-      >
-        <AccountCircle fontSize="large" />
-      </Box>
-
-      {showLogout && (
-        <div id="logout-button" style={{
-          position: 'fixed',
-          top: '60px',
-          right: '16px',
-          zIndex: 9,
-        }}>
-          <Button onClick={handleLogout} className='button-menu neon-button'>Logout</Button>
-        </div>
-      )}
-
+      <LogoutButton />
+  
       <div id='modal'>
         <h1 className='title-main-menu'>Olá, navegante {user?.username}!</h1>
         <h2 className='title-main-menu-2'>Qual será a aventura de hoje?</h2>
