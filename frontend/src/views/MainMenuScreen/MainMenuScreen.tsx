@@ -25,7 +25,6 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   const { user, setUser } = useUser();
   const [openModal, setOpenModal] = useState(false);
 
-  gameAudio.stopAll();
 
   useEffect(() => {
     webSocketService.registerCallback('something', (data) => {
@@ -55,8 +54,9 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
 
     if (success) {
       console.log("Deslogado com sucesso");
-      setUser(null);
-      navigate('/');
+      setUser(null); // Limpar o estado de usuário
+    gameAudio.stopAll(); // Parar todos os sons
+    navigate('/'); // Redireciona para a tela de login
     }
   }
 
@@ -113,19 +113,19 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
         <h1 className='title-main-menu'>Olá, navegante {user?.username}!</h1>
         <h2 className='title-main-menu-2'>Qual será a aventura de hoje?</h2>
         <Button className='button-menu'
-          onClick={() => setScreen('create-room')}
+          onClick={ () => { gameAudio.playClickSound(); setScreen('create-room')}}
           sx={{ backgroundColor: '#9D00FF', color: 'white', '&:hover': { backgroundColor: '#8900ab' }, fontFamily: '"Tilt Neon", sans-serif', fontSize: '2.5vh', borderRadius: '2rem', border: '1.6px solid #11205F' }}
         >
           Criar partida
         </Button>
         <Button className='button-menu'
-          onClick={() => setScreen('join-room')}
+          onClick={ () => { gameAudio.playClickSound(); setScreen('join-room')}}
           sx={{ backgroundColor: '#FF0062', color: 'white', '&:hover': { backgroundColor: '#d10065' }, fontFamily: '"Tilt Neon", sans-serif', fontSize: '2.5vh', borderRadius: '2rem', border: '1.6px solid #11205F' }}
         >
           Encontrar partida
         </Button>
         <Button className='button-menu'
-          onClick={() => setScreen('ranking-room')}
+         onClick={ () => { gameAudio.playClickSound(); setScreen('ranking-room')}}
           sx={{ backgroundColor: '#03B46D', color: 'white', '&:hover': { backgroundColor: '#006400' }, fontFamily: '"Tilt Neon", sans-serif', fontSize: '2.5vh', borderRadius: '2rem', border: '1.6px solid #11205F' }}
         >
           Ranking
