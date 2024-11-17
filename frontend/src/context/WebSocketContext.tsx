@@ -30,6 +30,7 @@ interface WebSocketContextType {
   lastChatMessage: IChatMessage | null;
   setGameState: (gameState: IGameState | null) => void;
   setRoomState: (roomState: IRoomState | null) => void;
+  setLastChatMessage: (chatMessage: IChatMessage | null) => void;
 
 }
 
@@ -45,7 +46,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [lastMessage, setLastMessage] = useState<IGameMessage | null>(null);
   const [lastChatMessage, setLastChatMessage] = useState<IChatMessage | null>(null);
 
-  const { user } = useUser();
+  const { user, setUser } = useUser();
 
   const [moveNumber, setMoveNumber] = useState<number>(0);
   const [moveHistory, setMoveHistory] = useState<IMove[]>([]);
@@ -80,6 +81,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     webSocketService.registerCallback('uuid', (data) => {
       setSocketId(data.socketId);
+      setUser(prevUser => ({ ...prevUser!, color: data.color }))
       setStatus('online');
     });
   }, [user]);
@@ -155,7 +157,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     });
 
     webSocketService.registerCallback('playerJoined', (data) => {
-
       const roomState = data.data.roomState;
 
       if (!roomState) {
@@ -216,13 +217,16 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     webSocketService.registerCallback('receivedChatMessage', (data) => {
       const chatMessage = data.data.chatMessage;
+      console.log("chegou", chatMessage);
 
       if (!chatMessage) {
         console.log("Erro ao processar mensagem de chat. Unexpected server response");
         return;
       }
-
       setLastChatMessage(chatMessage);
+      /* setTimeout(() => {
+      }, 10000); */
+
     });
 
 
@@ -768,7 +772,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   return (
     <WebSocketContext.Provider value={{
       socketId, webSocketService, status, gameState, roomState, rooms, lastMessage, lastChatMessage,
-      getRooms, createRoom, closeRoom, joinRoom, leaveRoom, toggleReadyStatus, sendChatMessage, removePlayer,
+      getRooms, createRoom, closeRoom, joinRoom, leaveRoom, toggleReadyStatus, sendChatMessage, setLastChatMessage, removePlayer,
       movePlayer, startGame, leaveGame, setLastMessage, checkGameInProgress, setGameState, setRoomState
       // Opção para criar um botão de liga e desliga áudio
       // toggleAudio: gameAudio.toggleMute.bind(gameAudio), // Add audio toggle function

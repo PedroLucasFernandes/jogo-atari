@@ -4,6 +4,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useWebSocket } from '../../context/WebSocketContext';
 import Chat from '../../components/Chat/Chat';
 import Box from '@mui/joy/Box';
+import MemoizedChat from '../../components/Chat/Chat';
 
 interface ScreenProps {
   setScreen: Dispatch<SetStateAction<string>>;
@@ -171,7 +172,7 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
                 width: '100%',
                 marginTop: '0.5vw',
               }}>
-                <Chat roomId={roomState.roomId} />
+                <MemoizedChat roomId={roomState.roomId} />
               </Box>
 
               <div className="buttons">

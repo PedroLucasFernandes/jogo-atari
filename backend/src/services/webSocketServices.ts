@@ -70,18 +70,19 @@ class WebSocketService {
 
 				//const clientId = `socket_${decoded.id}_${Date.now()}`;
 				const clientId = `socket_${decoded.id}`;
+				const color = this.getRandomColor()
 				this.clients[clientId] = {
 					ws,
 					user: {
 						id: decoded.id,
-						color: this.getRandomColor(),
+						color,
 						// Adicione outros dados do usuário que você precise
 					},
 					isAlive: true
 				};
 
 				// Enviar o ID do socket para o cliente
-				ws.send(JSON.stringify({ type: 'uuid', socketId: clientId }));
+				ws.send(JSON.stringify({ type: 'uuid', socketId: clientId, color }));
 
 				// Configurar listeners de mensagens
 				ws.on('message', (message) => {
@@ -284,6 +285,19 @@ class WebSocketService {
 			data: data
 		});
 
+		this.notifyClient(clientId, {
+			type: 'receivedChatMessage',
+			data: {
+				chatMessage: {
+					type: 'join',
+					playerId: clientId,
+					username: username,
+					content: 'entrou!',
+					color: this.clients[clientId].user.color,
+				}
+			}
+		});
+
 		this.notifyRoomObservers();
 	}
 
@@ -387,6 +401,21 @@ class WebSocketService {
 			});
 		});
 
+		room.players.forEach(player => {
+			this.notifyClient(player.playerId, {
+				type: 'receivedChatMessage',
+				data: {
+					chatMessage: {
+						type: 'join',
+						playerId: clientId,
+						username: room.players.find(p => p.playerId === clientId)?.username,
+						content: 'entrou!',
+						color: this.clients[clientId].user.color,
+					}
+				}
+			});
+		});
+
 		this.unsubscribeFromRoomUpdates(clientId);
 		this.notifyRoomObservers();
 	}
@@ -456,6 +485,21 @@ class WebSocketService {
 			this.notifyClient(player.playerId, {
 				type: 'playerLeft',
 				data: data
+			});
+		});
+
+		room.players.forEach(player => {
+			this.notifyClient(player.playerId, {
+				type: 'receivedChatMessage',
+				data: {
+					chatMessage: {
+						type: 'left',
+						playerId: clientId,
+						username: client.username,
+						content: 'saiu!',
+						color: this.clients[clientId].user.color,
+					}
+				}
 			});
 		});
 
@@ -595,6 +639,21 @@ class WebSocketService {
 			this.notifyClient(player.playerId, {
 				type: 'playerRemoved',
 				data: data
+			});
+		});
+
+		room.players.forEach(player => {
+			this.notifyClient(player.playerId, {
+				type: 'receivedChatMessage',
+				data: {
+					chatMessage: {
+						type: 'removed',
+						playerId: playerId,
+						username: player.username,
+						content: 'foi removido!',
+						color: this.clients[playerId].user.color,
+					}
+				}
 			});
 		});
 

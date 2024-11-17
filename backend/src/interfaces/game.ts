@@ -1,5 +1,7 @@
 export type gameStatus = 'lobby' | 'waiting' | 'inprogress' | 'paused' | 'finished';
-export const chatColors = ["amaranth", "amber", "amethyst", "apricot", "aqua", "aquamarine", "azure", "beige", "black", "blue", "blush", "bronze", "brown", "chocolate", "coffee", "copper", "coral", "crimson", "cyan", "emerald", "fuchsia", "gold", "gray", "green", "harlequin", "indigo", "ivory", "jade", "lavender", "lime", "magenta", "maroon", "moccasin", "olive", "orange", "peach", "pink", "plum", "purple", "red", "rose", "salmon", "sapphire", "scarlet", "silver", "tan", "teal", "tomato", "turquoise", "violet", "white", "yellow"]
+export const chatColors = ["amaranth", "amber", "amethyst", "apricot", "aqua", "aquamarine", "black", "blue", "blush", "bronze", "brown", "chocolate", "coffee", "copper", "coral", "crimson", "cyan", "emerald", "fuchsia", "gold", "gray", "green", "harlequin", "indigo", "jade", "lime", "magenta", "maroon", "moccasin", "olive", "orange", "peach", "pink", "plum", "purple", "red", "rose", "salmon", "sapphire", "scarlet", "silver", "tan", "teal", "tomato", "turquoise", "violet"]
+//Cores removidos por serem muito claras, readicionar se mudar a cor do fundo
+const lightColors = ["azure", "beige", "ivory", "lavender", "white", "yellow"];
 
 export interface IPlanet {
   x: number;
