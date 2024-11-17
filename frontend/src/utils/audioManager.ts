@@ -23,6 +23,10 @@ class GameAudio {
     this.backgroundMusic.loop = true;
     this.menuSound.loop = true;
 
+    // Pré-carregar os sons
+    this.backgroundMusic.load();
+    this.menuSound.load();
+
     this.updateVolume();
   }
 
@@ -79,7 +83,7 @@ class GameAudio {
   }
 
   public playMenuSound(): void {
-    if (!this.isMuted) {
+    if (!this.isMuted && !this.isPlayingHomeMusic) {
       this.menuSound.play().catch(err => console.log('Erro ao tocar som do menu'));
       this.isPlayingHomeMusic = true;
       this.isPlayingGameMusic = false;
@@ -87,7 +91,7 @@ class GameAudio {
   }
 
   public startBackgroundMusic(): void {
-    if (!this.isMuted) {
+    if (!this.isMuted && !this.isPlayingGameMusic) {
       this.backgroundMusic.play().catch(err => console.log('Erro ao tocar som de background'));
       this.isPlayingHomeMusic = false;
       this.isPlayingGameMusic = true;
@@ -127,9 +131,9 @@ class GameAudio {
 
   public stopAll(): void {
     this.backgroundMusic.pause();
-    this.backgroundMusic.currentTime = 0;
     this.menuSound.pause();
-    this.menuSound.currentTime = 0;
+    this.isPlayingHomeMusic = false;
+    this.isPlayingGameMusic = false;
   }
 }
 

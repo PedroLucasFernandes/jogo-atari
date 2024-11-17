@@ -10,12 +10,11 @@ export const GlobalSound: React.FC<GlobalSoundProps> = ({ currentScreen }) => {
   const location = useLocation();
 
   useEffect(() => {
-    // Parar todos os sons primeiro
-    gameAudio.stopAll();
-
-    // Se estiver na tela de login ("/"), não tocar nenhum som
-    if (location.pathname === '/' || gameAudio.isAudioMuted()) return;
-
+     // Se estiver na tela de login ("/"), parar todos os sons
+     if (location.pathname === '/' || gameAudio.isAudioMuted()) {
+      gameAudio.stopAll();
+      return;
+    }
     // Tocar música com base na tela atual
     if (location.pathname === '/monolito') {
       if (currentScreen === 'game') {
