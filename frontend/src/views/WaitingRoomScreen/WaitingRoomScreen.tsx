@@ -2,6 +2,8 @@ import './WaitingRoomScreen.css';
 import Button from "@mui/joy/Button";
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useWebSocket } from '../../context/WebSocketContext';
+import Chat from '../../components/Chat/Chat';
+import Box from '@mui/joy/Box';
 import { LogoutButton } from '../../components/LogoutButton/LogoutButton';
 import { SoundToggleButton } from '../../components/SoundToggleButton/SoundToggleButton';
 import { gameAudio } from '../../utils/audioManager';
@@ -14,6 +16,7 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   const { startGame, socketId, roomState, toggleReadyStatus, removePlayer, closeRoom, leaveRoom, lastMessage, setLastMessage } = useWebSocket();
   const [loading, setLoading] = useState(true);
   const [isHost, setIsHost] = useState(false);
+  const [chatFocus, setChatFocus] = useState(false);
 
   useEffect(() => {
     if (lastMessage && (lastMessage.type === 'youLeft' || lastMessage.type === 'roomClosed' || lastMessage.type === 'youAreRemoved')) {
@@ -79,11 +82,15 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   };
 
   const avatarAssets = [
-    '/assets/player1.svg', 
-    '/assets/player2.svg', 
-    '/assets/player3.svg', 
+    '/assets/player1.svg',
+    '/assets/player2.svg',
+    '/assets/player3.svg',
     '/assets/player4.svg'
   ];
+
+  const handleFocusChange = (isFocused: boolean) => {
+    setChatFocus(isFocused);
+  };
 
   return (
     <div id="waiting-room">
@@ -108,76 +115,80 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
             <>
               <p className='p-waiting'>Id da sala: {roomState.roomId} | Código da sala: {roomState.code}</p>
               <div className="player-list">
-  {avatarAssets.map((avatar, index) => {
-    const player = roomState.players[index];
-    return (
-      <div key={index} className="player-item">
-        <img src={avatar} alt={`Avatar do jogador ${index + 1}`} className="image" />
-        <span className="player-name" style={{fontFamily: '"Chewy", system-ui', fontSize: '2.5vh'}}>
-          {player ? player.username : `Jogador ${index + 1}`} - {player?.ready ? 'Pronto' : 'Aguardando'}
-        </span>
+                {avatarAssets.map((avatar, index) => {
+                  const player = roomState.players[index];
+                  return (
+                    <div key={index} className="player-item">
+                      <img src={avatar} alt={`Avatar do jogador ${index + 1}`} className="image" />
+                      <span className="player-name" style={{ fontFamily: '"Chewy", system-ui', fontSize: '2.5vh' }}>
+                        {player ? player.username : `Jogador ${index + 1}`} - {player?.ready ? 'Pronto' : 'Aguardando'}
+                      </span>
 
-        {player?.isHost && (
-          <span className="host-crown-container">
-            <img src="/assets/crown-svgrepo-com.svg" alt="Coroa de Host" className="host-crown" />
-          </span>
-        )}
+                      {player?.isHost && (
+                        <span className="host-crown-container">
+                          <img src="/assets/crown-svgrepo-com.svg" alt="Coroa de Host" className="host-crown" />
+                        </span>
+                      )}
 
-        {player?.playerId === socketId ? (
-          <Button
-          variant="outlined"
-          size="sm"
-          onClick={() => {gameAudio.playClickSound(); handleToggleReady(roomState.roomId);}}
-          sx={{
-            backgroundColor: '#FF0062',
-            color: 'white',
-            border: '1.2px solid #11205F',
-            opacity: 0.8, 
-            '&:hover': {
-              backgroundColor: '#d10065',
-              opacity: 1, 
-            },
-            fontFamily: '"Tilt Neon", sans-serif',
-            fontSize: '2.5vh',
-            fontWeight:'300',
-            borderRadius: '2rem'
-          }}
-        >
-          {player.ready ? 'Desmarcar Pronto' : 'Marcar Pronto'}
-        </Button>
-        
-        ) : (
-          isHost && player && (
-            <Button variant="outlined" size="sm" color="danger" sx={{
-              backgroundColor: '#FF0062',
-              color: 'white',
-              border: '1.2px solid #11205F',
-              opacity: 0.8, 
-              '&:hover': {
-                backgroundColor: '#d10065',
-                opacity: 1, 
-              },
-              fontFamily: '"Tilt Neon", sans-serif',
-              fontSize: '2.5vh',
-              fontWeight:'300',
-              borderRadius: '2rem'
-            }} onClick={() => {gameAudio.playClickSound(); handleRemovePlayer(roomState.roomId, player.playerId)}}>
-              Remover
-            </Button>
-          )
-        )}
-      </div>
-    );
-  })}
-</div>
+                      {player?.playerId === socketId ? (
+                        <Button
+                          variant="outlined"
+                          size="sm"
+                          onClick={() => {gameAudio.playClickSound(); handleToggleReady(roomState.roomId);}}
+                          sx={{
+                            backgroundColor: '#FF0062',
+                            color: 'white',
+                            border: '1.2px solid #11205F',
+                            opacity: 0.8,
+                            '&:hover': {
+                              backgroundColor: '#d10065',
+                              opacity: 1,
+                            },
+                            fontFamily: '"Tilt Neon", sans-serif',
+                            fontSize: '2.5vh',
+                            fontWeight: '300',
+                            borderRadius: '2rem'
+                          }}
+                        >
+                          {player.ready ? 'Desmarcar Pronto' : 'Marcar Pronto'}
+                        </Button>
 
-
+                      ) : (
+                        isHost && player && (
+                          <Button variant="outlined" size="sm" color="danger" sx={{
+                            backgroundColor: '#FF0062',
+                            color: 'white',
+                            border: '1.2px solid #11205F',
+                            opacity: 0.8,
+                            '&:hover': {
+                              backgroundColor: '#d10065',
+                              opacity: 1,
+                            },
+                            fontFamily: '"Tilt Neon", sans-serif',
+                            fontSize: '2.5vh',
+                            fontWeight: '300',
+                            borderRadius: '2rem'
+                          }} onClick={() => {gameAudio.playClickSound(); handleRemovePlayer(roomState.roomId, player.playerId)}}>
+                            Remover
+                          </Button>
+                        )
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              <Box sx={{
+                width: '72%',
+                marginTop: '0.5vw',
+              }}>
+                <Chat roomId={roomState.roomId} onFocusChange={handleFocusChange} />
+              </Box>
 
               <div className="buttons">
-              {roomState?.players.length > 1 && (
-                <button className='button-waiting-final' onClick={() => { gameAudio.playClickSound(); handleLeaveRoom(roomState.roomId); }}>
-                  Sair da sala
-                </button>
+                {roomState?.players.length > 1 && (
+                  <button className='button-waiting-final' onClick={() => { gameAudio.playClickSound(); handleLeaveRoom(roomState.roomId); }}>
+                    Sair da sala
+                  </button>
                 )}
                 {isHost && (
                   <>
@@ -194,6 +205,8 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
                   </>
                 )}
               </div>
+
+
             </>
           )}
         </div>

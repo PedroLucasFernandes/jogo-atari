@@ -1,0 +1,13 @@
+#game-screen #chat-container {
+  background-color: #111111;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 1vw;
+  border-bottom-left-radius: 1vw;
+  color: white;
+  min-height: 80px;
+}
+
+#game-screen #message-container:hover {
+  background-color: #2c2c2c;
+}
