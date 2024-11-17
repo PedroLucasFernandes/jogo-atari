@@ -106,19 +106,19 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
         <h2 className='title-main-menu-2'>Qual será a aventura de hoje?</h2>
         <Button className='button-menu neon-button-1'
           onClick={() => setScreen('create-room')}
-          sx={{ backgroundColor: '#a721fa', color: 'white', boxShadow: '0 0 15px rgba(157, 0, 255, 0.7), inset 0 0 10px rgba(157, 0, 255, 0.6)', '&:hover': { backgroundColor: '#8900ab' , boxShadow: '0 0 25px rgba(157, 0, 255, 1), 0 0 35px rgba(157, 0, 255, 0.8)' }}}
+          sx={{fontFamily: '"Tilt Neon", sans-serif', fontSize:'1rem', backgroundColor: '#a721fa', color: 'white', boxShadow: '0 0 15px rgba(157, 0, 255, 0.7), inset 0 0 10px rgba(157, 0, 255, 0.6)', '&:hover': { backgroundColor: '#8900ab' , boxShadow: '0 0 25px rgba(157, 0, 255, 1), 0 0 35px rgba(157, 0, 255, 0.8)' }}}
         >
           Criar partida
         </Button>
         <Button className='button-menu neon-button-2'
           onClick={() => setScreen('join-room')}
-          sx={{ backgroundColor: '#fd68a1', color: 'white', boxShadow: '0 0 15px rgba(255, 0, 98, 0.7), inset 0 0 10px rgba(255, 0, 98, 0.6)', '&:hover': { backgroundColor: '#d10065' , boxShadow: '0 0 25px rgba(255, 0, 98, 1), 0 0 35px rgba(255, 0, 98, 0.8)' }}}
+          sx={{fontFamily: '"Tilt Neon", sans-serif', fontSize:'1rem',  backgroundColor: '#fd68a1', color: 'white', boxShadow: '0 0 15px rgba(255, 0, 98, 0.7), inset 0 0 10px rgba(255, 0, 98, 0.6)', '&:hover': { backgroundColor: '#d10065' , boxShadow: '0 0 25px rgba(255, 0, 98, 1), 0 0 35px rgba(255, 0, 98, 0.8)' }}}
         >
           Encontrar partida
         </Button>
         <Button className='button-menu neon-button-3'
           onClick={() => setScreen('ranking-room')}
-          sx={{ backgroundColor: '#03B46D', color: 'white', boxShadow: '0 0 15px rgba(3, 180, 109, 0.7), inset 0 0 10px rgba(3, 180, 109, 0.6)', '&:hover': { backgroundColor: '#006400' , boxShadow: '0 0 25px rgba(3, 180, 109, 1), 0 0 35px rgba(3, 180, 109, 0.8)' }}}
+          sx={{fontFamily: '"Tilt Neon", sans-serif', fontSize:'1rem', backgroundColor: '#03B46D', color: 'white', boxShadow: '0 0 15px rgba(3, 180, 109, 0.7), inset 0 0 10px rgba(3, 180, 109, 0.6)', '&:hover': { backgroundColor: '#006400' , boxShadow: '0 0 25px rgba(3, 180, 109, 1), 0 0 35px rgba(3, 180, 109, 0.8)' }}}
         >
           Ranking
         </Button>
