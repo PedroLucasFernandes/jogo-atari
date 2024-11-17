@@ -5,6 +5,7 @@
   border-bottom-right-radius: 1vw;
   border-bottom-left-radius: 1vw;
   color: white;
+  min-height: 80px;
 }
 
 #game-screen #message-container:hover {

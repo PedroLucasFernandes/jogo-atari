@@ -680,6 +680,14 @@ class WebSocketService {
 			return;
 		}
 
+		if (room.players.length < 2) {
+			this.notifyClient(clientId, {
+				type: 'error',
+				data: { message: 'A sala precisa ter pelo menos 2 jogadores' }
+			});
+			return;
+		}
+
 		//verificar se todos os jogdores estão com o status ready
 		const allPlayersReady = room.players.every(player => player.ready);
 		if (!allPlayersReady) {
