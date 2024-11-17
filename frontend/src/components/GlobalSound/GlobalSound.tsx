@@ -24,37 +24,10 @@ export const GlobalSound: React.FC<GlobalSoundProps> = ({ currentScreen }) => {
       gameAudio.playMenuSound();
     }
   }
+
+    // Forçar a atualização no localStorage quando o estado do áudio mudar
+    gameAudio.saveAudioState(); // Salvar estado a cada vez que o áudio mudar
   }, [location, currentScreen]);
 
   return null;
 };
-
-
-
-// import React, { useEffect } from "react";
-// import { useLocation } from "react-router-dom";
-// import { gameAudio } from "../../utils/audioManager";
-
-// interface GlobalSoundProps {
-//   currentScreen: string;
-// }
-
-// export const GlobalSound: React.FC = () => {
-//   const location = useLocation();
-
-//   useEffect(() => {
-//     if (location.pathname === '/') {
-//       gameAudio.stopAll(); 
-//     } else {
-//       gameAudio.stopAll(); 
-//       gameAudio.playMenuSound(); 
-//     }
-
-//     return () => {
-      
-//       gameAudio.stopAll();
-//     };
-//   }, [location]);
-
-//   return null; 
-// };

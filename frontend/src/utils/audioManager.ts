@@ -52,10 +52,11 @@ class GameAudio {
 
     // Atualiza o volume com base no estado do mute
     this.updateVolume();
+
   }
 
   // Métodos para salvar o estado atual
-  private saveAudioState(): void {
+  public saveAudioState(): void {
     localStorage.setItem('isMuted', String(this.isMuted));
     localStorage.setItem('isPlayingHomeMusic', String(this.isPlayingHomeMusic));
     localStorage.setItem('isPlayingGameMusic', String(this.isPlayingGameMusic));
@@ -121,6 +122,9 @@ class GameAudio {
       this.menuSound.play().catch(err => console.log('Erro ao tocar som do menu'));
       this.isPlayingHomeMusic = true;
       this.isPlayingGameMusic = false;
+
+       // Salvar o estado no localStorage
+       this.saveAudioState();
     }
   }
 
@@ -130,6 +134,9 @@ class GameAudio {
       this.backgroundMusic.play().catch(err => console.log('Erro ao tocar som de background'));
       this.isPlayingHomeMusic = false;
       this.isPlayingGameMusic = true;
+
+      // Salvar o estado no localStorage
+      this.saveAudioState();
     }
   }
   
@@ -168,12 +175,6 @@ class GameAudio {
     // Não redefinir os estados aqui para manter a referência do som que estava tocando
   }
 
-  // public stopAll(): void {
-  //   this.backgroundMusic.pause();
-  //   this.menuSound.pause();
-  //   this.isPlayingHomeMusic = false;
-  //   this.isPlayingGameMusic = false;
-  // }
 }
 
 export const gameAudio = new GameAudio();
