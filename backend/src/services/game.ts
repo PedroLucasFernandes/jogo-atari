@@ -34,7 +34,7 @@ export default function createGame(roomState: IRoomState) {
 
     setTimeout(() => {
       intervalId = setInterval(moveBall, frequency);
-    }, 3000000);
+    }, 3000);
   }
 
   function subscribe(observerFunction: (message: IGameMessage) => void) {
