@@ -75,15 +75,7 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   }
 
   return (
-    <Box id="main-menu" sx={{
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      gap: '2px',
-      position: 'relative',
-    }}>
-
+    <Box id="main-menu">
       <Box
         onClick={() => setShowLogout(!showLogout)}
         sx={{
@@ -105,28 +97,28 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
           right: '16px',
           zIndex: 9,
         }}>
-          <Button onClick={handleLogout} className='button-menu'>Logout</Button>
+          <Button onClick={handleLogout} className='button-menu neon-button'>Logout</Button>
         </div>
       )}
 
       <div id='modal'>
         <h1 className='title-main-menu'>Olá, navegante {user?.username}!</h1>
         <h2 className='title-main-menu-2'>Qual será a aventura de hoje?</h2>
-        <Button className='button-menu'
+        <Button className='button-menu neon-button-1'
           onClick={() => setScreen('create-room')}
-          sx={{ backgroundColor: '#9D00FF', color: 'white', '&:hover': { backgroundColor: '#8900ab' }, fontFamily: '"Tilt Neon", sans-serif', fontSize: '2.5vh', borderRadius: '2rem', border: '1.6px solid #11205F' }}
+          sx={{fontFamily: '"Tilt Neon", sans-serif', fontSize:'1rem', backgroundColor: '#a721fa', color: 'white', boxShadow: '0 0 15px rgba(157, 0, 255, 0.7), inset 0 0 10px rgba(157, 0, 255, 0.6)', '&:hover': { backgroundColor: '#8900ab' , boxShadow: '0 0 25px rgba(157, 0, 255, 1), 0 0 35px rgba(157, 0, 255, 0.8)' }}}
         >
           Criar partida
         </Button>
-        <Button className='button-menu'
+        <Button className='button-menu neon-button-2'
           onClick={() => setScreen('join-room')}
-          sx={{ backgroundColor: '#FF0062', color: 'white', '&:hover': { backgroundColor: '#d10065' }, fontFamily: '"Tilt Neon", sans-serif', fontSize: '2.5vh', borderRadius: '2rem', border: '1.6px solid #11205F' }}
+          sx={{fontFamily: '"Tilt Neon", sans-serif', fontSize:'1rem',  backgroundColor: '#fd68a1', color: 'white', boxShadow: '0 0 15px rgba(255, 0, 98, 0.7), inset 0 0 10px rgba(255, 0, 98, 0.6)', '&:hover': { backgroundColor: '#d10065' , boxShadow: '0 0 25px rgba(255, 0, 98, 1), 0 0 35px rgba(255, 0, 98, 0.8)' }}}
         >
           Encontrar partida
         </Button>
-        <Button className='button-menu'
+        <Button className='button-menu neon-button-3'
           onClick={() => setScreen('ranking-room')}
-          sx={{ backgroundColor: '#03B46D', color: 'white', '&:hover': { backgroundColor: '#006400' }, fontFamily: '"Tilt Neon", sans-serif', fontSize: '2.5vh', borderRadius: '2rem', border: '1.6px solid #11205F' }}
+          sx={{fontFamily: '"Tilt Neon", sans-serif', fontSize:'1rem', backgroundColor: '#03B46D', color: 'white', boxShadow: '0 0 15px rgba(3, 180, 109, 0.7), inset 0 0 10px rgba(3, 180, 109, 0.6)', '&:hover': { backgroundColor: '#006400' , boxShadow: '0 0 25px rgba(3, 180, 109, 1), 0 0 35px rgba(3, 180, 109, 0.8)' }}}
         >
           Ranking
         </Button>
@@ -141,8 +133,8 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
           <p>Você está em uma partida em andamento, deseja continuá-la?</p>
         </DialogContent>
         <DialogActions>
-          <button className="button-search-room-3" onClick={handleAbandon}>Abandonar</button>
-          <button className="button-search-room-3" onClick={handleRejoin}>Continuar</button>
+          <button className="button-search-room-3 neon-button" onClick={handleAbandon}>Abandonar</button>
+          <button className="button-search-room-3 neon-button" onClick={handleRejoin}>Continuar</button>
         </DialogActions>
       </Dialog>
 

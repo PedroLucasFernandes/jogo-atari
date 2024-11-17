@@ -10,14 +10,16 @@
     background-position: center;
     background-repeat: no-repeat;
 }
-.title-create{
+
+.title-create {
     font-family: "Chewy", system-ui;
     font-size: 2rem;
     margin: 0;
     color: #11205f;
 }
-.square-create-room{
-    background-color: white;
+
+.square-create-room {
+    background-color: #ffffff;
     width: 50%;
     height: 70vh;
     border-radius: 3rem;
@@ -26,7 +28,8 @@
     align-items: center;
     justify-content: center;
 }
-.input-create{
+
+.input-create {
     padding: 10px;
     padding-left: 1rem;
     margin: 5px 0;
@@ -34,30 +37,40 @@
     border-radius: 2rem;
     width: 30%;
     align-self: center;
-    color: #333; 
+    color: #333;
     font-size: 16px;
-    line-height: 1.5; 
+    line-height: 1.5;
 }
 
-.button-create{
-    padding: 0.8rem;
+.button-create,
+.button-back {
+    padding: 10px;
     width: 30%;
     max-width: 300px;
-    border-radius: 1rem;
+    border-radius: 10px;
+    border: none;
     margin: 0.5rem 0;
-    font-size: 1.2rem;
-    font-family: "Chewy", system-ui;
-    background-color: #750de5;
+    font-size: 1rem;
+    font-family: "Tilt neon", system-ui;
     color: white;
     cursor: pointer;
 }
 
-.button-create:hover {
+.button-create {
+    background-color: #00a447;
+}
+
+.button-back {
+    background-color: #750de5;
+}
+
+.button-create:hover,
+.button-back:hover {
     background-color: #5e09b7;
-  }
-  
-  .button-create:disabled {
+}
+
+.button-create:disabled {
     background-color: #cccccc;
     color: #666666;
     cursor: not-allowed;
-  }
+}
