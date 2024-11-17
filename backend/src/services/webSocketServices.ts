@@ -25,6 +25,7 @@ class WebSocketService {
 
 	constructor(private wss: WebSocketServer) {
 		this.initialize();
+		this.startRoomCleanup();
 	}
 
 	public getClient(clientId: string): WebSocket | undefined {
@@ -963,6 +964,22 @@ class WebSocketService {
 	private getRandomColor(): string {
 		const randomIndex = Math.floor(Math.random() * chatColors.length);
 		return chatColors[randomIndex];
+	}
+
+	//Exclui salas bugadas (sem jogadores)
+	private startRoomCleanup() {
+		setInterval(() => {
+			Object.keys(this.rooms).forEach((roomId) => {
+				const room = this.rooms[roomId];
+				if (room.players.length === 0 && room.status === 'inprogress') {
+					if (this.gamesByRoom[roomId]) {
+						delete this.gamesByRoom[roomId];
+					}
+					delete this.rooms[roomId];
+					this.notifyRoomObservers();
+				}
+			});
+		}, 15000);
 	}
 
 	//TODO: Modificar as mensagens de atualizações dos clientes para enviar somente
