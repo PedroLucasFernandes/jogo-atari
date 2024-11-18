@@ -5,10 +5,17 @@
   border-radius: 4px;
 
 
+
   .author {
     font-weight: 700;
   }
 
+}
+
+.content {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  text-align: start;
 }
 
 #message-container:hover {

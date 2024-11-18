@@ -1,5 +1,5 @@
 export type gameStatus = 'lobby' | 'waiting' | 'inprogress' | 'paused' | 'finished';
-export const chatColors = ["aquamarine", "blue", "blush", "bronze", "brown", "chocolate", "coral", "crimson", "cyan", "fuchsia", "gold", "gray", "green", "indigo", "lime", "magenta", "maroon", "olive", "orange", "pink", "plum", "purple", "red", "salmon", "silver", "tan", "teal", "tomato", "turquoise", "violet"]
+export const chatColors = ["aquamarine", "blue", "brown", "chocolate", "coral", "crimson", "cyan", "fuchsia", "gold", "gray", "green", "indigo", "lime", "magenta", "maroon", "olive", "orange", "pink", "plum", "purple", "red", "salmon", "silver", "tan", "teal", "tomato", "turquoise", "violet"]
 
 export interface IPlanet {
   x: number;
