@@ -1,3 +1,7 @@
+#game-screen {
+  display: flex;
+}
+
 #game-screen #chat-container {
   background-color: #111111;
   border-top-left-radius: 4px;
