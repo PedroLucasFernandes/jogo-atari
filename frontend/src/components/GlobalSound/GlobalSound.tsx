@@ -20,14 +20,20 @@ export const GlobalSound: React.FC<GlobalSoundProps> = ({ currentScreen }) => {
 
       if (location.pathname === '/monolito') {
         if (currentScreen === 'game' && !gameAudio.isPlayingGameMusic) {
-          await gameAudio.startBackgroundMusic();
+          console.log(currentScreen)
+          gameAudio.stopAll(); // Parar músicas anteriores
+          gameAudio.startBackgroundMusic();
+          gameAudio.saveAudioState();
         } else if (!gameAudio.isPlayingHomeMusic) {
-          await gameAudio.playMenuSound();
+          console.log(currentScreen)
+          gameAudio.stopAll(); // Parar músicas anteriores
+          gameAudio.playMenuSound();
+          gameAudio.saveAudioState();
         }
       }
 
-      // Salvar estado do áudio após tocar
-      gameAudio.saveAudioState();
+      // // Salvar estado do áudio após tocar
+      // gameAudio.saveAudioState();
     } catch (error) {
       console.log("Reprodução automática bloqueada, aguardando interação do usuário...");
       // Adicionar listener para tentar novamente após uma interação do usuário
@@ -37,7 +43,7 @@ export const GlobalSound: React.FC<GlobalSoundProps> = ({ currentScreen }) => {
 
   const handleUserInteraction = async () => {
     console.log("Interação detectada, tentando tocar música novamente...");
-    await playMusicWithFallback();
+    playMusicWithFallback();
   };
 
   useEffect(() => {
@@ -50,6 +56,7 @@ export const GlobalSound: React.FC<GlobalSoundProps> = ({ currentScreen }) => {
     // Tentar tocar música novamente ao voltar para a aba
     const handleVisibilityChange = () => {
       if (!document.hidden) {
+        gameAudio.loadAudioState(); // Garantir que o estado correto seja carregado
         playMusicWithFallback();
       }
     };
