@@ -21,7 +21,7 @@ const GameHudVertical: React.FC = () => {
 
 
   return (
-    <div id="gamehud-container">
+    <div id="gamehud-vertical-container">
       <p className='description'>Dificuldade: {difficulty}</p>
       <p className='description'>Tempo: {time}</p>
     </div>

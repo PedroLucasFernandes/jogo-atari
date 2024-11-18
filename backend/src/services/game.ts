@@ -32,7 +32,7 @@ export default function createGame(roomState: IRoomState) {
     setTimeout(() => {
       gameState.info.startTime = Date.now(); // Tempo de início do jogo
       intervalId = setInterval(wrappedFunctions, frequency);
-    }, 300000);
+    }, 3000);
   }
 
   function subscribe(observerFunction: (message: IGameMessage) => void) {

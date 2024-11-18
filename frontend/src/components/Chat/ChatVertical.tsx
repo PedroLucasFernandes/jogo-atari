@@ -76,7 +76,7 @@ const ChatVertical: React.FC<ChatVerticalProps> = ({ roomId, onFocusChange }) =>
   };
 
   return (
-    <div id="chat-container">
+    <div id="chat-vertical-container">
       <div id="messages" ref={messagesEndRef}>
 
         {messages.map((msg, index) => (

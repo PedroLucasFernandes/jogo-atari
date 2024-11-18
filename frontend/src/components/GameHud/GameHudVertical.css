@@ -1,4 +1,4 @@
-#gamehud-container {
+#gamehud-vertical-container {
   display: flex;
   justify-content: space-between;
   background-color: #111111;

@@ -181,8 +181,11 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 			<SoundToggleButton />
 			{roomState &&
 				<Box sx={{
+					display: 'flex',
+					flexDirection: 'column',
 					width: '100%',
 					marginRight: '8px',
+					height: '100%',
 				}}>
 					<GameHud />
 				</Box>
@@ -190,8 +193,11 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 			<canvas ref={canvasRef} width={800} height={600} />
 			{roomState &&
 				<Box sx={{
+					display: 'flex',
+					flexDirection: 'column',
 					width: '100%',
 					marginLeft: '8px',
+					height: '100%',
 				}}>
 					<Chat roomId={roomState?.roomId} onFocusChange={handleFocusChange} />
 				</Box>
