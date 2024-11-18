@@ -260,6 +260,13 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         return;
       }
 
+        // Trocar a música assim que o jogo começar
+      if (gameAudio.isPlayingHomeMusic) {
+        gameAudio.stopAll();
+      }
+      gameAudio.startBackgroundMusic();
+      gameAudio.saveAudioState();
+
       setLastMessage(data);
       setRoomState(roomState);
       setGameState(data.data.gameState)
