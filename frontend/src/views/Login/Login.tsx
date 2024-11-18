@@ -76,7 +76,7 @@ export const Login: React.FC = () => {
             onKeyDown={handleKeyDown} // Adiciona o evento de teclado
           />
           <CustomInput
-            placeholder="Password"
+            placeholder="Senha"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             type="password"
