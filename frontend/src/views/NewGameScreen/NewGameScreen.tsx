@@ -1,8 +1,13 @@
+import './NewGameScreen.css';
 import React, { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
 import { useWebSocket } from '../../context/WebSocketContext';
 import renderScreen from './renderScreen';
 import { IWinner } from '../../interfaces/game';
 import { gameAudio } from '../../utils/audioManager';
+import Chat from '../../components/Chat/Chat';
+import Box from '@mui/joy/Box';
+import GameHud from '../../components/GameHud/GameHud';
+import { SoundToggleButton } from '../../components/SoundToggleButton/SoundToggleButton';
 
 interface ScreenProps {
 	setScreen: Dispatch<SetStateAction<string>>;
@@ -23,6 +28,7 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 	const interval = 1000 / FPS;
 	let frameTimes: number[] = [];
 	const startTimeOverall = performance.now();
+	const [chatFocus, setChatFocus] = useState(false);
 
 	useEffect(() => {
 		gameStateRef.current = gameState;
@@ -105,7 +111,7 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 		if (roomState) {
 			const currentPlayer = gameStateRef.current?.players[socketId as string];
 			if (currentPlayer?.active) {
-			movePlayer(roomState.roomId, direction);
+				movePlayer(roomState.roomId, direction);
 			}
 		}
 	}, [movePlayer, roomState]);
@@ -115,6 +121,7 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 		const validKeys = ['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'];
 
 		const handleKeyDown = (e: KeyboardEvent) => {
+			if (chatFocus) return;
 			const keyPressed = e.key.toLowerCase();
 			if (validKeys.includes(keyPressed)) {
 				activeKeysRef.current.add(keyPressed);
@@ -122,6 +129,7 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 		};
 
 		const handleKeyUp = (e: KeyboardEvent) => {
+			if (chatFocus) return;
 			const keyReleased = e.key.toLowerCase();
 			activeKeysRef.current.delete(keyReleased);
 		};
@@ -141,7 +149,7 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 			document.removeEventListener('keydown', handleKeyDown);
 			document.removeEventListener('keyup', handleKeyUp);
 		};
-	}, [stableMovePlayer]); // `stableMovePlayer` é uma dependência estável
+	}, [chatFocus, stableMovePlayer]); // `stableMovePlayer` é uma dependência estável
 
 	useEffect(() => {
 		const img = new Image();
@@ -157,7 +165,6 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 	}, []);
 
 	useEffect(() => {
-		console.log("aa")
 		if (canvasRef.current) {
 			canvasRef.current.style.backgroundImage = `url(/assets/bg-space.svg)`;
 			canvasRef.current.style.backgroundSize = "cover"; // Ajusta a imagem ao canvas
@@ -165,9 +172,28 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 		}
 	}, [canvasRef.current]);
 
+	const handleFocusChange = (isFocused: boolean) => { setChatFocus(isFocused) };
+
 	return (
-		<div className="relative">
+		<div id="game-screen" className="relative">
+			<SoundToggleButton />
+			{roomState &&
+				<Box sx={{
+					width: '100%',
+					marginBottom: '0.5vw',
+				}}>
+					<GameHud />
+				</Box>
+			}
 			<canvas ref={canvasRef} width={800} height={600} />
+			{roomState &&
+				<Box sx={{
+					width: '100%',
+					marginTop: '0.5vw',
+				}}>
+					<Chat roomId={roomState?.roomId} onFocusChange={handleFocusChange} />
+				</Box>
+			}
 		</div>
 	);
 };

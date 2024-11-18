@@ -69,6 +69,12 @@ export interface IWinner {
 //   result: string;
 // }
 
+export interface IInfo {
+  startTime: number;
+  elapsedSeconds: number;
+  difficulty: number;
+}
+
 export interface IGameState {
   players: PlayersRecord;
   planets: IPlanet[];
@@ -77,6 +83,7 @@ export interface IGameState {
   room: IRoomState;
   winner?: IWinner;
   result?: string;
+  info: IInfo;
 }
 
 export interface IGameMessage {
@@ -96,6 +103,8 @@ export interface IGameMessage {
     rooms?: IRoomState[];
     winner?: IWinner;
     position?: IPosition;
+    chatMessage?: IChatMessage;
+    info?: IInfo;
   }
 }
 
@@ -113,9 +122,9 @@ export const initialPlanetsState: IPlanet[] = [
 
 export const initialPlayersState: PlayersRecord = {
   'player0': { username: 'Player 0', x: 170, y: 150, initialX: 170, initialY: 150, toX: 170, toY: 150, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 0, active: false },
-  'player1': { username: 'Player 1', x: 550, y: 150, initialX: 550, initialY: 150, toX: 550, toY: 150, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 1, active: false  },
-  'player2': { username: 'Player 2', x: 170, y: 370, initialX: 170, initialY: 370, toX: 170, toY: 370, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 2, active: false  },
-  'player3': { username: 'Player 3', x: 550, y: 370, initialX: 550, initialY: 370, toX: 550, toY: 370, size: 80, isBot: false, imageSrc: '', defendingPlanetId: 3, active: false  }
+  'player1': { username: 'Player 1', x: 550, y: 150, initialX: 550, initialY: 150, toX: 550, toY: 150, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 1, active: false },
+  'player2': { username: 'Player 2', x: 170, y: 370, initialX: 170, initialY: 370, toX: 170, toY: 370, size: 80, isBot: true, imageSrc: '', defendingPlanetId: 2, active: false },
+  'player3': { username: 'Player 3', x: 550, y: 370, initialX: 550, initialY: 370, toX: 550, toY: 370, size: 80, isBot: false, imageSrc: '', defendingPlanetId: 3, active: false }
 };
 
 export const planetsByPlayersPosition = [
@@ -157,6 +166,12 @@ export const initialRoomState: IRoomState = {
   players: initialPlayersRoomState
 }
 
+export const initialInfoState: IInfo = {
+  startTime: 0,
+  elapsedSeconds: 0,
+  difficulty: 1
+}
+
 
 export const playersImages = Array.from({ length: 5 }, (_, i) => {
   const img = new Image(300, 300);
@@ -185,4 +200,12 @@ export interface ILastMove {
 export interface IPosition {
   x: number;
   y: number;
+}
+
+export interface IChatMessage {
+  type: string;
+  playerId?: string;
+  username: string;
+  content: string;
+  color: string;
 }

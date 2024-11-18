@@ -9,6 +9,9 @@ import DialogTitle from '@mui/joy/DialogTitle';
 import DialogContent from '@mui/joy/DialogContent';
 import DialogActions from '@mui/joy/DialogActions';
 import Toast from '../../components/Toast/Toast';
+import { LogoutButton } from '../../components/LogoutButton/LogoutButton';
+import { SoundToggleButton } from '../../components/SoundToggleButton/SoundToggleButton';
+import { gameAudio } from '../../utils/audioManager';
 
 interface ScreenProps {
   setScreen: Dispatch<SetStateAction<string>>;
@@ -95,18 +98,18 @@ export const JoinRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   
     // Verifica o estado do último erro ou sucesso
     if (lastMessage?.type === 'error') {
-      // Verifica se a mensagem está definida antes de passá-la para showToast
-      const message = lastMessage.data.message || 'Ocorreu um erro desconhecido'; // Mensagem padrão se não houver
+      const message = lastMessage.data.message || 'Ocorreu um erro desconhecido';
       showToast(message, '#ff0000');
     } else if (lastMessage?.type === 'success') {
-      // Verifica se a mensagem está definida antes de passá-la para showToast
-      const message = lastMessage.data.message || 'Operação realizada com sucesso'; // Mensagem padrão
+      const message = lastMessage.data.message || 'Operação realizada com sucesso';
       showToast(message, '#00ff00');
     }
   };
 
   return (
     <div id="join-room">
+      <LogoutButton />
+      <SoundToggleButton />
       <div className="div-join">
         <h2 className="title-join">Procurar sala</h2>
         <div className="scrollable-room-list">
@@ -132,9 +135,9 @@ export const JoinRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
                   <button
                     className='button-search-room-2'
                     onClick={() => {
+                      gameAudio.playClickSound();
                       setSelectedRoomId(room.roomId);
                       setOpenModal(true);
-                      console.log(room);
                     }}
                     disabled={room.players.length === 4}
                   >
@@ -166,11 +169,11 @@ export const JoinRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
             >
               {loading ? 'Carregando...' : 'Entrar'}
             </button>
-            <button className="button-search-room-3" onClick={() => setOpenModal(false)}>Cancelar</button>
+            <button className="button-search-room-3" onClick={() => { gameAudio.playClickSound(); setOpenModal(false); }}>Cancelar</button>
           </DialogActions>
         </Dialog>
 
-        <button className='button-search-room' onClick={() => setScreen('main-menu')}>
+        <button className='button-search-room' onClick={() => { gameAudio.playClickSound(); setScreen('main-menu'); }}>
           Voltar ao menu
         </button>
       </div>

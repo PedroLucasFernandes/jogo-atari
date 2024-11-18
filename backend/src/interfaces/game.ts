@@ -1,4 +1,5 @@
 export type gameStatus = 'lobby' | 'waiting' | 'inprogress' | 'paused' | 'finished';
+export const chatColors = ["aquamarine", "blue", "blush", "bronze", "brown", "chocolate", "coral", "crimson", "cyan", "fuchsia", "gold", "gray", "green", "indigo", "lime", "magenta", "maroon", "olive", "orange", "pink", "plum", "purple", "red", "salmon", "silver", "tan", "teal", "tomato", "turquoise", "violet"]
 
 export interface IPlanet {
   x: number;
@@ -65,12 +66,19 @@ interface Winner {
   id: string;
 }
 
+export interface IInfo {
+  startTime: number;
+  elapsedSeconds: number;
+  difficulty: number;
+}
+
 export interface IGameState {
   players: PlayersRecord;
   planets: IPlanet[];
   ball: IBall;
   canvas: ICanvas;
   room: IRoomState;
+  info: IInfo;
 }
 
 export interface IGameMessage {
@@ -94,6 +102,8 @@ export interface IGameMessage {
     position?: IPosition;
     result?: string;
     playerActive?: boolean
+    chatMessage?: IChatMessage;
+    info?: IInfo;
   }
 }
 
@@ -159,6 +169,12 @@ export const initialRoomState: IRoomState = {
   players: initialPlayersRoomState
 }
 
+export const initialInfoState: IInfo = {
+  startTime: 0,
+  elapsedSeconds: 0,
+  difficulty: 1
+}
+
 export interface IMove {
   direction: string;
   x: number;
@@ -174,4 +190,12 @@ export interface ILastMove {
 export interface IPosition {
   x: number;
   y: number;
+}
+
+export interface IChatMessage {
+  type: string;
+  playerId?: string;
+  username: string;
+  content: string;
+  color: string;
 }

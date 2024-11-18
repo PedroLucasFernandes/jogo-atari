@@ -1,0 +1,7 @@
+.sound-toggle-icon {
+    transition: transform 0.2s;
+}
+
+.sound-toggle-icon:hover {
+    transform: scale(1.1);
+}
