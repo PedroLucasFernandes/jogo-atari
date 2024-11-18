@@ -58,7 +58,7 @@ export const Login: React.FC = () => {
             onChange={(e) => setEmail(e.target.value)}
           />
           <CustomInput
-            placeholder="Password"
+            placeholder="Senha"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             type="password"

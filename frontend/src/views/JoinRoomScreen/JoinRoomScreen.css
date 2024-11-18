@@ -106,39 +106,42 @@
 }
 
 .title-strong{
-  color: #FF0062;
+  font-family: "Tilt neon", system-ui;
+  color: #750de5;
 }
 
 .room-item p {
+  font-family: "Tilt neon", system-ui;;
   margin: 0.5vh 0;
 }
 
 .button-search-room {
-  padding: 1vh;
-  width: 10vw;
-  max-width: 12vw;
-  border-radius: 2rem;
-  font-size: 2.5vh;
-  font-family: "Chewy", system-ui;
-  background-color: #750de5;
+  padding: 10px;
+  width: 30%;
+  max-width: 300px;
+  border-radius: 10px;
+  border: none;
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  font-family: "Tilt neon", system-ui;
   color: white;
+  background-color: #750de5;
   cursor: pointer;
-  margin: 1rem;
-  border: 1.6px solid #11205F;
+  margin-right: 20px;
 }
 
 .button-search-room-3 {
-  padding: 1vh;
-  width: 7vw;
-  max-width: 7vw;
-  border-radius: 1vw;
-  font-size: 2.5vh;
-  font-family: "Chewy", system-ui;
-  background-color: #750de5;
+  padding: 10px;
+  width: 100%;
+  max-width: 100px;
+  border-radius: 10px;
+  border: none;
+  font-size: 1rem;
+  font-family: "Tilt neon", system-ui;
   color: white;
+  background-color: #750de5;
   cursor: pointer;
-  margin: 1rem;
-  border: 1.6px solid #11205F;
+  margin: 10px;
 }
 
 .room-item-2{
@@ -147,16 +150,16 @@
 }
 
 .button-search-room-2 {
-  padding: 1vh;
-  width: 8vw;
-  max-width: 10vw;
-  border-radius: 2rem;
-  font-size: 2.5vh;
-  font-family: "Chewy", system-ui;
-  background-color: #FF0062;
+  padding: 10px;
+  width: 25%;
+  max-width: 200px;
+  border-radius: 10px;
+  border: none;
+  font-size: 1rem;
+  font-family: "Tilt neon", system-ui;
   color: white;
+  background-color: #00a447;
   cursor: pointer;
-  border: 1.6px solid #11205F;
 }
 
 button:disabled {

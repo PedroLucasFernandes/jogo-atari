@@ -61,19 +61,25 @@
   flex-direction: column;
 }
 
+.button-waiting-final-2,
 .button-waiting-final {
-  padding: 1.5vh;
-  width: 8vw;
-  max-width: 10vw;
-  border-radius: 2rem;
-  margin-left: 1vw;
-  margin-top: 1rem;
-  font-size: 2.5vh;
-  font-family: "Chewy", system-ui;
-  background-color: #750de5;
+  padding: 10px;
+  width: 80%;
+  max-width: 500px;
+  border-radius: 10px;
+  border: none;
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  font-family: "Tilt neon", system-ui;
   color: white;
+  background-color: #750de5;
   cursor: pointer;
-  border: 1.6px solid #11205F;
+  margin-right: 20px;
+}
+
+.button-waiting-final-2{
+  background-color: #00a447;
+  margin-right: 0;
 }
 
 .button-waiting-final:disabled {
@@ -119,7 +125,9 @@
 .buttons {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
+  width: 60%;
+  max-width: 50vh;
 }
 
 .image {

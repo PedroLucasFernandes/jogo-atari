@@ -124,18 +124,18 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
           size="sm"
           onClick={() => handleToggleReady(roomState.roomId)}
           sx={{
-            backgroundColor: '#FF0062',
+            backgroundColor: '#750de5',
             color: 'white',
-            border: '1.2px solid #11205F',
-            opacity: 0.8, 
             '&:hover': {
-              backgroundColor: '#d10065',
+              backgroundColor: '#5702b1',
               opacity: 1, 
             },
             fontFamily: '"Tilt Neon", sans-serif',
-            fontSize: '2.5vh',
+            fontSize: '3vh',
+            width: '16vh',
+            maxWidth: '17vh',
             fontWeight:'300',
-            borderRadius: '2rem'
+            borderRadius: '10px'
           }}
         >
           {player.ready ? 'Desmarcar Pronto' : 'Marcar Pronto'}
@@ -143,19 +143,19 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
         
         ) : (
           isHost && player && (
-            <Button variant="outlined" size="sm" color="danger" sx={{
-              backgroundColor: '#FF0062',
-              color: 'white',
-              border: '1.2px solid #11205F',
-              opacity: 0.8, 
-              '&:hover': {
-                backgroundColor: '#d10065',
-                opacity: 1, 
-              },
-              fontFamily: '"Tilt Neon", sans-serif',
-              fontSize: '2.5vh',
-              fontWeight:'300',
-              borderRadius: '2rem'
+            <Button variant="outlined" size="sm" sx={{
+              backgroundColor: '#750de5',
+            color: 'white',
+            '&:hover': {
+              backgroundColor: '#5702b1',
+              opacity: 1, 
+            },
+            fontFamily: '"Tilt Neon", sans-serif',
+            fontSize: '3vh',
+            width: '16vh',
+            maxWidth: '17vh',
+            fontWeight:'300',
+            borderRadius: '10px'
             }} onClick={() => handleRemovePlayer(roomState.roomId, player.playerId)}>
               Remover
             </Button>
@@ -180,7 +180,7 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
                       Cancelar sala
                     </button>
                     <button
-                      className='button-waiting-final'
+                      className='button-waiting-final-2'
                       onClick={() => handleStartGame(roomState.roomId)}
                       disabled={!roomState.players.every(player => player.ready) || roomState?.players.length <= 1}
                     >
