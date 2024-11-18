@@ -19,6 +19,7 @@ const CreateRoomScreen: React.FC<CreateRoomScreenProps> = ({ setScreen }) => {
     const [noCode, setNoCode] = useState(false);
 
     const handleCreateRoom = () => {
+        console.log("rrrr", roomState);
         if (!noCode && !roomCode) return;
         setLoading(true);
         createRoom(roomCode);
@@ -32,8 +33,10 @@ const CreateRoomScreen: React.FC<CreateRoomScreenProps> = ({ setScreen }) => {
     };
 
     useEffect(() => {
+        console.log("rom", roomState);
         if (!roomState) return;
         if (roomState.status === 'waiting') {
+            console.log("rom2", roomState);
             setScreen('waiting-room');
             setRoomCode('');
             setLoading(false);

@@ -40,6 +40,7 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   }, [roomState, socketId, setScreen, lastMessage]);
 
   useEffect(() => {
+    console.log("xx", roomState);
     if (roomState && roomState.status === 'inprogress') {
       setScreen('game');
       setLoading(false);
@@ -74,9 +75,10 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   };
 
   const handleCloseRoom = (roomId: string) => {
+    console.log("Close room", roomId);
     if (isHost) {
       closeRoom(roomId);
-      setRoomState(null); //TODO: Provisório pra apresenaçaõ
+      //setRoomState(null); //TODO: Provisório pra apresenaçaõ
       setScreen('main-menu')
     } else {
       console.log("Apenas o host pode iniciar o jogo.");
