@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { webSocketService } from '../services/WebSocketService';
-import { IGameMessage, IGameState, IWinner, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialPlanetsState, IRoomState, IMove, PlayersRecord, IPlayer, IChatMessage } from '../interfaces/game';
+import { IGameMessage, IGameState, IWinner, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialPlanetsState, IRoomState, IMove, PlayersRecord, IPlayer, IChatMessage, initialInfoState } from '../interfaces/game';
 import { useUser } from './UserContext';
 import { gameAudio } from '../utils/audioManager';
 import { movePlayerPredict } from '../services/game';
@@ -88,6 +88,13 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   useEffect(() => {
     if (!user || !socketId) return;
+
+    webSocketService.registerCallback('error', (data) => {
+      const error = data.data.message;
+      if (error) {
+        setLastMessage(error)
+      }
+    });
 
     webSocketService.registerCallback('gameInProgress', (data) => {
       const roomState = data.data.roomState;
@@ -381,7 +388,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
               planets: initialPlanetsState,
               ball: initialBallState,
               canvas: initialCanvasState,
-              room: initialRoomState
+              room: initialRoomState,
+              info: initialInfoState
             };
           }
 
@@ -423,7 +431,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
               planets: initialPlanetsState,
               ball: initialBallState,
               canvas: initialCanvasState,
-              room: initialRoomState
+              room: initialRoomState,
+              info: initialInfoState
             };
           }
 
@@ -457,6 +466,33 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         console.error('Erro ao atualizar o estado dos planetas:', data);
         setLastMessage({ type: 'error', data: { message: 'Erro ao processar jogo. Unexpected server response' } });
       }
+    });
+
+    webSocketService.registerCallback('infoUpdated', (data) => {
+      const info = data.data.info;
+
+      if (!info) {
+        console.error('Erro ao atualizar a informações da partida:', data);
+        setLastMessage({ type: 'error', data: { message: 'Erro ao atualizar a informações da partida. Unexpected server response' } });
+        return;
+      }
+
+      setGameState(prevGameState => {
+        if (prevGameState === null) {
+          return {
+            players: initialPlayersState,
+            planets: initialPlanetsState,
+            ball: initialBallState,
+            canvas: initialCanvasState,
+            room: initialRoomState,
+            info: initialInfoState
+          };
+        }
+        return {
+          ...prevGameState,
+          info
+        };
+      })
     });
 
   }, [socketId, user, roomState, gameState, moveNumber, moveHistory, isReconciling, updateTarget,
@@ -699,6 +735,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             ball: initialBallState,
             canvas: initialCanvasState,
             room: initialRoomState,
+            info: initialInfoState
           };
         }
         return {
