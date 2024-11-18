@@ -267,7 +267,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         return;
       }
 
-      gameAudio.startBackgroundMusic();
       setLastMessage(data);
       setRoomState(roomState);
       setGameState(data.data.gameState)
@@ -449,7 +448,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     webSocketService.registerCallback('gameOver', (data) => {
       if (data.data && data.data.winner) {
-        gameAudio.stopAll();
+        // gameAudio.stopAll();
         setGameState(prevGameState => {
           // Atualiza o estado do jogo
           return {
@@ -585,7 +584,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       return;
     }
 
-    gameAudio.stopAll();
     const data = { roomId: roomId, playerId: socketId }
     webSocketService.send({ type: 'leaveRoom', data });
   }
@@ -811,8 +809,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       socketId, webSocketService, status, gameState, roomState, rooms, lastMessage, lastChatMessage,
       getRooms, createRoom, closeRoom, joinRoom, leaveRoom, toggleReadyStatus, sendChatMessage, setLastChatMessage, removePlayer,
       movePlayer, startGame, leaveGame, setLastMessage, checkGameInProgress, setGameState, setRoomState
-      // Opção para criar um botão de liga e desliga áudio
-      // toggleAudio: gameAudio.toggleMute.bind(gameAudio), // Add audio toggle function
     }}>
       {children}
     </WebSocketContext.Provider>
