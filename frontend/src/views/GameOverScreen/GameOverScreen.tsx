@@ -19,10 +19,6 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({ setScreen, winne
     // Remove o prefixo "socket_" do id do player
     const playerId = socketId?.replace(/^socket_/, '');
   
-    console.log("Tela de GameOver");
-    console.log("Id do vencedor:", winner?.id);
-    console.log("Id do player:", playerId);
-  
     // Comparando o id do jogador com o id do vencedor
     const isWinner = winner?.id === playerId;
 
@@ -82,7 +78,7 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({ setScreen, winne
         )}
         <Button
           className='button-menu'
-          onClick={handleBackToMenu}
+          onClick={() => { gameAudio.playClickSound(); handleBackToMenu()}}
           sx={{
             backgroundColor: '#9D00FF',
             color: 'white',

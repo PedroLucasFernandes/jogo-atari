@@ -6,6 +6,7 @@ import { IWinner } from '../../interfaces/game';
 import { gameAudio } from '../../utils/audioManager';
 import Chat from '../../components/Chat/Chat';
 import Box from '@mui/joy/Box';
+import { SoundToggleButton } from '../../components/SoundToggleButton/SoundToggleButton';
 
 interface ScreenProps {
 	setScreen: Dispatch<SetStateAction<string>>;
@@ -174,6 +175,7 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 
 	return (
 		<div id="game-screen" className="relative">
+			   <SoundToggleButton />
 			<canvas ref={canvasRef} width={800} height={600} />
 			{roomState &&
 				<Box sx={{

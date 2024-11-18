@@ -4,6 +4,9 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useWebSocket } from '../../context/WebSocketContext';
 import Chat from '../../components/Chat/Chat';
 import Box from '@mui/joy/Box';
+import { LogoutButton } from '../../components/LogoutButton/LogoutButton';
+import { SoundToggleButton } from '../../components/SoundToggleButton/SoundToggleButton';
+import { gameAudio } from '../../utils/audioManager';
 
 interface ScreenProps {
   setScreen: Dispatch<SetStateAction<string>>;
@@ -91,6 +94,8 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
 
   return (
     <div id="waiting-room">
+       <LogoutButton />
+       <SoundToggleButton />
       {loading ? (
         <div className="div-waiting-loading">
           <h2>Carregando...</h2>
@@ -102,7 +107,7 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
           {!roomState ? (
             <>
               <p className='p-waiting'>Não foi possível carregar a sala.</p>
-              <Button variant="solid" size="md" onClick={() => setScreen('main-menu')}>
+              <Button variant="solid" size="md" onClick={() =>{gameAudio.playClickSound(); setScreen('main-menu')}}>
                 Voltar
               </Button>
             </>
@@ -129,7 +134,7 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
                         <Button
                           variant="outlined"
                           size="sm"
-                          onClick={() => handleToggleReady(roomState.roomId)}
+                          onClick={() => {gameAudio.playClickSound(); handleToggleReady(roomState.roomId);}}
                           sx={{
                             backgroundColor: '#FF0062',
                             color: 'white',
@@ -163,7 +168,7 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
                             fontSize: '2.5vh',
                             fontWeight: '300',
                             borderRadius: '2rem'
-                          }} onClick={() => handleRemovePlayer(roomState.roomId, player.playerId)}>
+                          }} onClick={() => {gameAudio.playClickSound(); handleRemovePlayer(roomState.roomId, player.playerId)}}>
                             Remover
                           </Button>
                         )
@@ -181,18 +186,18 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
 
               <div className="buttons">
                 {roomState?.players.length > 1 && (
-                  <button className='button-waiting-final' onClick={() => handleLeaveRoom(roomState.roomId)}>
+                  <button className='button-waiting-final' onClick={() => { gameAudio.playClickSound(); handleLeaveRoom(roomState.roomId); }}>
                     Sair da sala
                   </button>
                 )}
                 {isHost && (
                   <>
-                    <button className='button-waiting-final' onClick={() => handleCloseRoom(roomState.roomId)}>
+                    <button className='button-waiting-final' onClick={() => { gameAudio.playClickSound(); handleCloseRoom(roomState.roomId); }}>
                       Cancelar sala
                     </button>
                     <button
                       className='button-waiting-final'
-                      onClick={() => handleStartGame(roomState.roomId)}
+                      onClick={() => { gameAudio.playClickSound(); handleStartGame(roomState.roomId); }}
                       disabled={!roomState.players.every(player => player.ready) || roomState?.players.length <= 1}
                     >
                       Iniciar jogo

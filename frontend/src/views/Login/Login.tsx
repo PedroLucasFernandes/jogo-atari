@@ -8,6 +8,8 @@ import LoginGoogleButton from '../../components/LoginGoogleButton/LoginGoogleBut
 import CustomInput from '../../components/CustomInput/CustomInput';
 import Toast from '../../components/Toast/Toast';
 import { Link } from 'react-router-dom';
+import { useEffect } from "react";
+
 
 export const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -17,6 +19,14 @@ export const Login: React.FC = () => {
   const [toastColor, setToastColor] = useState('#ff0000');
   const { setUser } = useUser();
   const navigate = useNavigate();
+
+  const { user } = useUser();
+
+  useEffect(() => {
+    if (user) {
+      navigate("/monolito");
+    }
+  }, [user, navigate]);
 
   const showToast = (message: string, color: string = '#ff0000') => {
     setToastMessage(message);
