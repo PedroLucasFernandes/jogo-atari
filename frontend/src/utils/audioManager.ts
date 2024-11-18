@@ -33,7 +33,7 @@ class GameAudio {
       this.loadAudioState();
   }
 
-  private loadAudioState(): void {
+  public loadAudioState(): void {
     const savedMuteState = localStorage.getItem('isMuted');
     const savedHomeMusicState = localStorage.getItem('isPlayingHomeMusic');
     const savedGameMusicState = localStorage.getItem('isPlayingGameMusic');
@@ -52,6 +52,14 @@ class GameAudio {
 
     // Atualiza o volume com base no estado do mute
     this.updateVolume();
+
+    if (!this.isMuted) {
+      if (this.isPlayingHomeMusic) {
+        this.menuSound.play().catch(err => console.log('Erro ao tocar som do menu'));
+      } else if (this.isPlayingGameMusic) {
+        this.backgroundMusic.play().catch(err => console.log('Erro ao tocar som de background'));
+      }
+    }
 
   }
 

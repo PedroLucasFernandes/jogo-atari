@@ -47,12 +47,12 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   }
 
   const handleRejoin = () => {
-    gameAudio.startBackgroundMusic();
     setScreen('game');
   }
 
   return (
     <Box id="main-menu">
+
          <LogoutButton />
          <SoundToggleButton />
       <div id='modal'>
