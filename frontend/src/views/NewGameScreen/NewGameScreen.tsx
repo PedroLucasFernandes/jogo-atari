@@ -6,6 +6,7 @@ import { IWinner } from '../../interfaces/game';
 import { gameAudio } from '../../utils/audioManager';
 import Chat from '../../components/Chat/Chat';
 import Box from '@mui/joy/Box';
+import GameHud from '../../components/GameHud/GameHud';
 import { SoundToggleButton } from '../../components/SoundToggleButton/SoundToggleButton';
 
 interface ScreenProps {
@@ -175,7 +176,15 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 
 	return (
 		<div id="game-screen" className="relative">
-			   <SoundToggleButton />
+			<SoundToggleButton />
+			{roomState &&
+				<Box sx={{
+					width: '100%',
+					marginBottom: '0.5vw',
+				}}>
+					<GameHud />
+				</Box>
+			}
 			<canvas ref={canvasRef} width={800} height={600} />
 			{roomState &&
 				<Box sx={{

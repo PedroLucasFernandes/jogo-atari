@@ -66,12 +66,19 @@ interface Winner {
   id: string;
 }
 
+export interface IInfo {
+  startTime: number;
+  elapsedSeconds: number;
+  difficulty: number;
+}
+
 export interface IGameState {
   players: PlayersRecord;
   planets: IPlanet[];
   ball: IBall;
   canvas: ICanvas;
   room: IRoomState;
+  info: IInfo;
 }
 
 export interface IGameMessage {
@@ -96,6 +103,7 @@ export interface IGameMessage {
     result?: string;
     playerActive?: boolean
     chatMessage?: IChatMessage;
+    info?: IInfo;
   }
 }
 
@@ -159,6 +167,12 @@ export const initialRoomState: IRoomState = {
   status: 'lobby',
   host: '',
   players: initialPlayersRoomState
+}
+
+export const initialInfoState: IInfo = {
+  startTime: 0,
+  elapsedSeconds: 0,
+  difficulty: 1
 }
 
 export interface IMove {
