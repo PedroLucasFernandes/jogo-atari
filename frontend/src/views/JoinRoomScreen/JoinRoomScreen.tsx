@@ -51,7 +51,7 @@ export const JoinRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       gameAudio.playClickSound();
-      handleJoinRoom();
+      validate();
     }
   };
 

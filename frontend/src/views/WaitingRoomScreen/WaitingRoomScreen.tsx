@@ -120,10 +120,16 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
                   return (
                     <div key={index} className="player-item">
                       <img src={avatar} alt={`Avatar do jogador ${index + 1}`} className="image" />
-                      <span className="player-name" style={{ fontFamily: '"Chewy", system-ui', fontSize: '2.5vh' }}>
-                        {player ? player.username : `Jogador ${index + 1}`} - {player?.ready ? 'Pronto' : 'Aguardando'}
+                      <span
+                        className="player-name"
+                        style={{
+                          fontFamily: '"Chewy", system-ui',
+                          fontSize: '2.5vh',
+                          color: player?.ready ? '#FF0062' : '#11205F', 
+                        }}
+                      >
+                        {player ? player.username : `Jogador ${index + 1}`} -  {player?.ready ? 'Pronto' : 'Aguardando'}
                       </span>
-
                       {player?.isHost && (
                         <span className="host-crown-container">
                           <img src="/assets/crown-svgrepo-com.svg" alt="Coroa de Host" className="host-crown" />
@@ -136,13 +142,13 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
                           size="sm"
                           onClick={() => {gameAudio.playClickSound(); handleToggleReady(roomState.roomId);}}
                           sx={{
-                            backgroundColor: '#FF0062',
+                            backgroundColor: player.ready ? '#11205F' : '#FF0062' , 
                             color: 'white',
-                            border: '1.2px solid #11205F',
+                            border:'none',
                             opacity: 0.8,
                             '&:hover': {
-                              backgroundColor: '#d10065',
-                              opacity: 1,
+                              backgroundColor: player.ready ? '#11215f' : '#FF0062' ,
+                              scale: 1.05,
                             },
                             fontFamily: '"Tilt Neon", sans-serif',
                             fontSize: '2.5vh',
