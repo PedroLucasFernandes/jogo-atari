@@ -44,6 +44,13 @@ export const Register: React.FC = () => {
     }
   };
 
+  // Função para lidar com Enter
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleRegister();
+    }
+  };
+
   return (
     <div id="register">
       <div id="part-2">
@@ -60,17 +67,20 @@ export const Register: React.FC = () => {
             placeholder="Nome de usuário"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            onKeyDown={handleKeyDown} 
           />
           <CustomInput
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={handleKeyDown} 
           />
           <CustomInput
             placeholder="Senha"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             type="password"
+            onKeyDown={handleKeyDown} 
           />
           <button
             className="button"
