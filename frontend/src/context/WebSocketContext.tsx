@@ -139,7 +139,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setLastMessage({ type: 'error', data: { message: 'Erro ao criar sala. Unexpected server response' } });
         return;
       }
-
+      setLastMessage(null);
       setRoomState(data.data.roomState)
     });
 
