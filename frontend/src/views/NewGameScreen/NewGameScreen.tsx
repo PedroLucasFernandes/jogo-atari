@@ -8,6 +8,8 @@ import Chat from '../../components/Chat/Chat';
 import Box from '@mui/joy/Box';
 import GameHud from '../../components/GameHud/GameHud';
 import { SoundToggleButton } from '../../components/SoundToggleButton/SoundToggleButton';
+import GameHudVertical from '../../components/GameHud/GameHudVertical';
+import ChatVertical from '../../components/Chat/ChatVertical';
 
 interface ScreenProps {
 	setScreen: Dispatch<SetStateAction<string>>;
@@ -179,8 +181,11 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 			<SoundToggleButton />
 			{roomState &&
 				<Box sx={{
+					display: 'flex',
+					flexDirection: 'column',
 					width: '100%',
-					marginBottom: '0.5vw',
+					marginRight: '8px',
+					height: '100%',
 				}}>
 					<GameHud />
 				</Box>
@@ -188,8 +193,11 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 			<canvas ref={canvasRef} width={800} height={600} />
 			{roomState &&
 				<Box sx={{
+					display: 'flex',
+					flexDirection: 'column',
 					width: '100%',
-					marginTop: '0.5vw',
+					marginLeft: '8px',
+					height: '100%',
 				}}>
 					<Chat roomId={roomState?.roomId} onFocusChange={handleFocusChange} />
 				</Box>
