@@ -455,7 +455,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     webSocketService.registerCallback('gameOver', (data) => {
       if (data.data && data.data.winner) {
-        // gameAudio.stopAll();
+        gameAudio.stopAll();
         setGameState(prevGameState => {
           // Atualiza o estado do jogo
           return {

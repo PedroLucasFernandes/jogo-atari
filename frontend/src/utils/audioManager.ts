@@ -118,9 +118,7 @@ class GameAudio {
 
   public playClickSound(): void {
     if (!this.isMuted) {
-      const sound = this.clickSound.cloneNode() as HTMLAudioElement;
-      sound.volume = this.clickSound.volume;
-      sound.play().catch(err => console.log('Erro ao tocar som de clique'));
+      this.clickSound.play().catch(err => console.log('Erro ao tocar som de clique'));
     }
   }
 
