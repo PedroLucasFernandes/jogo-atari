@@ -96,7 +96,7 @@ export const RankingScreen: React.FC<ScreenProps> = ({ setScreen }) => {
         </>
       )}
 
-      <Button variant="solid" size="md" sx={{fontFamily:}} onClick={() =>{gameAudio.playClickSound(); setScreen('main-menu')}}>Voltar</Button>
+      <Button variant="solid" size="md" onClick={() =>{gameAudio.playClickSound(); setScreen('main-menu')}}>Voltar</Button>
     </Box>
   );
 };
