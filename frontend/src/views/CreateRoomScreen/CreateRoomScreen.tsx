@@ -22,6 +22,12 @@ const CreateRoomScreen: React.FC<CreateRoomScreenProps> = ({ setScreen }) => {
         //setScreen('game');
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            handleCreateRoom();
+        }
+    };
+
     useEffect(() => {
         if (!roomState) return;
         if (roomState.status === 'waiting') {
@@ -44,6 +50,7 @@ const CreateRoomScreen: React.FC<CreateRoomScreenProps> = ({ setScreen }) => {
                 type="text"
                 value={roomCode}
                 onChange={(e) => setRoomCode(e.target.value)}
+                onKeyDown={handleKeyDown} 
                 placeholder="Código"
                 className="input-create"
                 maxLength={6}

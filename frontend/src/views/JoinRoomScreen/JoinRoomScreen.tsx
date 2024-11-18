@@ -48,6 +48,13 @@ export const JoinRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
     }
   }, [loading])
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      gameAudio.playClickSound();
+      validate();
+    }
+  };
+
   useEffect(() => {
     if (roomState && roomState.roomId === selectedRoomId) {
       if (roomState.status === 'waiting') {
@@ -156,7 +163,8 @@ export const JoinRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
               placeholder="Insira o código da sala"
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              fullWidth
+              onKeyDown={handleKeyDown}
+          fullWidth
               sx={{ fontFamily: '"Tilt Neon", sans-serif', fontSize: '3vh', maxWidth: '15vw', alignSelf: 'center', borderRadius: '2rem' }}
             />
           </DialogContent>
