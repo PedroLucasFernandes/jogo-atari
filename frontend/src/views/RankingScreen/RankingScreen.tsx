@@ -66,19 +66,20 @@ export const RankingScreen: React.FC<ScreenProps> = ({ setScreen }) => {
     <Box id="ranking-room">
          <LogoutButton />
          <SoundToggleButton />
-      <h1>Melhores jogadores</h1>
+      <h1 className='title-ranking'style={{fontFamily: '"Chewy", system-ui', color: '#11205f' }}>Ranking - Top 5</h1>
 
-      {isLoading && <p>Carregando...</p>}
+      {isLoading && <p style={{fontFamily: '"Chewy", system-ui', color: '#11205f' }}>Carregando...</p>}
       {error && <p>{error}</p>}
 
       {!isLoading && !error && (
         <>
-          <Box id="header">
+          <Box id="header" 
+          sx={{fontFamily: '"Tilt Neon" , system-ui', boxShadow: '0 0 15px rgba(255, 0, 98, 0.7), inset 0 0 10px rgba(255, 0, 98, 0.6)'}}>
             <h2>JOGADORES</h2>
             <h2>PONTOS</h2>
           </Box>
 
-          <Box id="ranking-box">
+          <Box id="ranking-box" sx={{fontFamily: '"Tilt Neon", sans-serif', boxShadow: '0 0 15px rgba(255, 0, 98, 0.7), inset 0 0 10px rgba(255, 0, 98, 0.6)'}}>
             {topJogadores.map((jogador, index) => (
               <Box key={jogador.user_id} className={`ranking-item ${jogador.user_id === currentUserId ? 'highlight' : ''}`}>
                 <h2>{index + 1}º {jogador.username}</h2>
@@ -95,7 +96,7 @@ export const RankingScreen: React.FC<ScreenProps> = ({ setScreen }) => {
         </>
       )}
 
-      <Button variant="solid" size="md" onClick={() =>{gameAudio.playClickSound(); setScreen('main-menu')}}>VOLTAR</Button>
+      <Button variant="solid" size="md" sx={{fontFamily:}} onClick={() =>{gameAudio.playClickSound(); setScreen('main-menu')}}>Voltar</Button>
     </Box>
   );
 };
