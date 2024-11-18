@@ -32,7 +32,10 @@ export const MainMenuScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   }, [socketId]);
 
   useEffect(() => {
-    if (!roomState) return
+    if (!roomState) {
+      setOpenModal(false);
+      return
+    }
     setOpenModal(true);
     console.log("modal");
 

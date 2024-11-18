@@ -35,8 +35,8 @@ export const JoinRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   }
 
   useEffect(() => {
-    if (!rooms) getRooms()
-  }, [rooms, getRooms])
+    getRooms(); // Fixar dessa forma pois possui um observer definido
+  }, []);
 
   useEffect(() => {
     if (loading) {
@@ -62,7 +62,7 @@ export const JoinRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
         resetModalState()
       }
     }
-    
+
     if (lastMessage?.type === 'error') {
       const message = lastMessage.data?.message === 'Código inválido'
         ? 'Código inválido'
@@ -84,25 +84,37 @@ export const JoinRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
     setLoading(false)
   }
 
-  const validate = () => {
+
+
+  const validate = (roomId?: string) => {
+    console.log("oi");
+    const id = selectedRoomId || roomId;
+
     if (!rooms || rooms.length === 0) {
       showToast('Nenhuma sala disponível', '#ff0000');
       return;
     }
-    if (!selectedRoomId || !code) {
+    console.log("1", selectedRoomId);
+    const room2 = rooms.find(r => r.roomId === id);
+
+    if (!room2) {
       showToast('Selecione uma sala e insira o código', '#ff0000');
       return;
     }
-  
-    const room2 = rooms.find(r => r.roomId === selectedRoomId);
+    console.log("2");
+    if (!code && room2.hasCode) {
+      showToast('Selecione uma sala e insira o código', '#ff0000');
+      return;
+    }
+    console.log("3");
     const originalcode = room2?.code;
     console.log(originalcode);
     console.log(room2);
     console.log(room2?.code);
-  
+
     // Tenta entrar na sala
-    joinRoom(selectedRoomId, code);
-  
+    joinRoom(room2.roomId, code);
+
     // Verifica o estado do último erro ou sucesso
     if (lastMessage?.type === 'error') {
       const message = lastMessage.data.message || 'Ocorreu um erro desconhecido';
@@ -112,6 +124,22 @@ export const JoinRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
       showToast(message, '#00ff00');
     }
   };
+
+  const handleOpenModal = (roomId: string) => {
+    if (!rooms) return;
+    const room = rooms.find(r => r.roomId === roomId);
+
+    if (!room) return;
+
+    if (room.hasCode) {
+      gameAudio.playClickSound();
+      setSelectedRoomId(roomId);
+      setOpenModal(true);
+    } else {
+      setSelectedRoomId(roomId);
+      validate(roomId);
+    }
+  }
 
   return (
     <div id="join-room">
@@ -131,8 +159,8 @@ export const JoinRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
                 <div key={room.roomId} className="room-item">
                   <div className='room-item-2'>
                     <p>
-                      <strong className='title-strong'>ID da sala:</strong> {room.roomId} | 
-                      <strong className='title-strong'>Host:</strong> {hostUsername} | 
+                      <strong className='title-strong'>ID da sala:</strong> {room.roomId} |
+                      <strong className='title-strong'>Host:</strong> {hostUsername} |
                       <strong className='title-strong'>Jogadores:</strong> {room.players.length}/4
                     </p>
                     <p style={{ color: "#4C3C7F" }}>
@@ -142,9 +170,7 @@ export const JoinRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
                   <button
                     className='button-search-room-2'
                     onClick={() => {
-                      gameAudio.playClickSound();
-                      setSelectedRoomId(room.roomId);
-                      setOpenModal(true);
+                      handleOpenModal(room.roomId)
                     }}
                     disabled={room.players.length === 4}
                   >
@@ -164,14 +190,14 @@ export const JoinRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
               value={code}
               onChange={(e) => setCode(e.target.value)}
               onKeyDown={handleKeyDown}
-          fullWidth
+              fullWidth
               sx={{ fontFamily: '"Tilt Neon", sans-serif', fontSize: '3vh', maxWidth: '15vw', alignSelf: 'center', borderRadius: '2rem' }}
             />
           </DialogContent>
           <DialogActions className="custom-dialog-actions">
             <button
               className="button-search-room-3"
-              onClick={validate}
+              onClick={() => validate()}
               disabled={!code || loading}
               style={{ backgroundColor: '#00a447' }}
             >

@@ -267,7 +267,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         return;
       }
 
-        // Trocar a música assim que o jogo começar
+      // Trocar a música assim que o jogo começar
       if (gameAudio.isPlayingHomeMusic) {
         gameAudio.stopAll();
       }
@@ -567,20 +567,21 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       console.log('Can\'t join in a room without a socketId or user context');
       return;
     }
-  
-    if (!roomId || !code) {
-      setLastMessage({ type: 'error', data: { message: 'Id da sala ou código não informados ou nulos' } });
-      console.log('Id da sala ou código não informados ou nulos');
+
+    //if (!roomId || !code) {
+    if (!roomId) {
+      setLastMessage({ type: 'error', data: { message: 'Id da sala ou não informado' } });
+      console.log('Id da sala não informado');
       return;
     }
-  
+
     const data = { playerId: socketId, username: user.username, roomId: roomId, code: code };
     webSocketService.send({ type: 'joinRoom', data });
-  
+
     // Atualiza o estado com a mensagem de sucesso ou erro (não precisa de retorno direto)
     setLastMessage({ type: 'success', data: { message: 'Entrou na sala com sucesso!' } });
   };
-  
+
 
   const leaveRoom = (roomId: string) => {
     if (!socketId) {

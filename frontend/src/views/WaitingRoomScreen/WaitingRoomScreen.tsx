@@ -14,7 +14,7 @@ interface ScreenProps {
 }
 
 export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
-  const { startGame, socketId, roomState, toggleReadyStatus, removePlayer, closeRoom, leaveRoom, lastMessage, setLastMessage } = useWebSocket();
+  const { startGame, socketId, roomState, toggleReadyStatus, removePlayer, closeRoom, leaveRoom, lastMessage, setLastMessage, setRoomState } = useWebSocket();
   const [loading, setLoading] = useState(true);
   const [isHost, setIsHost] = useState(false);
   const [chatFocus, setChatFocus] = useState(false);
@@ -76,6 +76,7 @@ export const WaitingRoomScreen: React.FC<ScreenProps> = ({ setScreen }) => {
   const handleCloseRoom = (roomId: string) => {
     if (isHost) {
       closeRoom(roomId);
+      setRoomState(null); //TODO: Provisório pra apresenaçaõ
       setScreen('main-menu')
     } else {
       console.log("Apenas o host pode iniciar o jogo.");

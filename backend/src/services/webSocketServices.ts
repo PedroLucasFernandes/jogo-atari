@@ -14,6 +14,7 @@ class WebSocketService {
 	private rooms: {
 		[key: string]: {
 			players: { playerId: string; username: string; ready: boolean, isHost: boolean }[];
+			hasCode: boolean;
 			code: string;
 			status: gameStatus,
 			host: string;
@@ -182,6 +183,7 @@ class WebSocketService {
 					// Monta os estados para notificação
 					const roomState = {
 						roomId,
+						hasCode: roomData.hasCode,
 						code: roomData.code,
 						status: roomData.status,
 						host: roomData.host,
@@ -206,6 +208,7 @@ class WebSocketService {
 	private getRoomStates() {
 		const roomStates: IRoomState[] = Object.entries(this.rooms).map(([roomId, room]) => ({
 			roomId, // A chave é o id da sala
+			hasCode: room.hasCode,
 			code: null,
 			status: room.status,
 			host: room.host,
@@ -257,7 +260,9 @@ class WebSocketService {
 			this.rooms[roomId] = {
 				status: 'waiting',
 				host: clientId,
-				players: [{ playerId: clientId, username: username, ready: false, isHost: true }], code
+				players: [{ playerId: clientId, username: username, ready: false, isHost: true }],
+				hasCode: code !== '' ? true : false,
+				code
 			};
 
 		} else {
@@ -273,6 +278,7 @@ class WebSocketService {
 		const data = {
 			roomState: {
 				roomId: roomId,
+				hasCode: this.rooms[roomId].hasCode,
 				code: code,
 				status: 'waiting',
 				host: clientId,
@@ -350,7 +356,7 @@ class WebSocketService {
 			return;
 		}
 
-		if (room.code !== code) {
+		if (room.hasCode && room.code !== code) {
 			this.notifyClient(clientId, {
 				type: 'error',
 				data: { message: 'Código inválido' }
@@ -387,6 +393,7 @@ class WebSocketService {
 		const data = {
 			roomState: {
 				roomId: roomId,
+				hasCode: room.hasCode,
 				code: room.code,
 				status: room.status,
 				host: room.host,
@@ -474,6 +481,7 @@ class WebSocketService {
 		const data = {
 			roomState: {
 				roomId: roomId,
+				hasCode: room.hasCode,
 				code: room.code,
 				status: room.status,
 				host: room.host,
@@ -532,6 +540,7 @@ class WebSocketService {
 		const data = {
 			roomState: {
 				roomId: roomId,
+				hasCode: room.hasCode,
 				code: room.code,
 				status: room.status,
 				host: room.host,
@@ -627,6 +636,7 @@ class WebSocketService {
 		const data = {
 			roomState: {
 				roomId: roomId,
+				hasCode: room.hasCode,
 				code: room.code,
 				status: room.status,
 				host: room.host,
@@ -702,6 +712,7 @@ class WebSocketService {
 
 		const game = createGame({
 			roomId,
+			hasCode: room.hasCode,
 			code: room.code,
 			status: room.status,
 			host: room.host,
@@ -728,6 +739,7 @@ class WebSocketService {
 		const data = {
 			roomState: {
 				roomId: roomId,
+				hasCode: room.hasCode,
 				code: room.code,
 				status: room.status,
 				host: room.host,
@@ -846,6 +858,7 @@ class WebSocketService {
 					data: {
 						roomState: {
 							roomId: roomId,
+							hasCode: room.hasCode,
 							code: room.code,
 							status: room.status,
 							host: room.host,
@@ -895,6 +908,7 @@ class WebSocketService {
 								data: {
 									roomState: {
 										roomId: roomId,
+										hasCode: this.rooms[roomId].hasCode,
 										code: this.rooms[roomId].code,
 										status: this.rooms[roomId].status,
 										host: this.rooms[roomId].host,
@@ -930,6 +944,7 @@ class WebSocketService {
 							data: {
 								roomState: {
 									roomId: roomId,
+									hasCode: this.rooms[roomId].hasCode,
 									code: this.rooms[roomId].code,
 									status: this.rooms[roomId].status,
 									host: this.rooms[roomId].host,
