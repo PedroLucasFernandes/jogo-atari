@@ -1,4 +1,4 @@
-import { IGameMessage, IGameState, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialPlanetsState, IPlayer, IPlayerRoom, PlayersRecord, planetsByPlayersPosition, IRoomState, IPlanet } from "../interfaces/game"
+import { IGameMessage, IGameState, initialBallState, initialCanvasState, initialPlayersState, initialRoomState, initialPlanetsState, IPlayer, IPlayerRoom, PlayersRecord, planetsByPlayersPosition, IRoomState, IPlanet, initialInfoState } from "../interfaces/game"
 import * as leaderboardServices from "../services/leaderboardServices";
 import webSocketService from '../index';
 
@@ -10,20 +10,17 @@ export default function createGame(roomState: IRoomState) {
     ball: JSON.parse(JSON.stringify(initialBallState)),
     canvas: JSON.parse(JSON.stringify(initialCanvasState)),
     room: roomState,
+    info: JSON.parse(JSON.stringify(initialInfoState)),
   }
 
   // REFACTOR, ARRUMAR COM OS VALORES DAS NOVAS POSIÇÕES DOS PLAYERS!!
   const speed = 10;
-  const MAX_SPEED = 40; // Limite de velocidade
-  const INITIAL_SPEED = 10;
+  const BASE_MAX_SPEED = 40;
+  let MAX_SPEED = BASE_MAX_SPEED; // Limite de velocidade
+  const BASE_SPEED = 10 // Novo valor para o INITIAL_SPEED
+  let INITIAL_SPEED = BASE_SPEED; // INITIAL_SPEED agora so sofrerá incrementos conforme a dificuldade
   const ACCELERATION_FACTOR = 2.5; // Fator de aceleração ao colidir com um planeta
   const DECAY_RATE = 0.995; // Taxa de redução da velocidade após a aceleração
-  /* const initialPositions = [
-    { x: 170, y: 150 },
-    { x: 550, y: 150 },
-    { x: 170, y: 370 },
-    { x: 550, y: 370 },
-  ]; */
 
   const observers: Array<(message: IGameMessage) => void> = [];
 
@@ -33,7 +30,8 @@ export default function createGame(roomState: IRoomState) {
     const frequency = 1000 / 30
 
     setTimeout(() => {
-      intervalId = setInterval(moveBall, frequency);
+      gameState.info.startTime = Date.now(); // Tempo de início do jogo
+      intervalId = setInterval(wrappedFunctions, frequency);
     }, 3000);
   }
 
@@ -232,6 +230,7 @@ export default function createGame(roomState: IRoomState) {
 
 
   function moveBall() {
+    //console.log("bola", gameState.ball.speedX, gameState.ball.speedY);
     let collisionDetected = false;
 
     // Armazena a posição anterior da bola
@@ -781,6 +780,53 @@ export default function createGame(roomState: IRoomState) {
       clearInterval(intervalId);
       intervalId = null; // Reseta a variável para indicar que o intervalo foi interrompido
     }
+  }
+
+  let lastSentElapsedSeconds = 0;
+
+  // Notifica o tempo da partida a cada segundo
+  function updateInfo() {
+    const serverStartTime = gameState.info.startTime;
+    const currentTime = Date.now();
+    const elapsedTime = Math.floor((currentTime - serverStartTime) / 1000);
+
+    gameState.info.elapsedSeconds = elapsedTime;
+
+    if (elapsedTime !== lastSentElapsedSeconds) {
+      lastSentElapsedSeconds = elapsedTime;
+
+      updateDifficulty();
+
+      notifyAll({
+        type: 'infoUpdated',
+        data: {
+          info: gameState.info
+        }
+      });
+    }
+  }
+
+  // Incrementa a dificuldade a cada 30 segundos
+  function updateDifficulty() {
+    const elapsedSeconds = gameState.info.elapsedSeconds;
+    //if (elapsedSeconds < 30) return;
+    const difficultyLevel = Math.floor(elapsedSeconds / 30 + 1);
+
+    gameState.info.difficulty = difficultyLevel;
+
+    //Modifica a velocidade da bola
+    INITIAL_SPEED = BASE_SPEED + (difficultyLevel - 1) * 3; //Incrementa de 2 em 2 com base na dificuldade
+    MAX_SPEED = BASE_MAX_SPEED + (difficultyLevel - 1) * 3;
+    //gameState.ball.speedX = INITIAL_SPEED;
+    //gameState.ball.speedY = INITIAL_SPEED;
+    console.log(INITIAL_SPEED);
+    console.log(gameState.ball.speedX);
+    console.log(gameState.ball.speedY);
+  }
+
+  function wrappedFunctions() {
+    updateInfo();
+    moveBall();
   }
 
   return {
