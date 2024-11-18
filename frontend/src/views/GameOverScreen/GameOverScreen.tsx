@@ -16,33 +16,33 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({ setScreen, winne
   const [winnerPosition, setWinnerPosition] = useState<number | null>(null);
   const [playerPosition, setPlayerPosition] = useState<number | null>(null);
 
-    // Remove o prefixo "socket_" do id do player
-    const playerId = socketId?.replace(/^socket_/, '');
-  
-    // Comparando o id do jogador com o id do vencedor
-    const isWinner = winner?.id === playerId;
+  // Remove o prefixo "socket_" do id do player
+  const playerId = socketId?.replace(/^socket_/, '');
 
-    useEffect(() => {
-      if (gameState) {
-        if (winner) {
-          // Posição do vencedor
-          setWinnerPosition(gameState?.players[`socket_${winner.id}`]?.defendingPlanetId);
-        }
-        // Posição do jogador atual
-        setPlayerPosition(gameState?.players[`socket_${playerId}`]?.defendingPlanetId);
+  // Comparando o id do jogador com o id do vencedor
+  const isWinner = winner?.id === playerId;
+
+  useEffect(() => {
+    if (gameState) {
+      if (winner) {
+        // Posição do vencedor
+        setWinnerPosition(gameState?.players[`socket_${winner.id}`]?.defendingPlanetId);
       }
-  
-      // Toca o som apropriado com base no resultado
-      if (isWinner) {
-        gameAudio.playVictorySound();
-      } else {
-        gameAudio.playDefeatSound();
-      }
-    }, [gameState, winner, playerId, isWinner]);
+      // Posição do jogador atual
+      setPlayerPosition(gameState?.players[`socket_${playerId}`]?.defendingPlanetId);
+    }
+
+    // Toca o som apropriado com base no resultado
+    if (isWinner) {
+      gameAudio.playVictorySound();
+    } else {
+      gameAudio.playDefeatSound();
+    }
+  }, [gameState, winner, playerId, isWinner]);
 
   const handleBackToMenu = () => {
-    setGameState(null);
     setRoomState(null);  // Limpar o estado da sala após a vitória
+    setGameState(null);
     setLastMessage(null);
     setScreen('menu');
   };
@@ -78,7 +78,7 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({ setScreen, winne
         )}
         <Button
           className='button-menu'
-          onClick={() => { gameAudio.playClickSound(); handleBackToMenu()}}
+          onClick={() => { gameAudio.playClickSound(); handleBackToMenu() }}
           sx={{
             backgroundColor: '#9D00FF',
             color: 'white',
