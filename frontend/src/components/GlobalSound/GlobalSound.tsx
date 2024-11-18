@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { gameAudio } from "../../utils/audioManager";
 import { useLocation } from "react-router-dom";
+import { useWebSocket } from '../../context/WebSocketContext';
 
 interface GlobalSoundProps {
   currentScreen: string;
@@ -8,6 +9,7 @@ interface GlobalSoundProps {
 
 export const GlobalSound: React.FC<GlobalSoundProps> = ({ currentScreen }) => {
   const location = useLocation();
+  const { roomState } = useWebSocket(); 
 
   const playMusicWithFallback = async () => {
     try {
@@ -18,13 +20,36 @@ export const GlobalSound: React.FC<GlobalSoundProps> = ({ currentScreen }) => {
         return;
       }
 
-      if (location.pathname === '/monolito') {
-        if (currentScreen === 'game' && !gameAudio.isPlayingGameMusic) {
-          await gameAudio.startBackgroundMusic();
-        } else if (!gameAudio.isPlayingHomeMusic) {
-          await gameAudio.playMenuSound();
+       // Verificar estado do jogo e da tela
+       if (roomState?.status === "inprogress") {
+        // Tocar música do jogo se o jogo estiver iniciado
+        if (!gameAudio.isPlayingGameMusic) {
+          gameAudio.stopAll();
+          gameAudio.startBackgroundMusic();
+          gameAudio.saveAudioState();
+        }
+      } else if (location.pathname === '/monolito') {
+        // Tocar música da home se o jogador estiver no menu principal
+        if (!gameAudio.isPlayingHomeMusic) {
+          gameAudio.stopAll();
+          gameAudio.playMenuSound();
+          gameAudio.saveAudioState();
         }
       }
+
+      // if (location.pathname === '/monolito') {
+      //   if (currentScreen === 'game' && !gameAudio.isPlayingGameMusic) {
+      //     console.log(currentScreen)
+      //     gameAudio.stopAll(); // Parar músicas anteriores
+      //     gameAudio.startBackgroundMusic();
+      //     gameAudio.saveAudioState();
+      //   } else if (!gameAudio.isPlayingHomeMusic) {
+      //     console.log(currentScreen)
+      //     gameAudio.stopAll(); // Parar músicas anteriores
+      //     gameAudio.playMenuSound();
+      //     gameAudio.saveAudioState();
+      //   }
+      // }
 
       // Salvar estado do áudio após tocar
       gameAudio.saveAudioState();
@@ -37,7 +62,7 @@ export const GlobalSound: React.FC<GlobalSoundProps> = ({ currentScreen }) => {
 
   const handleUserInteraction = async () => {
     console.log("Interação detectada, tentando tocar música novamente...");
-    await playMusicWithFallback();
+    playMusicWithFallback();
   };
 
   useEffect(() => {
@@ -50,6 +75,7 @@ export const GlobalSound: React.FC<GlobalSoundProps> = ({ currentScreen }) => {
     // Tentar tocar música novamente ao voltar para a aba
     const handleVisibilityChange = () => {
       if (!document.hidden) {
+        gameAudio.loadAudioState(); // Garantir que o estado correto seja carregado
         playMusicWithFallback();
       }
     };

@@ -80,7 +80,7 @@ class GameAudio {
     this.defeatSound.volume = 0.1 * volume;
     this.clickSound.volume = 0.04 * volume;
     this.erroSound.volume = 0.1 * volume;
-    this.menuSound.volume = 0.1 * volume;
+    this.menuSound.volume = 0.2 * volume;
   }
 
   // Novo método para controlar o volume mestre
@@ -127,6 +127,7 @@ class GameAudio {
   public playMenuSound(): void {
     console.log("!this.isPlayingHomeMusic antes de iniciar a musica do jogo", !this.isPlayingHomeMusic)
     if (!this.isMuted && !this.isPlayingHomeMusic) {
+      this.stopAll(); // Adicionado para garantir que outras músicas parem
       this.menuSound.play().catch(err => console.log('Erro ao tocar som do menu'));
       this.isPlayingHomeMusic = true;
       this.isPlayingGameMusic = false;
@@ -139,6 +140,7 @@ class GameAudio {
   public startBackgroundMusic(): void {
     console.log("!this.isPlayingGameMusic antes de iniciar a musica do jogo",!this.isPlayingGameMusic )
     if (!this.isMuted && !this.isPlayingGameMusic) {
+      this.stopAll(); // Adicionado para garantir que outras músicas parem
       this.backgroundMusic.play().catch(err => console.log('Erro ao tocar som de background'));
       this.isPlayingHomeMusic = false;
       this.isPlayingGameMusic = true;

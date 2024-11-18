@@ -31,9 +31,10 @@ const Toast: React.FC<ToastProps> = ({ message, color, isActive }) => {
         border: '1px solid #ddd',
         borderRadius: '5px',
         boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-        zIndex: 1000,
+        zIndex: 9999,
         opacity: isActive ? 1 : 0, 
         transition: 'opacity 0.3s ease-in-out', 
+        fontSize: '2.5vh'
       }}
     >
       {message}
