@@ -35,6 +35,7 @@ const Chat: React.FC<ChatProps> = ({ roomId, onFocusChange }) => {
     return () => {
       //Limpando mensagem após desmontar
       setMessages([]);
+      console.log("teste");
     }
   }, []);
 
