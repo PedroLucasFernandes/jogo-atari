@@ -21,6 +21,8 @@ const Chat: React.FC<ChatProps> = ({ roomId, onFocusChange }) => {
   useEffect(() => {
     if (!lastChatMessage) return;
 
+    console.log("teste")
+
     setMessages((prevMessages) => {
       const updatedMessages = [...prevMessages, lastChatMessage];
       return updatedMessages;
